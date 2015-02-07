@@ -35,6 +35,9 @@
     <Reference Include="BeeHive">
       <HintPath>..\..\packages\BeeHive-common.0.8.3\lib\net45\BeeHive.dll</HintPath>
     </Reference>
+    <Reference Include="BeeHive.Azure">
+      <HintPath>..\..\packages\BeeHive.Azure.0.8.3\lib\net45\BeeHive.Azure.dll</HintPath>
+    </Reference>
     <Reference Include="BeeHive.DataStructures">
       <HintPath>..\..\packages\BeeHive.DataStructures.0.8.3\lib\net45\BeeHive.DataStructures.dll</HintPath>
       <Private>True</Private>
@@ -99,11 +102,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IBlobExtensions.cs" />
+    <Compile Include="DiagnosticsSource.cs" />
+    <Compile Include="ElasticserachBatchPusher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Actors\" />
+    <Folder Include="Events\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
