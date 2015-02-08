@@ -11,36 +11,52 @@ using Newtonsoft.Json.Linq;
 
 namespace ConveyorBelt.Tooling
 {
-    public class ElasticsearchBatchPusher
+    public class ElasticsearchBatchPusher : IElasticsearchBatchPusher
     {
         private string _esUrl;
         private StringBuilder _stringBuilder = new StringBuilder();
         private int _batchSize;
         private int _numberOfRecords = 0;
-        private DiagnosticsSource _source;
         private HttpClient _httpClient = new HttpClient();
-        private bool _isConnected = false;
 
-        public ElasticsearchBatchPusher(DiagnosticsSource source, string esUrl, int batchSize = 100)
+        public ElasticsearchBatchPusher(string esUrl, int batchSize = 100)
         {
-            _source = source;
             _batchSize = batchSize;
             _esUrl = esUrl;
-            _isConnected = true;
         }
 
-        public void Push(DynamicTableEntity entity)
+        private async Task PushbatchAsync()
         {
 
-            if (!_isConnected)
-                throw new InvalidOperationException("Please connect first.");
+            if (_stringBuilder.Length == 0)
+                return;
 
+            try
+            {
+                var responseMessage = await  _httpClient.PostAsync(_esUrl + "_bulk",
+                    new StringContent(_stringBuilder.ToString(),
+                        Encoding.UTF8, "application/json"));
+                _stringBuilder.Clear();
+                _numberOfRecords = 0;
+                responseMessage.EnsureSuccessStatusCode();
+
+                TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing to {0}", _esUrl);
+            }
+            catch (Exception e)
+            {
+                TheTrace.TraceError(e.ToString());
+                throw;
+            }
+        }
+
+        public async Task PushAsync(DynamicTableEntity entity, DiagnosticsSource source)
+        {
             var op = new
             {
                 index = new
                 {
-                    _index = entity.Timestamp.ToString("yyyyMMdd"),
-                    _type = _source.ToTypeKey(),
+                    _index = source.IndexName ?? entity.Timestamp.ToString("yyyyMMdd"),
+                    _type = source.ToTypeKey(),
                     _id = entity.PartitionKey + entity.RowKey
                 }
             };
@@ -60,45 +76,17 @@ namespace ConveyorBelt.Tooling
 
             if ((_numberOfRecords++) >= _batchSize)
             {
-                Pushbatch();
+                await PushbatchAsync();
                 TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed {0} records to ElasticSearch for {1}-{2}",
                     _numberOfRecords,
-                    _source.PartitionKey,
-                    _source.RowKey);
+                    source.PartitionKey,
+                    source.RowKey);
             }
         }
 
-        private void Pushbatch()
+        public Task FlushAsync()
         {
-
-            if (_stringBuilder.Length == 0)
-                return;
-
-            try
-            {
-                var responseMessage = _httpClient.PostAsync(_esUrl + "_bulk",
-                    new StringContent(_stringBuilder.ToString(),
-                        Encoding.UTF8, "application/json"))
-                      .Result;
-                _stringBuilder.Clear();
-                _numberOfRecords = 0;
-                responseMessage.EnsureSuccessStatusCode();
-
-                TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing to {0}", _esUrl);
-            }
-            catch (Exception e)
-            {
-                TheTrace.TraceError(e.ToString());
-                throw;
-            }
-        }
-
-        public void Flush()
-        {
-            if (!_isConnected)
-                throw new InvalidOperationException("Please connect first.");
-
-            Pushbatch();
+            return PushbatchAsync();
         }
     }
 
