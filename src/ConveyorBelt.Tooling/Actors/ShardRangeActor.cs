@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
+using ConveyorBelt.Tooling.Events;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling.Actors
 {
@@ -22,9 +25,32 @@ namespace ConveyorBelt.Tooling.Actors
             
         }
 
-        public Task<IEnumerable<Event>> ProcessAsync(Event evnt)
+        public async Task<IEnumerable<Event>> ProcessAsync(Event evnt)
         {
-            throw new NotImplementedException();
+            var shardKeyArrived = evnt.GetBody<ShardRangeArrived>();
+            var account = CloudStorageAccount.Parse(shardKeyArrived.Source.ConnectionString);
+            var client = account.CreateCloudTableClient();
+            var table = client.GetTableReference(shardKeyArrived.Source.Properties["TableName"].StringValue);
+
+            var entities = table.ExecuteQuery(new TableQuery().Where(
+                TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey", "ge", shardKeyArrived.InclusiveStartKey), 
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("PartitionKey", "le", shardKeyArrived.InclusiveEndKey))));
+
+            bool hasAnything = false;
+            foreach (var entity in entities)
+            {
+                await _pusher.PushAsync(entity, shardKeyArrived.Source);
+                hasAnything = true;
+            }
+
+            if (hasAnything)
+            {
+                await _pusher.FlushAsync();
+            }
+
+            return Enumerable.Empty<Event>();
         }
     }
 }

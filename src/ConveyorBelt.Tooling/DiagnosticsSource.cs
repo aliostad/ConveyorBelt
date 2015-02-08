@@ -27,10 +27,16 @@ namespace ConveyorBelt.Tooling
             set { _entity.Properties["ConnectionString"].StringValue = value; }
         }
 
-        public DateTimeOffset? LastOffset
+        public string ErrorMessage
         {
-            get { return _entity.Properties["LastOffset"].DateTimeOffsetValue; }
-            set { _entity.Properties["LastOffset"].DateTimeOffsetValue = value; } 
+            get { return _entity.Properties["ErrorMessage"].StringValue; }
+            set { _entity.Properties["ErrorMessage"].StringValue = value; }
+        }
+
+        public DateTimeOffset? LastScheduled
+        {
+            get { return _entity.Properties["LastScheduled"].DateTimeOffsetValue; }
+            set { _entity.Properties["LastScheduled"].DateTimeOffsetValue = value; } 
         }
 
         public string LastSetpoint
@@ -47,6 +53,12 @@ namespace ConveyorBelt.Tooling
         {
             get { return _entity.Properties["GracePeriodMinutes"].Int32Value; }
             set { _entity.Properties["GracePeriodMinutes"].Int32Value = value; } 
+        }
+
+        public int? SchedulingFrequencyMinutes
+        {
+            get { return _entity.Properties["SchedulingFrequencyMinutes"].Int32Value; }
+            set { _entity.Properties["SchedulingFrequencyMinutes"].Int32Value = value; }
         }
 
         public bool? IsActive

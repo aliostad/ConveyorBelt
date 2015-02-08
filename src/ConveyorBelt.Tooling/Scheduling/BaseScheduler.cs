@@ -20,16 +20,17 @@ namespace ConveyorBelt.Tooling.Scheduling
         protected abstract Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source);
 
 
-        public async Task<IEnumerable<Event>> ScheduleAsync(DiagnosticsSource source)
+        public async Task<Tuple<IEnumerable<Event>, bool>> TryScheduleAsync(DiagnosticsSource source)
         {
             var lockToken = new LockToken(source.ToTypeKey());
+            
             if (!(await _lockStore.TryLockAsync(lockToken)))
             {
                 TheTrace.TraceInformation("I could NOT be master for {0}", source.ToTypeKey());
-                return Enumerable.Empty<Event>();
+                return new Tuple<IEnumerable<Event>, bool>(Enumerable.Empty<Event>(), false);
             }
 
-            return await DoSchedule(source);
+            return new Tuple<IEnumerable<Event>, bool>(await DoSchedule(source), true);
         }
     }
 }
