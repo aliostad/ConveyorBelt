@@ -96,6 +96,27 @@ namespace ConveyorBelt.Tooling
         }
 
         public IDictionary<string, EntityProperty> Properties { get { return _entity.Properties; } }
+
+        public IEnumerable<string> GetIndexNames(int daysToGoBack = 7)
+        {
+            if (!string.IsNullOrEmpty(IndexName))
+                return new [] {IndexName};
+
+            if (String.IsNullOrEmpty(LastSetpoint))
+                LastSetpoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString();
+            var dateTimeOffset = DateTimeOffset.Parse(LastSetpoint);
+
+            var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset).TotalDays;
+            return Enumerable.Range(0, days).Select(x => DateTimeOffset.UtcNow.AddDays(1).AddDays(-x))
+                .Select(y => y.ToString("yyyyMMdd"));
+        }
+
+        public string GetMappingName()
+        {
+            return _entity.Properties.ContainsKey("MappingName")
+                ? _entity.Properties["MappingName"].StringValue
+                : _entity.Properties["TableName"].StringValue;
+        }
     }
 
 

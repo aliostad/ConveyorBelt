@@ -105,6 +105,7 @@
     <Compile Include="Actors\BlobFileActor.cs" />
     <Compile Include="Actors\ShardKeyActor.cs" />
     <Compile Include="Actors\ShardRangeActor.cs" />
+    <Compile Include="ConfigurationKeys.cs" />
     <Compile Include="Events\BlobFileArrived.cs" />
     <Compile Include="Events\ShardKeyArrived.cs" />
     <Compile Include="Events\ShardRangeArrived.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheduling\BaseScheduler.cs" />
     <Compile Include="Scheduling\D18MinuteTableShardScheduler.cs" />
+    <Compile Include="Scheduling\IisBlobScheduler.cs" />
     <Compile Include="Scheduling\ISourceScheduler.cs" />
     <Compile Include="Scheduling\MasterScheduler.cs" />
     <Compile Include="Scheduling\MinuteTableShardScheduler.cs" />
