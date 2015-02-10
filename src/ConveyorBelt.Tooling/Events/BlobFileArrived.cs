@@ -8,7 +8,7 @@ namespace ConveyorBelt.Tooling.Events
 {
     public class BlobFileArrived
     {
-        public DiagnosticsSource Source { get; set; }
+        public DiagnosticsSourceSummary Source { get; set; }
 
         public string BlobId { get; set; }
     }

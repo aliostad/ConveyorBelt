@@ -10,7 +10,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling.Actors
 {
-    [ActorDescription("ShardRangeArrived-Process", 10)]
+    [ActorDescription("ShardRangeArrived-Process", 1)]
     public class ShardRangeActor : IProcessorActor
     {
         private IElasticsearchBatchPusher _pusher;
@@ -28,9 +28,12 @@ namespace ConveyorBelt.Tooling.Actors
         public async Task<IEnumerable<Event>> ProcessAsync(Event evnt)
         {
             var shardKeyArrived = evnt.GetBody<ShardRangeArrived>();
+            TheTrace.TraceInformation("Got {0}->{1} from {2}", shardKeyArrived.InclusiveStartKey,
+                shardKeyArrived.InclusiveEndKey, shardKeyArrived.Source.ToTypeKey());
+
             var account = CloudStorageAccount.Parse(shardKeyArrived.Source.ConnectionString);
             var client = account.CreateCloudTableClient();
-            var table = client.GetTableReference(shardKeyArrived.Source.Properties["TableName"].StringValue);
+            var table = client.GetTableReference(shardKeyArrived.Source.DynamicProperties["TableName"].ToString());
 
             var entities = table.ExecuteQuery(new TableQuery().Where(
                 TableQuery.CombineFilters(

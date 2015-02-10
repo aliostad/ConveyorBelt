@@ -49,7 +49,7 @@ namespace ConveyorBelt.Tooling
             }
         }
 
-        public async Task PushAsync(DynamicTableEntity entity, DiagnosticsSource source)
+        public async Task PushAsync(DynamicTableEntity entity, DiagnosticsSourceSummary source)
         {
             var op = new
             {

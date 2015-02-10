@@ -8,7 +8,7 @@ namespace ConveyorBelt.Tooling.Events
 {
     public class ShardRangeArrived
     {
-        public DiagnosticsSource Source { get; set; }
+        public DiagnosticsSourceSummary Source { get; set; }
 
         public string InclusiveStartKey { get; set; }
 

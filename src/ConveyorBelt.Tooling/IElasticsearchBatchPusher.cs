@@ -9,7 +9,7 @@ namespace ConveyorBelt.Tooling
 {
     public interface IElasticsearchBatchPusher
     {
-        Task PushAsync(DynamicTableEntity entity, DiagnosticsSource source);
+        Task PushAsync(DynamicTableEntity entity, DiagnosticsSourceSummary source);
 
         Task FlushAsync();
     }

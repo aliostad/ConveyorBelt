@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BeeHive;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling
@@ -16,33 +17,37 @@ namespace ConveyorBelt.Tooling
             _entity = entity;
         }
 
-        public string SchedulerType 
+        public string SchedulerType
         {
-            get { return _entity.Properties["SchedulerType"].StringValue; }
-            set { _entity.Properties["SchedulerType"].StringValue = value; } 
+            get { return _entity.Properties.GetStringValue("SchedulerType"); } 
         }
 
-        public string ConnectionString {
-            get { return _entity.Properties["ConnectionString"].StringValue; }
-            set { _entity.Properties["ConnectionString"].StringValue = value; }
+        public string ConnectionString
+        {
+            get { return _entity.Properties.GetStringValue("ConnectionString"); }
         }
 
         public string ErrorMessage
         {
-            get { return _entity.Properties["ErrorMessage"].StringValue; }
-            set { _entity.Properties["ErrorMessage"].StringValue = value; }
+            get { return _entity.Properties.GetStringValue("ErrorMessage"); }
+            set { _entity.Properties["ErrorMessage"] = EntityProperty.GeneratePropertyForString(value);}
         }
 
         public DateTimeOffset? LastScheduled
         {
-            get { return _entity.Properties["LastScheduled"].DateTimeOffsetValue; }
-            set { _entity.Properties["LastScheduled"].DateTimeOffsetValue = value; } 
+            get { return _entity.Properties.GetDateTimeValue("LastScheduled"); }
+            set { _entity.Properties["LastScheduled"] = EntityProperty.GeneratePropertyForDateTimeOffset(value); }
         }
 
-        public string LastSetpoint
+        public string LastOffsetPoint
         {
-            get { return _entity.Properties["LastSetpoint"].StringValue; }
-            set { _entity.Properties["LastSetpoint"].StringValue = value; } 
+            get { return _entity.Properties.GetStringValue("LastOffsetPoint"); }
+            set { _entity.Properties["LastOffsetPoint"] = EntityProperty.GeneratePropertyForString(value); }
+        }
+
+        public string StopOffsetPoint
+        {
+            get { return _entity.Properties.GetStringValue("StopOffsetPoint"); }
         }
 
         /// <summary>
@@ -51,43 +56,44 @@ namespace ConveyorBelt.Tooling
         /// </summary>
         public int? GracePeriodMinutes
         {
-            get { return _entity.Properties["GracePeriodMinutes"].Int32Value; }
-            set { _entity.Properties["GracePeriodMinutes"].Int32Value = value; } 
+            get { return _entity.Properties.GetIntValue("GracePeriodMinutes", 5); }
         }
 
         public int? SchedulingFrequencyMinutes
         {
-            get { return _entity.Properties["SchedulingFrequencyMinutes"].Int32Value; }
-            set { _entity.Properties["SchedulingFrequencyMinutes"].Int32Value = value; }
+            get { return _entity.Properties.GetIntValue("SchedulingFrequencyMinutes", 1); }
+        }
+
+        public int? MaxItemsInAScheduleRun
+        {
+            get { return _entity.Properties.GetIntValue("MaxItemsInAScheduleRun"); }
         }
 
         public bool? IsActive
         {
-            get { return _entity.Properties["IsActive"].BooleanValue; }
-            set { _entity.Properties["IsActive"].BooleanValue = value; } 
+            get { return _entity.Properties.GetBooleanValue("IsActive", true); }
         }
 
         public string ToTypeKey()
         {
-            return _entity.PartitionKey + "_" + _entity.RowKey;
-        }
-
-        public string IndexName
-        {
-            get { return _entity.Properties["IndexName"].StringValue; }
-            set { _entity.Properties["IndexName"].StringValue = value; } 
+            return PartitionKey + "_" + RowKey;
         }
 
         public string PartitionKey
         {
             get { return _entity.PartitionKey; }
-            set { _entity.PartitionKey = value; } 
+            set { _entity.PartitionKey = value; }
         }
 
         public string RowKey
         {
             get { return _entity.RowKey; }
-            set { _entity.RowKey = value; } 
+            set { _entity.RowKey = value; }
+        }
+
+        public string IndexName
+        {
+            get { return _entity.Properties.GetStringValue("IndexName"); }
         }
 
         public DynamicTableEntity ToEntity()
@@ -95,16 +101,42 @@ namespace ConveyorBelt.Tooling
             return _entity;
         }
 
-        public IDictionary<string, EntityProperty> Properties { get { return _entity.Properties; } }
+        public T GetProperty<T>(string name)
+        {
+            if (_entity.Properties.ContainsKey(name))
+            {
+                try
+                {
+                    if (typeof (T) == typeof (DateTimeOffset))
+                        return (T) (object) new DateTimeOffset((DateTime) _entity.Properties[name].PropertyAsObject);
+
+                    return (T) _entity.Properties[name].PropertyAsObject;
+                }
+                catch (Exception)
+                {
+                    TheTrace.TraceError("Failed to convert {0} to {1}", name, typeof(T).Name);   
+                    throw;
+                }
+            }
+            else
+            {
+                return default(T);
+            }
+        }
+
+        public void SetProperty<T>(string name, T value)
+        {
+            _entity.Properties[name] = EntityProperty.CreateEntityPropertyFromObject(value);
+        }
 
         public IEnumerable<string> GetIndexNames(int daysToGoBack = 7)
         {
             if (!string.IsNullOrEmpty(IndexName))
                 return new [] {IndexName};
 
-            if (String.IsNullOrEmpty(LastSetpoint))
-                LastSetpoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString();
-            var dateTimeOffset = DateTimeOffset.Parse(LastSetpoint);
+            if (String.IsNullOrEmpty(LastOffsetPoint))
+                LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString();
+            var dateTimeOffset = DateTimeOffset.Parse(LastOffsetPoint);
 
             var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset).TotalDays;
             return Enumerable.Range(0, days).Select(x => DateTimeOffset.UtcNow.AddDays(1).AddDays(-x))
@@ -113,11 +145,61 @@ namespace ConveyorBelt.Tooling
 
         public string GetMappingName()
         {
-            return _entity.Properties.ContainsKey("MappingName")
-                ? _entity.Properties["MappingName"].StringValue
-                : _entity.Properties["TableName"].StringValue;
+            return GetProperty<string>("MappingName") ??
+                   GetProperty<string>("TableName");
+        }
+
+        public DiagnosticsSourceSummary ToSummary()
+        {
+            var dss = new DiagnosticsSourceSummary()
+            {
+                ConnectionString = ConnectionString,
+                IndexName = IndexName,
+                PartitionKey = PartitionKey,
+                RowKey = RowKey,
+                DynamicProperties = new Dictionary<string, object>()
+            };
+
+            foreach (var kv in _entity.Properties)
+            {
+                dss.DynamicProperties.Add(kv.Key, kv.Value.PropertyAsObject);
+            }
+
+            return dss;
         }
     }
 
+    static class IDictionaryExtensions
+    {
+        public static string GetStringValue(this IDictionary<string, EntityProperty> dic, string name, string defaultValue = null)
+        {
+            return dic.ContainsKey(name)
+                ? dic[name].StringValue
+                : defaultValue;
+        }
+
+        public static int? GetIntValue(this IDictionary<string, EntityProperty> dic, string name, int? defaultValue = null)
+        {
+            return dic.ContainsKey(name)
+                ? dic[name].Int32Value
+                : defaultValue;
+        }
+
+        public static DateTimeOffset? GetDateTimeValue(this IDictionary<string, EntityProperty> dic, 
+            string name, DateTimeOffset? defaultValue = null)
+        {
+            return dic.ContainsKey(name)
+                ? dic[name].DateTimeOffsetValue
+                : defaultValue;
+        }
+
+        public static bool? GetBooleanValue(this IDictionary<string, EntityProperty> dic,
+            string name, bool? defaultValue = null)
+        {
+            return dic.ContainsKey(name)
+                ? dic[name].BooleanValue
+                : defaultValue;
+        }
+    }
 
 }

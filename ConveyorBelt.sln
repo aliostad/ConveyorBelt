@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConveyorBelt.Tooling", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConveyorBelt.Tooling.Test", "test\ConveyorBelt.Tooling.Test\ConveyorBelt.Tooling.Test.csproj", "{5FB4A4FE-A161-4EAC-8B2F-497BAE7DAFB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConveyorBelt.ConsoleWorker", "src\ConveyorBelt.ConsoleWorker\ConveyorBelt.ConsoleWorker.csproj", "{15F6DBF7-942D-455C-9AE3-5C2DBFFEFEDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{5FB4A4FE-A161-4EAC-8B2F-497BAE7DAFB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FB4A4FE-A161-4EAC-8B2F-497BAE7DAFB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FB4A4FE-A161-4EAC-8B2F-497BAE7DAFB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15F6DBF7-942D-455C-9AE3-5C2DBFFEFEDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15F6DBF7-942D-455C-9AE3-5C2DBFFEFEDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15F6DBF7-942D-455C-9AE3-5C2DBFFEFEDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15F6DBF7-942D-455C-9AE3-5C2DBFFEFEDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

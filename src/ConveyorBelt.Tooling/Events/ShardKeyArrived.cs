@@ -8,7 +8,7 @@ namespace ConveyorBelt.Tooling.Events
 {
     public class ShardKeyArrived
     {
-        public DiagnosticsSource Source { get; set; }
+        public DiagnosticsSourceSummary Source { get; set; }
 
         public string ShardKey { get; set; }
     }

@@ -1,8 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ServiceDefinition name="ConveyorBelt" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2014-06.2.4">
-  <WorkerRole name="ConveyorBelt.Worker" vmsize="Small">
+  <WorkerRole name="ConveyorBelt.Worker" vmsize="Medium">
     <Imports>
       <Import moduleName="Diagnostics" />
     </Imports>
+    <ConfigurationSettings>
+      <Setting name="ConveyorBelt.ElasticSearchUrl" />
+      <Setting name="ConveyorBelt.TableName" />
+      <Setting name="ConveyorBelt.FrequencyInSeconds" />
+      <Setting name="ConveyorBelt.ServiceBus.ConnectionString" />
+      <Setting name="ConveyorBelt.MappingsPath" />
+      <Setting name="ConveyorBelt.Storage.ConnectionString" />
+    </ConfigurationSettings>
   </WorkerRole>
 </ServiceDefinition>

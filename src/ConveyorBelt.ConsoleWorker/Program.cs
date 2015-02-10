@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BeeHive;
@@ -11,34 +12,39 @@ using BeeHive.Azure;
 using BeeHive.Configuration;
 using BeeHive.DataStructures;
 using BeeHive.ServiceLocator.Windsor;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using ConveyorBelt.Tooling;
 using ConveyorBelt.Tooling.Actors;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Diagnostics;
-using Microsoft.WindowsAzure.ServiceRuntime;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
-using Castle.MicroKernel.Registration;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
 
-namespace ConveyorBelt.Worker
+namespace ConveyorBelt.ConsoleWorker
 {
-    public class WorkerRole : RoleEntryPoint
+    class AppSettingsConfigProvider : IConfigurationValueProvider
     {
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
-        private IConfigurationValueProvider _configurationValueProvider;
-        private Orchestrator _orchestrator;
-        private MasterScheduler _scheduler;
+        public string GetValue(string name)
+        {
+            return ConfigurationManager.AppSettings[name];
+        }
+    }
 
-        public WorkerRole()
+    class Program
+    {
+
+
+        private static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private static readonly ManualResetEvent _runCompleteEvent = new ManualResetEvent(false);
+        private static IConfigurationValueProvider _configurationValueProvider;
+        private static Orchestrator _orchestrator;
+        private static MasterScheduler _scheduler;
+
+        protected static void Setup()
         {
             var container = new WindsorContainer();
             var serviceLocator = new WindsorServiceLocator(container);
 
-            _configurationValueProvider = new AzureConfigurationValueProvider();
+            _configurationValueProvider = new AppSettingsConfigProvider();
             var storageConnectionString = _configurationValueProvider.GetValue(ConfigurationKeys.StorageConnectionString);
             var servicebusConnectionString = _configurationValueProvider.GetValue(ConfigurationKeys.ServiceBusConnectionString);
 
@@ -107,53 +113,45 @@ namespace ConveyorBelt.Worker
             _scheduler = container.Resolve<MasterScheduler>();
         }
 
-        public override void Run()
+        public static void Run()
         {
             Trace.TraceInformation("ConveyorBelt.Worker is running");
-
             try
             {
-                this.RunAsync(this.cancellationTokenSource.Token).Wait();
+                RunAsync(_cancellationTokenSource.Token).Wait();
             }
             finally
             {
-                this.runCompleteEvent.Set();
+                _runCompleteEvent.Set();
             }
         }
 
-        public override bool OnStart()
+        private static void Start()
         {
-            // Set the maximum number of concurrent connections
-            ServicePointManager.DefaultConnectionLimit = 12;
-
-            // For information on handling configuration changes
-            // see the MSDN topic at http://go.microsoft.com/fwlink/?LinkId=166357.
-
-            bool result = base.OnStart();
-
             Trace.TraceInformation("ConveyorBelt.Worker has been started");
             Task.Run(() => _orchestrator.SetupAsync()).Wait();
             _orchestrator.Start();
-
-            return result;
         }
 
-        public override void OnStop()
+        static void Stop()
         {
-            Trace.TraceInformation("ConveyorBelt.Worker is stopping");
-
-            this.cancellationTokenSource.Cancel();
-            this.runCompleteEvent.WaitOne();
-
-            base.OnStop();
-            _orchestrator.Stop();
-
-            Trace.TraceInformation("ConveyorBelt.Worker has stopped");
+            _orchestrator.Stop();  
+            _cancellationTokenSource.Cancel();
         }
 
-        private async Task RunAsync(CancellationToken cancellationToken)
+        static void Main(string[] args)
         {
-            
+            Setup();
+            Start();
+            Console.WriteLine("Running. Please press <ENTER> to stop...");
+            Run();
+            Console.Read();
+            Stop();
+        }
+
+        private static async Task RunAsync(CancellationToken cancellationToken)
+        {
+
             // schedule every 30 seconds or so
             while (!cancellationToken.IsCancellationRequested)
             {

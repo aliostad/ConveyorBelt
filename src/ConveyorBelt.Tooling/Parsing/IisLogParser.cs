@@ -13,9 +13,13 @@ namespace ConveyorBelt.Tooling.Parsing
     {
         public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id)
         {
+            if (body.Position != 0)
+                body.Position = 0;
+
             var reader = new StreamReader(body);
             string line = null;
             string[] fields = null;
+            int lineNumber = 1;
             while ((line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("#Fields: "))
@@ -31,10 +35,9 @@ namespace ConveyorBelt.Tooling.Parsing
                 var entity = new DynamicTableEntity();
                 entity.Timestamp = DateTimeOffset.Parse(datetime);
                 entity.PartitionKey = string.Join("_", idSegments.Take(idSegments.Length - 1));
-                entity.RowKey = string.Format("{0}_{1:yyyyMMddHHmmss}_{2}",
+                entity.RowKey = string.Format("{0}_{1}",
                     Path.GetFileNameWithoutExtension(idSegments.Last()),
-                    entity.Timestamp,
-                    Guid.NewGuid().ToString("N"));
+                    lineNumber);
 
                 if (fields.Length != rest.Length)
                     throw new InvalidOperationException("fields not equal");
@@ -50,6 +53,7 @@ namespace ConveyorBelt.Tooling.Parsing
                         entity.Properties.Add(name, new EntityProperty(value));
                 }
 
+                lineNumber++;
                 yield return entity;
             }
         }
