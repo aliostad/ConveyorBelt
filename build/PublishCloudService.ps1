@@ -10,7 +10,8 @@ Param(  $serviceName = "",
         $selectedsubscription = "",
         $subscriptionDataFile = "cloud.publishsettings",
         $slot = "Production",
-        $affinityGroupName
+        $affinityGroupName = "",
+        $tokensFile = "tokens.json"
      )
 
 
@@ -235,7 +236,7 @@ Write-Host "So the package is here: $packagePath"
 $packageLocation = $packagePath
 $outFolder = (get-item $packagePath ).DirectoryName
 $cloudConfigLocation = (gci ($outFolder + "\*.cscfg")).FullName
-ReplaceTokens $cloudConfigLocation "tokens.json"
+ReplaceTokens $cloudConfigLocation $tokensFile
 
 # specify path for Azure module (anyone knows how to configure PSModuleuPath?)
 $env:PSModulePath=$env:PSModulePath+";"+"C:\Program Files (x86)\Microsoft SDKs\Windows Azure\PowerShell"
