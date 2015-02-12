@@ -18,9 +18,12 @@ namespace ConveyorBelt.Tooling.Scheduling
         protected async override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             if (source.LastOffsetPoint == null)
-                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-7).ToString();
+                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-7).ToString("O");
 
             var offset = DateTimeOffset.Parse(source.LastOffsetPoint);
+            offset =
+                offset.Subtract(TimeSpan.FromSeconds(offset.Second))
+                    .Subtract(TimeSpan.FromMilliseconds(offset.Millisecond));
             var events = new List<Event>();
             var totalMinutes = DateTimeOffset.UtcNow.Subtract(offset.AddMinutes(source.GracePeriodMinutes.Value)).TotalMinutes;
 
@@ -33,7 +36,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 if(source.MaxItemsInAScheduleRun.HasValue && i >= source.MaxItemsInAScheduleRun)
                     break;
             }
-            source.LastOffsetPoint = offset.ToString();
+            source.LastOffsetPoint = ofsted.ToString("O");
             return events;
         }
 

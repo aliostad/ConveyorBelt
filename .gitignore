@@ -33,3 +33,7 @@ docs/
 packages/
 artifacts/
 script.sql
+*.azurePubxml
+*tokens.json
+*.publishsettings
+build/deploy.ps1

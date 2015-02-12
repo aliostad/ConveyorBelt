@@ -135,10 +135,13 @@ namespace ConveyorBelt.Tooling
                 return new [] {IndexName};
 
             if (String.IsNullOrEmpty(LastOffsetPoint))
-                LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString();
+                LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString("O");
             var dateTimeOffset = DateTimeOffset.Parse(LastOffsetPoint);
 
             var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset).TotalDays;
+            if (days <= 0)
+                return Enumerable.Empty<string>();
+
             return Enumerable.Range(0, days).Select(x => DateTimeOffset.UtcNow.AddDays(1).AddDays(-x))
                 .Select(y => y.ToString("yyyyMMdd"));
         }

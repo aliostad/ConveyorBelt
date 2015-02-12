@@ -52,7 +52,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 instanceIndex++;
             }
 
-            source.LastOffsetPoint = maxOffset.ToString();
+            source.LastOffsetPoint = maxOffset.ToString("O");
             return events;
         }
 

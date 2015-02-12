@@ -3,13 +3,13 @@
   <Role name="ConveyorBelt.Worker">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="ConveyorBelt.ElasticSearchUrl" value="http://asos-gl-eun-cb-es.cloudapp.net:29200/" />
-      <Setting name="ConveyorBelt.TableName" value="DiagnosticsSource2" />
-      <Setting name="ConveyorBelt.FrequencyInSeconds" value="30" />
-      <Setting name="ConveyorBelt.ServiceBus.ConnectionString" value="Endpoint=sb://shobaka-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=DYlMRGKasSka140VIDNSVM6GOtvUleSi3qKt9jfLchk=" />
-      <Setting name="ConveyorBelt.MappingsPath" value="https://asos82euncb.blob.core.windows.net/mappings/" />
-      <Setting name="ConveyorBelt.Storage.ConnectionString" value="DefaultEndpointsProtocol=http;AccountName=asos82euncb;AccountKey=g/LSrxHsWQJbrahIdS3UPAsXoJgvRi+hPOLl35/AyIcCSVLC+qsnnScOti0FTfHPslZ2tNJeH3UdlYsLb2DDBA==" />
+      <Setting name="ConveyorBelt.ElasticSearchUrl" value="###__ConveyorBelt_ElasticSearchUrl__###" />
+      <Setting name="ConveyorBelt.TableName" value="###__ConveyorBelt_TableName__###" />
+      <Setting name="ConveyorBelt.FrequencyInSeconds" value="###__ConveyorBelt_FrequencyInSeconds__###" />
+      <Setting name="ConveyorBelt.ServiceBus.ConnectionString" value="###__ConveyorBelt_ServiceBus_ConnectionString__###" />
+      <Setting name="ConveyorBelt.MappingsPath" value="###__ConveyorBelt_MappingsPath__###" />
+      <Setting name="ConveyorBelt.Storage.ConnectionString" value="###__ConveyorBelt_Storage_ConnectionString__###" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="###__ConveyorBelt_Diagnostics_ConnectionString__###" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

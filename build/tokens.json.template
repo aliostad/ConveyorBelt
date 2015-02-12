@@ -1,0 +1,8 @@
+{
+	"ConveyorBelt_ElasticSearchUrl":"shmi",
+	"ConveyorBelt_TableName":"shmi",
+	"ConveyorBelt_FrequencyInSeconds":"shmi",
+	"ConveyorBelt_ServiceBus_ConnectionString":"shmi",
+	"ConveyorBelt_MappingsPath":"shmi",
+	"ConveyorBelt_Storage_ConnectionString":"shmi"
+}

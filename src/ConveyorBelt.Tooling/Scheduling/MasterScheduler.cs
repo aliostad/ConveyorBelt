@@ -89,7 +89,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
                     source.ErrorMessage = string.Empty;
                     TheTrace.TraceInformation("MasterScheduler - Finished Scheduling {0}", source.ToTypeKey());
-
+                    source.LastScheduled = DateTimeOffset.UtcNow;
                 }
                 catch (Exception e)
                 {
