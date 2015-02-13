@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Configuration;
 using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Events;
 using Microsoft.WindowsAzure.Storage;
@@ -20,6 +21,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             var client = account.CreateCloudBlobClient();
             var pathFormat = source.GetProperty<string>("BlobPathFormat");
             TheTrace.TraceInformation("IisBlobScheduler - pathformat: {0}", pathFormat);
+            pathFormat = pathFormat.TrimEnd('/') + "/"; // ensure path ends with /
 
             var offset = DateTimeOffset.Parse(source.LastOffsetPoint);
             int instanceIndex = 0;
@@ -56,7 +58,8 @@ namespace ConveyorBelt.Tooling.Scheduling
             return events;
         }
 
-        public IisBlobScheduler(ILockStore lockStore) : base(lockStore)
+        public IisBlobScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
+            : base(lockStore, configurationValueProvider)
         {
         }
     }

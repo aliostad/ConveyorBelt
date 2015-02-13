@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Configuration;
 using BeeHive.DataStructures;
 
 namespace ConveyorBelt.Tooling.Scheduling
@@ -11,9 +12,11 @@ namespace ConveyorBelt.Tooling.Scheduling
     public abstract class BaseScheduler : ISourceScheduler
     {
         private ILockStore _lockStore;
+        private IConfigurationValueProvider _configurationValueProvider;
 
-        public BaseScheduler(ILockStore lockStore)
+        public BaseScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
         {
+            _configurationValueProvider = configurationValueProvider;
             _lockStore = lockStore;
         }
 
@@ -26,8 +29,10 @@ namespace ConveyorBelt.Tooling.Scheduling
             if (source.StopOffsetPoint != null && source.LastOffsetPoint != null && source.LastOffsetPoint.CompareTo(source.StopOffsetPoint) >= 0)
                 return new Tuple<IEnumerable<Event>, bool>(Enumerable.Empty<Event>(), false);
 
-            var lockToken = new LockToken(source.ToTypeKey());            
-            if (!(await _lockStore.TryLockAsync(lockToken)))
+            var lockToken = new LockToken(source.ToTypeKey());
+            int seconds =
+                Convert.ToInt32(_configurationValueProvider.GetValue(ConfigurationKeys.ClusterLockDurationSeconds));
+            if (!(await _lockStore.TryLockAsync(lockToken, 2, 1000, seconds * 1000)))
             {
                 TheTrace.TraceInformation("I could NOT be master for {0}", source.ToTypeKey());
                 return new Tuple<IEnumerable<Event>, bool>(Enumerable.Empty<Event>(), false);

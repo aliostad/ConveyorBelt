@@ -10,6 +10,9 @@
       <Setting name="ConveyorBelt.MappingsPath" value="###__ConveyorBelt_MappingsPath__###" />
       <Setting name="ConveyorBelt.Storage.ConnectionString" value="###__ConveyorBelt_Storage_ConnectionString__###" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="###__ConveyorBelt_Diagnostics_ConnectionString__###" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockContainer" value="locks" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockRoot" value="conveyor_belt/locks/master_Keys/" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" value="30" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

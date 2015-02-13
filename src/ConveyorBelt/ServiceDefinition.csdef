@@ -11,6 +11,9 @@
       <Setting name="ConveyorBelt.ServiceBus.ConnectionString" />
       <Setting name="ConveyorBelt.MappingsPath" />
       <Setting name="ConveyorBelt.Storage.ConnectionString" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockContainer" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockRoot" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" />
     </ConfigurationSettings>
   </WorkerRole>
 </ServiceDefinition>

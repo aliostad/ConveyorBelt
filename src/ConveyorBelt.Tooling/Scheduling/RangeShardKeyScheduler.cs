@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Configuration;
 using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Events;
 using Microsoft.WindowsAzure.Storage;
@@ -13,7 +14,8 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class RangeShardKeyScheduler : BaseScheduler
     {
-        public RangeShardKeyScheduler(ILockStore lockStore) : base(lockStore)
+        public RangeShardKeyScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
+            : base(lockStore, configurationValueProvider)
         {
         }
 

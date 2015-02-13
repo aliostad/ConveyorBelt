@@ -3,13 +3,20 @@
   <Role name="ConveyorBelt.Worker">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="ConveyorBelt.ElasticSearchUrl" value="http://localhost:9200/" /> <!-- root URL. end it with a slash -->
-      <Setting name="ConveyorBelt.TableName" value="DiagnosticSource" /> <!-- Name of the Azure table containing diagnostic sources -->
-      <Setting name="ConveyorBelt.FrequencyInSeconds" value="30" /> <!-- How often the master scheduler should schedule. 30 sec is sensible.-->
+      <Setting name="ConveyorBelt.ElasticSearchUrl" value="http://localhost:9200/" />
+      <!-- root URL. end it with a slash -->
+      <Setting name="ConveyorBelt.TableName" value="DiagnosticSource" />
+      <!-- Name of the Azure table containing diagnostic sources -->
+      <Setting name="ConveyorBelt.FrequencyInSeconds" value="30" />
+      <!-- How often the master scheduler should schedule. 30 sec is sensible.-->
       <Setting name="ConveyorBelt.ServiceBus.ConnectionString" value="[connection string to your Azure Service Bus hosting BeeHive topics]" />
       <Setting name="ConveyorBelt.MappingsPath" value="Base URL of the location (often a read-only Azure Blob location) containing ES mappings" />
-      <Setting name="ConveyorBelt.Storage.ConnectionString" value="UseDevelopmentStorage=true" /> <!-- Storage connection string for the source table and lock blobs -->
+      <Setting name="ConveyorBelt.Storage.ConnectionString" value="UseDevelopmentStorage=true" />
+      <!-- Storage connection string for the source table and lock blobs -->
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockContainer" value="locks" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockRoot" value="conveyor_belt/locks/master_Keys/" />
+      <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" value="30" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

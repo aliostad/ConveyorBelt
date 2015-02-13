@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Configuration;
 using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Events;
 
@@ -11,7 +12,8 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class MinuteTableShardScheduler : BaseScheduler
     {
-        public MinuteTableShardScheduler(ILockStore lockStore) : base(lockStore)
+        public MinuteTableShardScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider) 
+            : base(lockStore, configurationValueProvider)
         {
         }
 

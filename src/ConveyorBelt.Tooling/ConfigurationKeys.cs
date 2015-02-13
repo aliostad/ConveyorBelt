@@ -14,5 +14,8 @@ namespace ConveyorBelt.Tooling
         public const string StorageConnectionString = "ConveyorBelt.Storage.ConnectionString";
         public const string ServiceBusConnectionString = "ConveyorBelt.ServiceBus.ConnectionString";
         public const string MappingsPath = "ConveyorBelt.MappingsPath";
+        public const string ClusterLockContainer = "ConveyorBelt.Storage.ClusterLockContainer";
+        public const string ClusterLockRootPath = "ConveyorBelt.Storage.ClusterLockRoot";
+        public const string ClusterLockDurationSeconds = "ConveyorBelt.Storage.ClusterLockDurationSeconds";
     }
 }
