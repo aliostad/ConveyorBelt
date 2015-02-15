@@ -1,0 +1,64 @@
+﻿{
+    "___type_name___": {
+        "properties": {
+            "@timestamp": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "DeploymentId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "EventId": {
+                "type": "long"
+            },
+            "EventTickCount": {
+                "type": "long"
+            },
+            "Level": {
+                "type": "long"
+            },
+            "PartitionKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "Pid": {
+                "type": "long"
+            },
+            "Role": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RoleInstance": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RowKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "Tid": {
+                "type": "long"
+            },
+            "ProviderGuid": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "ProviderName": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "Channel": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RawXml": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "Description": {
+                "type": "string"
+            }
+        }
+    }
+}

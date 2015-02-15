@@ -1,8 +1,9 @@
 {
-	"ConveyorBelt_ElasticSearchUrl":"shmi",
-	"ConveyorBelt_TableName":"shmi",
-	"ConveyorBelt_FrequencyInSeconds":"shmi",
-	"ConveyorBelt_ServiceBus_ConnectionString":"shmi",
-	"ConveyorBelt_MappingsPath":"shmi",
-	"ConveyorBelt_Storage_ConnectionString":"shmi"
+	"ConveyorBelt_ElasticSearchUrl":"[Your elasticsearch server]",
+	"ConveyorBelt_TableName":"[Name of the table containing sources]",
+	"ConveyorBelt_FrequencyInSeconds":"30",
+	"ConveyorBelt_ServiceBus_ConnectionString":"[A service bus connection for BeeHive worker topics]",
+	"ConveyorBelt_MappingsPath":"[where you put your mappings on, typically a read-only public Azure Blob location]",
+	"ConveyorBelt_Storage_ConnectionString":"[Connection string to the storage where ]",
+	"ConveyorBelt_Diagnostics_ConnectionString": "[Diagnostics connection string for the worker role]"
 }

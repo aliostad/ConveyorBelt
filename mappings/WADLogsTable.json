@@ -1,0 +1,48 @@
+﻿{
+    "___type_name___": {
+        "properties": {
+            "@timestamp": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "DeploymentId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "EventId": {
+                "type": "long"
+            },
+            "EventTickCount": {
+                "type": "long"
+            },
+            "Level": {
+                "type": "long"
+            },
+            "Message": {
+                "type": "string"
+            },
+            "PartitionKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "Pid": {
+                "type": "long"
+            },
+            "Role": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RoleInstance": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RowKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "Tid": {
+                "type": "long"
+            }
+        }
+    }
+}

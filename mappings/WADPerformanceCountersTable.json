@@ -1,0 +1,40 @@
+﻿{
+    "___type_name___": {
+        "properties": {
+            "@timestamp": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "CounterName": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "CounterValue": {
+                "type": "double"
+            },
+            "DeploymentId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "EventTickCount": {
+                "type": "long"
+            },
+            "PartitionKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "Role": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RoleInstance": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RowKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            }
+        }
+    }
+}
