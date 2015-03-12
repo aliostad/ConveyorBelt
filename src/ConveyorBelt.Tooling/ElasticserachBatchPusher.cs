@@ -17,10 +17,12 @@ namespace ConveyorBelt.Tooling
         private StringBuilder _stringBuilder = new StringBuilder();
         private int _batchSize;
         private int _numberOfRecords = 0;
-        private HttpClient _httpClient = new HttpClient();
+        private IHttpClient _httpClient;
 
-        public ElasticsearchBatchPusher(string esUrl, int batchSize = 100)
+
+        public ElasticsearchBatchPusher(IHttpClient httpClient, string esUrl, int batchSize = 100)
         {
+            _httpClient = httpClient;
             _batchSize = batchSize;
             _esUrl = esUrl;
         }
@@ -67,8 +69,17 @@ namespace ConveyorBelt.Tooling
             doc.Add("RowKey", entity.RowKey);
             foreach (var property in entity.Properties)
             {
-                doc[property.Key] = JToken.FromObject(property.Value.PropertyAsObject);
+                if (property.Key != DiagnosticsSource.CustomAttributesFieldName)
+                    doc[property.Key] = JToken.FromObject(property.Value.PropertyAsObject);
             }
+            if (entity.Properties.ContainsKey(DiagnosticsSource.CustomAttributesFieldName))
+            {
+                foreach (var keyValue in GetNameValues(entity.Properties[DiagnosticsSource.CustomAttributesFieldName].StringValue))
+                {
+                    doc[keyValue.Key] = keyValue.Value;
+                }
+            }
+                
             _stringBuilder.Append(JsonConvert.SerializeObject(op).Replace("\r\n", " "));
             _stringBuilder.Append('\n');
             _stringBuilder.Append(doc.ToString().Replace("\r\n", " "));
@@ -82,6 +93,16 @@ namespace ConveyorBelt.Tooling
                     source.PartitionKey,
                     source.RowKey);
             }
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> GetNameValues(string customAttribs)
+        {
+            if (string.IsNullOrWhiteSpace(customAttribs))
+                customAttribs = "";
+
+            return customAttribs.Split(';')
+                .Select(s => s.Split('='))
+                .Select(ss => new KeyValuePair<string, string>(ss[0], ss.Length == 1 ? string.Empty : ss[1]));
         }
 
         public Task FlushAsync()

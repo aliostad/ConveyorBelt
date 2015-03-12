@@ -108,6 +108,7 @@
     <Compile Include="Actors\ShardKeyActor.cs" />
     <Compile Include="Actors\ShardRangeActor.cs" />
     <Compile Include="ConfigurationKeys.cs" />
+    <Compile Include="DefaultHttpClient.cs" />
     <Compile Include="DiagnosticsSourceSummary.cs" />
     <Compile Include="ElasticsearchClient.cs" />
     <Compile Include="Events\BlobFileArrived.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="ElasticserachBatchPusher.cs" />
     <Compile Include="IElasticsearchClient.cs" />
     <Compile Include="IElasticsearchBatchPusher.cs" />
+    <Compile Include="IHttpClient.cs" />
     <Compile Include="Parsing\IisLogParser.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -87,6 +87,9 @@ namespace ConveyorBelt.Worker
                 Component.For<IisLogParser>()
                     .ImplementedBy<IisLogParser>()
                     .LifestyleTransient(),
+                Component.For<IHttpClient>()
+                    .ImplementedBy<DefaultHttpClient>()
+                    .LifestyleSingleton(),
                 Component.For<IElasticsearchBatchPusher>()
                     .ImplementedBy<ElasticsearchBatchPusher>()
                     .LifestyleTransient()
@@ -100,7 +103,6 @@ namespace ConveyorBelt.Worker
                     })),
                 Component.For<IEventQueueOperator>()
                     .Instance(new ServiceBusOperator(servicebusConnectionString))
-
                 );
 
             _orchestrator = container.Resolve<Orchestrator>();

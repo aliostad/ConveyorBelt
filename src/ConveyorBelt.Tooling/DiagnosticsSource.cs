@@ -11,6 +11,7 @@ namespace ConveyorBelt.Tooling
     public class DiagnosticsSource
     {
         private DynamicTableEntity _entity;
+        internal const string CustomAttributesFieldName = "CustomAttributes";
 
         public DiagnosticsSource(DynamicTableEntity entity)
         {
@@ -25,6 +26,11 @@ namespace ConveyorBelt.Tooling
         public string ConnectionString
         {
             get { return _entity.Properties.GetStringValue("ConnectionString"); }
+        }
+
+        public string CustomAttributes
+        {
+            get { return _entity.Properties.GetStringValue(CustomAttributesFieldName); }
         }
 
         public string ErrorMessage
