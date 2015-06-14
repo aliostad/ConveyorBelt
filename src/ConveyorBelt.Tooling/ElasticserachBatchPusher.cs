@@ -87,9 +87,10 @@ namespace ConveyorBelt.Tooling
 
             if ((_numberOfRecords++) >= _batchSize)
             {
+                var nrec = _numberOfRecords;
                 await PushbatchAsync();
                 TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed {0} records to ElasticSearch for {1}-{2}",
-                    _numberOfRecords,
+                    nrec,
                     source.PartitionKey,
                     source.RowKey);
             }

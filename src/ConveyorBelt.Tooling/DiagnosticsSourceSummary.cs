@@ -8,10 +8,6 @@ namespace ConveyorBelt.Tooling
 {
     public class DiagnosticsSourceSummary
     {
-        public DiagnosticsSourceSummary()
-        {
-            
-        }
 
         public string ConnectionString { get; set; }
 

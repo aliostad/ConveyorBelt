@@ -11,7 +11,7 @@ Param(  $serviceName = "",
         $subscriptionDataFile = "cloud.publishsettings",
         $slot = "Production",
         $affinityGroupName = "",
-        $tokensFile = "tokens.json"
+        $tokensFile = "tokensMain.json"
      )
 
 
