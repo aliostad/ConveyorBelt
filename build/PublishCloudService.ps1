@@ -33,7 +33,7 @@ function Publish()
         Write-Output "$(Get-Date –f $timeStampFormat) - No deployment is detected. Creating a new deployment. "
     }
     #check for existing deployment and then either upgrade, delete + deploy, or cancel according to $alwaysDeleteExistingDeployments and $enableDeploymentUpgrade boolean variables
-    if ($deployment.Name -ne $null)
+    if ($deployment -ne $null -and $deployment.Name -ne $null)
     {
         switch ($alwaysDeleteExistingDeployments)
         {
@@ -227,6 +227,9 @@ function ReplaceTokens([String] $targetFile, [String] $tokensFile)
 }
 
 Write-Host $serviceName
+
+$erroractionpreference = "stop"
+set-strictmode -version "latest"
 
 
 Write-Host  "Packaging the project" -foregroundcolor "green"
