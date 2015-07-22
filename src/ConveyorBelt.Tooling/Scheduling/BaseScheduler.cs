@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Configuration;
 using BeeHive.DataStructures;
+using ConveyorBelt.Tooling.Configuration;
 
 namespace ConveyorBelt.Tooling.Scheduling
 {

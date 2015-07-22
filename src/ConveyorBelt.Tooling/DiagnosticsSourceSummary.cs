@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,10 @@ namespace ConveyorBelt.Tooling
 {
     public class DiagnosticsSourceSummary
     {
+        public DiagnosticsSourceSummary()
+        {
+            DynamicProperties = new ConcurrentDictionary<string, object>();
+        }
 
         public string ConnectionString { get; set; }
 
@@ -15,10 +20,7 @@ namespace ConveyorBelt.Tooling
 
         public string RowKey { get; set; }
 
-        public string ToTypeKey()
-        {
-            return PartitionKey + "_" + RowKey;
-        }
+        public string TypeName { get; set; }
 
         public string IndexName { get; set; }
 

@@ -3,44 +3,39 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Configuration;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using ConveyorBelt.Tooling.Configuration;
+
 
 namespace ConveyorBelt.Tooling.Scheduling
 {
     public class MasterScheduler
     {
-        protected CloudTable _table;
         private IEventQueueOperator _eventQueueOperator;
         private IConfigurationValueProvider _configurationValueProvider;
-        private HttpClient _httpClient = new HttpClient();
         private IElasticsearchClient _elasticsearchClient;
         private IServiceLocator _locator;
+        private ISourceConfiguration _sourceConfiguration;
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
             IConfigurationValueProvider configurationValueProvider,
+            ISourceConfiguration sourceConfiguration,
             IElasticsearchClient elasticsearchClient,
             IServiceLocator locator)
         {
+            _sourceConfiguration = sourceConfiguration;
             _locator = locator;
             _elasticsearchClient = elasticsearchClient;
             _configurationValueProvider = configurationValueProvider;
             _eventQueueOperator = eventQueueOperator;
-            var account = CloudStorageAccount.Parse(_configurationValueProvider.GetValue(ConfigurationKeys.StorageConnectionString));
-            var client = account.CreateCloudTableClient();
-            _table = client.GetTableReference(_configurationValueProvider.GetValue(ConfigurationKeys.TableName));
-            _table.CreateIfNotExists();
-        }
+         }
 
         public async Task ScheduleSourcesAsync()
         {
-            var sources = _table.ExecuteQuery(new TableQuery<DynamicTableEntity>()).Select(x => new DiagnosticsSource(x));
+            var sources = _sourceConfiguration.GetSources();
             foreach (var source in sources)
             {
                 try
@@ -97,7 +92,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                     source.ErrorMessage = e.ToString();
                 }
 
-                _table.Execute(TableOperation.InsertOrReplace(source.ToEntity()));
+                _sourceConfiguration.UpdateSource(source);
                 TheTrace.TraceInformation("MasterScheduler - Updated {0}", source.ToTypeKey());
             }
         }

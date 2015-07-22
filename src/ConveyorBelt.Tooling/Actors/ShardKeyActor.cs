@@ -31,7 +31,8 @@ namespace ConveyorBelt.Tooling.Actors
         public async Task<IEnumerable<Event>> ProcessAsync(Event evnt)
         {
             var shardKeyArrived = evnt.GetBody<ShardKeyArrived>();
-            TheTrace.TraceInformation("Got {0} from {1}", shardKeyArrived.ShardKey, shardKeyArrived.Source.ToTypeKey());
+            TheTrace.TraceInformation("Got {0} from {1}", shardKeyArrived.ShardKey, 
+                shardKeyArrived.Source.TypeName);
 
             var account = CloudStorageAccount.Parse(shardKeyArrived.Source.ConnectionString);
             var client = account.CreateCloudTableClient();

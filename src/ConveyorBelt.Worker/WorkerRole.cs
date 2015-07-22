@@ -20,6 +20,7 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Castle.MicroKernel.Registration;
+using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
 
@@ -60,6 +61,8 @@ namespace ConveyorBelt.Worker
                     .Instance(
                     ActorDescriptors.FromAssemblyContaining<ShardRangeActor>()
                     .ToConfiguration()),
+                Component.For<ISourceConfiguration>()
+                    .ImplementedBy<TableStorageConfigurationSource>(),
                 Component.For<IFactoryActor>()
                     .ImplementedBy<FactoryActor>()
                     .LifestyleTransient(),

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Configuration;
 using BeeHive.DataStructures;
+using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Events;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;

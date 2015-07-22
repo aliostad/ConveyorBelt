@@ -29,7 +29,7 @@ namespace ConveyorBelt.Tooling.Actors
         {
             var shardKeyArrived = evnt.GetBody<ShardRangeArrived>();
             TheTrace.TraceInformation("Got {0}->{1} from {2}", shardKeyArrived.InclusiveStartKey,
-                shardKeyArrived.InclusiveEndKey, shardKeyArrived.Source.ToTypeKey());
+                shardKeyArrived.InclusiveEndKey, shardKeyArrived.Source.TypeName);
 
             var account = CloudStorageAccount.Parse(shardKeyArrived.Source.ConnectionString);
             var client = account.CreateCloudTableClient();

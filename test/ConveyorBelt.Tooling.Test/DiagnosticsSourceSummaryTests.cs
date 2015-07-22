@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConveyorBelt.Tooling.Configuration;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using Xunit;
@@ -54,9 +55,23 @@ namespace ConveyorBelt.Tooling.Test
             Assert.Equal(summary.DynamicProperties["dpi"], source.GetProperty<int>("dpi"));
             Assert.Equal(summary.DynamicProperties["dps"], source.GetProperty<string>("dps"));
             Assert.Equal(summary.DynamicProperties["dpb"], source.GetProperty<bool>("dpb"));
-            
+            Assert.Equal(summary.TypeName, source.ToTypeKey());
+
         }
 
+        [Fact]
+        public void CanConvertFromSourceToSummary_WithAlternateTypeName()
+        {
+            var entity = new DynamicTableEntity("pk", "rk");
+            entity.Properties["dpi"] = EntityProperty.GeneratePropertyForInt(2);
+            entity.Properties["AlternateTypeName"] = EntityProperty.GeneratePropertyForString("vahshi");
+            var source = new DiagnosticsSource(entity);
+
+            var summary = source.ToSummary();
+           
+            Assert.Equal(summary.TypeName, source.ToTypeKey());
+
+        }
 
         private DiagnosticsSourceSummary GetASummary()
         {

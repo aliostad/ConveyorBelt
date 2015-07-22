@@ -32,7 +32,7 @@ namespace ConveyorBelt.Tooling.Actors
         {
             var blobFileArrived = evnt.GetBody<BlobFileArrived>();
             TheTrace.TraceInformation("Got {0} from {1}", blobFileArrived.BlobId,
-                 blobFileArrived.Source.ToTypeKey());
+                 blobFileArrived.Source.TypeName);
             var account = CloudStorageAccount.Parse(blobFileArrived.Source.ConnectionString);
             var client = account.CreateCloudBlobClient();
             var container = client.GetContainerReference(blobFileArrived.Source.DynamicProperties["ContainerName"].ToString());

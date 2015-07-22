@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
+using ConveyorBelt.Tooling.Configuration;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -58,7 +59,7 @@ namespace ConveyorBelt.Tooling
                 index = new
                 {
                     _index = source.IndexName ?? entity.Timestamp.ToString("yyyyMMdd"),
-                    _type = source.ToTypeKey(),
+                    _type = source.TypeName,
                     _id = entity.PartitionKey + entity.RowKey
                 }
             };

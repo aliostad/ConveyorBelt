@@ -108,6 +108,8 @@
     <Compile Include="Actors\ShardKeyActor.cs" />
     <Compile Include="Actors\ShardRangeActor.cs" />
     <Compile Include="ConfigurationKeys.cs" />
+    <Compile Include="Configuration\ISourceConfiguration.cs" />
+    <Compile Include="Configuration\TableStorageConfigurationSource.cs" />
     <Compile Include="DefaultHttpClient.cs" />
     <Compile Include="DiagnosticsSourceSummary.cs" />
     <Compile Include="ElasticsearchClient.cs" />
@@ -115,7 +117,7 @@
     <Compile Include="Events\ShardKeyArrived.cs" />
     <Compile Include="Events\ShardRangeArrived.cs" />
     <Compile Include="IBlobExtensions.cs" />
-    <Compile Include="DiagnosticsSource.cs" />
+    <Compile Include="Configuration\DiagnosticsSource.cs" />
     <Compile Include="ElasticserachBatchPusher.cs" />
     <Compile Include="IElasticsearchClient.cs" />
     <Compile Include="IElasticsearchBatchPusher.cs" />

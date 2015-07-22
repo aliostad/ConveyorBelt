@@ -16,6 +16,7 @@ using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using ConveyorBelt.Tooling;
 using ConveyorBelt.Tooling.Actors;
+using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
 
@@ -60,6 +61,8 @@ namespace ConveyorBelt.ConsoleWorker
                     .LifestyleSingleton(),
                  Component.For<IConfigurationValueProvider>()
                     .Instance(_configurationValueProvider),
+                Component.For<ISourceConfiguration>()
+                    .ImplementedBy<TableStorageConfigurationSource>(),
                 Component.For<IServiceLocator>()
                     .Instance(serviceLocator),
                 Component.For<IActorConfiguration>()

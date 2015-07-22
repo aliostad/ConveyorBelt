@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BeeHive;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace ConveyorBelt.Tooling
+namespace ConveyorBelt.Tooling.Configuration
 {
     public class DiagnosticsSource
     {
@@ -82,7 +80,7 @@ namespace ConveyorBelt.Tooling
 
         public string ToTypeKey()
         {
-            return PartitionKey + "_" + RowKey;
+            return AlternateTypeName ?? (PartitionKey + "_" + RowKey);
         }
 
         public string PartitionKey
@@ -100,6 +98,16 @@ namespace ConveyorBelt.Tooling
         public string IndexName
         {
             get { return _entity.Properties.GetStringValue("IndexName"); }
+        }
+
+        public string AlternateTypeName
+        {
+            get
+            {
+                return _entity.Properties.ContainsKey("AlternateTypeName")
+                    ? _entity.Properties["AlternateTypeName"].StringValue
+                    : null;
+            }
         }
 
         public DynamicTableEntity ToEntity()
@@ -166,6 +174,7 @@ namespace ConveyorBelt.Tooling
                 IndexName = IndexName,
                 PartitionKey = PartitionKey,
                 RowKey = RowKey,
+                TypeName = ToTypeKey(),
                 DynamicProperties = new Dictionary<string, object>()
             };
 
