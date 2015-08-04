@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.0"
+         DefaultTargets="Default">
+
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <SolutionDir Condition=" '$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <BuildArtifactsDir Include=".\..\artifacts\" />
+    <PackageOutputDir Include=".\..\artifacts\packages" />
+    <SolutionFile Include=".\..\ConveyorBelt.sln" />
+    <AppProjFiles Include=".\..\src\**\*.csproj" />
+    <ScriptsDir Include=".\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <NuGetCommandLinePath>$(SolutionDir)NuGet\NuGet.exe</NuGetCommandLinePath>
+  </PropertyGroup>
+
+  <Target Name="Default" DependsOnTargets="Compile" />
+  <Target Name="Restore">
+    <Exec Command="nuget.exe restore ..\" />
+  </Target>
+  
+  <Target Name="Compile" DependsOnTargets="Restore">
+    <MSBuild Projects="@(SolutionFile)" Targets="Rebuild" Properties="Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
+  </Target>
+</Project>
