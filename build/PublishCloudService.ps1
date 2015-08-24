@@ -28,7 +28,7 @@ function Package()
 function Publish()
 {
     $deployment = Get-AzureDeployment -ServiceName $serviceName -Slot $slot -ErrorVariable a -ErrorAction silentlycontinue 
-    if ($a[0] -ne $null)
+    if ($a -ne $null -and $a[0] -ne $null)
     {
         Write-Output "$(Get-Date –f $timeStampFormat) - No deployment is detected. Creating a new deployment. "
     }
