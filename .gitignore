@@ -37,4 +37,4 @@ script.sql
 *tokens.json
 *.publishsettings
 build/deploy.ps1
-/build/tokensMain.json
+/build/tokens.json
