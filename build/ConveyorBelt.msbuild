@@ -22,7 +22,7 @@
 
   <Target Name="Default" DependsOnTargets="Compile" />
   <Target Name="Restore">
-    <Exec Command="nuget.exe restore ..\" />
+    <Exec Command="..\tools\nuget.exe restore ..\" />
   </Target>
   
   <Target Name="Compile" DependsOnTargets="Restore">

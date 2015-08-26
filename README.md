@@ -42,15 +42,16 @@ Now open a powershell window, add your subscription and accounts and then run `P
 ```PowerShell
 .\PublishCloudService.ps1 `
   -serviceName <name your ConveyorBelt Azure service> `
-  -storageAccountName <name of the storage account for the service> `
+  -storageAccountName <name of the storage account needed for the deployment of the service> `
   -subscriptionDataFile <your .publishsettings file> `
-  -selectedsubscription <subscription to use> `
+  -selectedsubscription <name of subscription to use> `
   -affinityGroupName <affinity group or Azure region to deploy to>
 ```
 
 Now you should have a running cluster of ConveyorBelt!
 
 ### Step 3: Set up your source
+Source configuration can wildly differ depending on the type of data source but below is the settings required for shovelling WADLogsTable data.
 In Azure Storage Explorer (or your favourite tool) open `DiagnosticsSource` table (or whatever you named it) and create an item with properties described below:
 
  - PartitionKey: whatever you like - commonly `<top level business domain>_<mid level business domain>` 
@@ -59,7 +60,7 @@ In Azure Storage Explorer (or your favourite tool) open `DiagnosticsSource` tabl
  - GracePeriodMinutes (int): Depends on how often your logs gets copied to Azure table. If it is 10 minutes then 15 should be ok, if it is 1 minute then 3 is fine.
  - IsActive (bool): True
  - MappingName (string): `WADLogsTable`. ConveyorBelt would look for mapping in `<ConveyorBelt_MappingsPath>/<MappingName>`.json
- - LastOffsetPoint (string): set to ISO Date (second and millisecond must be zero) from which you want the data to be copied e.g. 2015-02-15T19:34:00.0000000+00:00
+ - LastOffsetPoint (string): set to ISO Date (second and millisecond MUST BE ZERO!!) from which you want the data to be copied e.g. 2015-02-15T19:34:00.0000000+00:00
  - LastScheduled (datetime): set it to a date in the past
  - MaxItemsInAScheduleRun (int): 100000 is fine
  - SchedulerType (string): ConveyorBelt.Tooling.Scheduling.MinuteTableShardScheduler
