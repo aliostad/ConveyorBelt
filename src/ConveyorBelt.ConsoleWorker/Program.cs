@@ -72,6 +72,9 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<IFactoryActor>()
                     .ImplementedBy<FactoryActor>()
                     .LifestyleTransient(),
+                Component.For<IHttpClient>()
+                    .ImplementedBy<DefaultHttpClient>()
+                    .LifestyleSingleton(),
                 Component.For<ShardKeyActor>()
                     .ImplementedBy<ShardKeyActor>()
                     .LifestyleTransient(),
@@ -144,6 +147,19 @@ namespace ConveyorBelt.ConsoleWorker
 
         static void Main(string[] args)
         {
+            if (args[0] == "trace")
+            {
+                TheTrace.Tracer = (level, format, formatParams) =>
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    var msg = formatParams == null || formatParams.Length == 0
+                        ? format
+                        : string.Format(format, formatParams);
+
+                    Console.WriteLine(msg);
+                };
+            }
+
             Setup();
             Start();
             Console.WriteLine("Running. Please press <ENTER> to stop...");
@@ -158,11 +174,16 @@ namespace ConveyorBelt.ConsoleWorker
             // schedule every 30 seconds or so
             while (!cancellationToken.IsCancellationRequested)
             {
+                Console.WriteLine("Now doing it...");
                 var then = DateTimeOffset.UtcNow;
                 await _scheduler.ScheduleSourcesAsync();
                 var seconds = DateTimeOffset.UtcNow.Subtract(then).TotalSeconds;
                 if (seconds < 30)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     await Task.Delay(TimeSpan.FromSeconds(30 - seconds), cancellationToken);
+                    Console.WriteLine("Waiting ...");                    
+                }
             }
         }
     }

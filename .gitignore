@@ -38,3 +38,4 @@ script.sql
 *.publishsettings
 build/deploy.ps1
 /build/tokens.json
+mappings/NuzLog.json
