@@ -27,7 +27,7 @@ namespace ConveyorBelt.Tooling.Scheduling
         public async Task<Tuple<IEnumerable<Event>, bool>> TryScheduleAsync(DiagnosticsSource source)
         {
             // if Stop offset has been reached
-            if (source.StopOffsetPoint != null && source.LastOffsetPoint != null && source.LastOffsetPoint.CompareTo(source.StopOffsetPoint) >= 0)
+            if (!string.IsNullOrEmpty(source.StopOffsetPoint) && source.LastOffsetPoint != null && source.LastOffsetPoint.CompareTo(source.StopOffsetPoint) >= 0)
                 return new Tuple<IEnumerable<Event>, bool>(Enumerable.Empty<Event>(), false);
 
             var lockToken = new LockToken(source.ToTypeKey());
