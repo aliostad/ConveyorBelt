@@ -166,6 +166,7 @@ namespace ConveyorBelt.Tooling.Configuration
                    GetProperty<string>("TableName");
         }
 
+        
         public DiagnosticsSourceSummary ToSummary()
         {
             var dss = new DiagnosticsSourceSummary()

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Azure;
 using ConveyorBelt.Tooling.Events;
+using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Parsing;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -42,15 +43,8 @@ namespace ConveyorBelt.Tooling.Actors
             if(!blob.Exists())
                 throw new InvalidOperationException("Blob does not exist: " + id);
             var stream = new MemoryStream();
-            await blob.DownloadToStreamAsync(stream);
-            var parserTypeName = blobFileArrived.Source.DynamicProperties["Parser"].ToString();
-            if(parserTypeName==null)
-                throw new NullReferenceException("parserTypeName");
-
-            var parserType = Assembly.GetExecutingAssembly().GetType(parserTypeName) ?? Type.GetType(parserTypeName);
-            if(parserType == null)
-                throw new InvalidOperationException("Parser type was null: " + parserTypeName);
-            var parser = (IParser) Activator.CreateInstance(parserType);
+            await blob.DownloadToStreamAsync(stream);          
+            var parser = FactoryHelper.Create<IParser>(blobFileArrived.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
             bool hasAnything = false;
 
             foreach (var entity in parser.Parse(stream, blob.Uri))

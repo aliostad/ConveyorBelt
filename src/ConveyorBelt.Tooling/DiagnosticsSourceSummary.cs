@@ -26,5 +26,11 @@ namespace ConveyorBelt.Tooling
 
         public IDictionary<string, object> DynamicProperties { get; set; } 
         
+        public object GetDynamicProperty(string name, object defaultValue = null)
+        {
+            return (DynamicProperties.ContainsKey(name) ? DynamicProperties[name] : null)
+                ?? defaultValue;
+        }
+
     }
 }

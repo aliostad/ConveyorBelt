@@ -30,7 +30,7 @@ function Publish()
     $deployment = Get-AzureDeployment -ServiceName $serviceName -Slot $slot -ErrorVariable a -ErrorAction silentlycontinue 
     if ($a -ne $null -and $a[0] -ne $null)
     {
-        Write-Output "$(Get-Date –f $timeStampFormat) - No deployment is detected. Creating a new deployment. "
+        Write-Output "$(Get-Date -f $timeStampFormat) - No deployment is detected. Creating a new deployment. "
     }
     #check for existing deployment and then either upgrade, delete + deploy, or cancel according to $alwaysDeleteExistingDeployments and $enableDeploymentUpgrade boolean variables
     if ($deployment -ne $null -and $deployment.Name -ne $null)
@@ -43,12 +43,12 @@ function Publish()
                 {
                     1  #Update deployment inplace (usually faster, cheaper, won't destroy VIP)
                     {
-                        Write-Output "$(Get-Date –f $timeStampFormat) - Deployment exists in $servicename.  Upgrading deployment."
+                        Write-Output "$(Get-Date -f $timeStampFormat) - Deployment exists in $servicename.  Upgrading deployment."
                         UpgradeDeployment
                     }
                     0  #Delete then create new deployment
                     {
-                        Write-Output "$(Get-Date –f $timeStampFormat) - Deployment exists in $servicename.  Deleting deployment."
+                        Write-Output "$(Get-Date -f $timeStampFormat) - Deployment exists in $servicename.  Deleting deployment."
                         DeleteDeployment
                         CreateNewDeployment
 
@@ -57,7 +57,7 @@ function Publish()
             }
             0
             {
-                Write-Output "$(Get-Date –f $timeStampFormat) - ERROR: Deployment exists in $servicename.  Script execution cancelled."
+                Write-Output "$(Get-Date -f $timeStampFormat) - ERROR: Deployment exists in $servicename.  Script execution cancelled."
                 exit
             }
         } #switch ($alwaysDeleteExistingDeployments)
@@ -69,8 +69,8 @@ function Publish()
 function CreateNewDeployment()
 {
     write-progress -id 3 -activity "Creating New Deployment" -Status "In progress"
-    Write-Host "$(Get-Date –f $timeStampFormat) - Creating New Deployment: In progress" -ForegroundColor DarkCyan
-    Write-Host "$(Get-Date –f $timeStampFormat) - Service name is $serviceName and config is $cloudConfigLocation" -ForegroundColor green
+    Write-Host "$(Get-Date -f $timeStampFormat) - Creating New Deployment: In progress" -ForegroundColor DarkCyan
+    Write-Host "$(Get-Date -f $timeStampFormat) - Service name is $serviceName and config is $cloudConfigLocation" -ForegroundColor green
     
     Write-Host "Creating new service $serviceName ..."
     New-AzureService -ServiceName $serviceName -AffinityGroup $affinityGroupName
@@ -81,7 +81,7 @@ function CreateNewDeployment()
     $completeDeploymentID = $completeDeployment.deploymentid
 
     write-progress -id 3 -activity "Creating New Deployment" -completed -Status "Complete"
-    Write-Output "$(Get-Date –f $timeStampFormat) - Creating New Deployment: Complete, Deployment ID: $completeDeploymentID"
+    Write-Output "$(Get-Date -f $timeStampFormat) - Creating New Deployment: Complete, Deployment ID: $completeDeploymentID"
 
     StartInstances
 }
@@ -89,7 +89,7 @@ function CreateNewDeployment()
 function UpgradeDeployment()
 {
     write-progress -id 3 -activity "Upgrading Deployment" -Status "In progress"
-    Write-Output "$(Get-Date –f $timeStampFormat) - Upgrading Deployment: In progress"
+    Write-Output "$(Get-Date -f $timeStampFormat) - Upgrading Deployment: In progress"
 
     # perform Update-Deployment
     $setdeployment = Set-AzureDeployment -Upgrade -Slot $slot -Package $packageLocation -Configuration $cloudConfigLocation -label $deploymentLabel -ServiceName $serviceName -Force
@@ -98,25 +98,25 @@ function UpgradeDeployment()
     $completeDeploymentID = $completeDeployment.deploymentid
 
     write-progress -id 3 -activity "Upgrading Deployment" -completed -Status "Complete"
-    Write-Output "$(Get-Date –f $timeStampFormat) - Upgrading Deployment: Complete, Deployment ID: $completeDeploymentID"
+    Write-Output "$(Get-Date -f $timeStampFormat) - Upgrading Deployment: Complete, Deployment ID: $completeDeploymentID"
 }
 
 function DeleteDeployment()
 {
     write-progress -id 2 -activity "Deleting Deployment" -Status "In progress"
-    Write-Output "$(Get-Date –f $timeStampFormat) - Deleting Deployment: In progress"
+    Write-Output "$(Get-Date -f $timeStampFormat) - Deleting Deployment: In progress"
 
     #WARNING - always deletes with force
     $removeDeployment = Remove-AzureDeployment -Slot $slot -ServiceName $serviceName -Force
 
     write-progress -id 2 -activity "Deleting Deployment: Complete" -completed -Status $removeDeployment
-    Write-Output "$(Get-Date –f $timeStampFormat) - Deleting Deployment: Complete"
+    Write-Output "$(Get-Date -f $timeStampFormat) - Deleting Deployment: Complete"
 }
 
 function StartInstances()
 {
     write-progress -id 4 -activity "Starting Instances" -status "In progress"
-    Write-Output "$(Get-Date –f $timeStampFormat) - Starting Instances: In progress"
+    Write-Output "$(Get-Date -f $timeStampFormat) - Starting Instances: In progress"
 
     $deployment = Get-AzureDeployment -ServiceName $serviceName -Slot $slot
     $runstatus = $deployment.Status
@@ -139,7 +139,7 @@ function StartInstances()
             if ($oldStatusStr[$i - 1] -ne $roleInstance.InstanceStatus)
             {
                 $oldStatusStr[$i - 1] = $roleInstance.InstanceStatus
-                Write-Output "$(Get-Date –f $timeStampFormat) - Starting Instance '$instanceName': $instanceStatus"
+                Write-Output "$(Get-Date -f $timeStampFormat) - Starting Instance '$instanceName': $instanceStatus"
             }
 
             write-progress -id (4 + $i) -activity "Starting Instance '$instanceName'" -status "$instanceStatus"
@@ -160,7 +160,7 @@ function StartInstances()
         if ($oldStatusStr[$i - 1] -ne $roleInstance.InstanceStatus)
         {
             $oldStatusStr[$i - 1] = $roleInstance.InstanceStatus
-            Write-Output "$(Get-Date –f $timeStampFormat) - Starting Instance '$instanceName': $instanceStatus"
+            Write-Output "$(Get-Date -f $timeStampFormat) - Starting Instance '$instanceName': $instanceStatus"
         }
 
         $i = $i + 1
@@ -170,7 +170,7 @@ function StartInstances()
     $opstat = $deployment.Status 
 
     write-progress -id 4 -activity "Starting Instances" -completed -status $opstat
-    Write-Output "$(Get-Date –f $timeStampFormat) - Starting Instances: $opstat"
+    Write-Output "$(Get-Date -f $timeStampFormat) - Starting Instances: $opstat"
 }
 
 function AllInstancesRunning($roleInstanceList)
@@ -268,15 +268,15 @@ $subscriptionid = $subscription.subscriptionid
 $slot = $environment
 
 # main driver - publish & write progress to activity log
-Write-Output "$(Get-Date –f $timeStampFormat) - Azure Cloud Service deploy script started."
-Write-Output "$(Get-Date –f $timeStampFormat) - Preparing deployment of $deploymentLabel for $subscriptionname with Subscription ID $subscriptionid."
+Write-Output "$(Get-Date -f $timeStampFormat) - Azure Cloud Service deploy script started."
+Write-Output "$(Get-Date -f $timeStampFormat) - Preparing deployment of $deploymentLabel for $subscriptionname with Subscription ID $subscriptionid."
 
 Publish
 
 $deployment = Get-AzureDeployment -slot $slot -serviceName $servicename
 $deploymentUrl = $deployment.Url
 
-Write-Output "$(Get-Date –f $timeStampFormat) - Azure Cloud Service deploy script finished."
-Write-Output "$(Get-Date –f $timeStampFormat) - Created Cloud Service with URL: "
+Write-Output "$(Get-Date -f $timeStampFormat) - Azure Cloud Service deploy script finished."
+Write-Output "$(Get-Date -f $timeStampFormat) - Created Cloud Service with URL: "
 Write-Output "$deploymentUrl"
 exit 0

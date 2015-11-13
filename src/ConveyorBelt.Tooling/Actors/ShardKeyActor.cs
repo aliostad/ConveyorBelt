@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Azure;
 using ConveyorBelt.Tooling.Events;
+using ConveyorBelt.Tooling.Internal;
+using ConveyorBelt.Tooling.Querying;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Shared.Protocol;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling.Actors
@@ -34,12 +37,9 @@ namespace ConveyorBelt.Tooling.Actors
             TheTrace.TraceInformation("Got {0} from {1}", shardKeyArrived.ShardKey, 
                 shardKeyArrived.Source.TypeName);
 
-            var account = CloudStorageAccount.Parse(shardKeyArrived.Source.ConnectionString);
-            var client = account.CreateCloudTableClient();
-            var table = client.GetTableReference(shardKeyArrived.Source.DynamicProperties["TableName"].ToString());
-
-            var entities = table.ExecuteQuery(new TableQuery().Where(
-                TableQuery.GenerateFilterCondition("PartitionKey", "eq", shardKeyArrived.ShardKey)));
+            var shardKeyQuerier = (string) shardKeyArrived.Source.GetDynamicProperty(ConveyorBeltConstants.ShardKeyQuery);
+            var query = FactoryHelper.Create<IShardKeyQuery>(shardKeyQuerier, typeof (TableStorageShardKeyQuery));
+            var entities = await query.QueryAsync(shardKeyArrived);
 
             bool hasAnything = false;
             foreach (var entity in entities)
