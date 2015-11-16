@@ -62,7 +62,7 @@ namespace ConveyorBelt.Tooling.Querying
 
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        entity.Properties.Add(reader.GetName(i), EntityProperty.CreateEntityPropertyFromObject(data[reader.GetName(i)]));
+                        entity.Properties.Add(reader.GetName(i), data[reader.GetName(i)]);
                     }
 
                     entities.Add(entity);
