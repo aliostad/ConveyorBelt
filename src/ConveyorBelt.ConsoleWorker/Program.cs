@@ -147,7 +147,7 @@ namespace ConveyorBelt.ConsoleWorker
 
         static void Main(string[] args)
         {
-            if (args[0] == "trace")
+            if (args.Length > 0 && args[0] == "trace")
             {
                 TheTrace.Tracer = (level, format, formatParams) =>
                 {
