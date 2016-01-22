@@ -24,26 +24,38 @@ namespace ConveyorBelt.Tooling.Scheduling
             TheTrace.TraceInformation("IisBlobScheduler - pathformat: {0}", pathFormat);
             pathFormat = pathFormat.TrimEnd('/') + "/"; // ensure path ends with /
 
-            var offset = DateTimeOffset.Parse(source.LastOffsetPoint);
+            var offset = FileOffset.Parse(source.LastOffsetPoint);
+            if(offset == null)
+                throw new InvalidOperationException("FileOffset failed parsing: => " + source.LastOffsetPoint);
             int instanceIndex = 0;
-            DateTimeOffset maxOffset = offset;
+            DateTimeOffset maxOffset = offset.TimeOffset;
+            FileOffset newOffset = null;
             var events = new List<Event>();
             while (true)
             {
                 bool found = false;
                 var path = string.Format(pathFormat, instanceIndex);
                 TheTrace.TraceInformation("IisBlobScheduler - Looking into {0}", path);
-                foreach (var itm in client.ListBlobs(path))
+                foreach (var blob in client.ListBlobs(path).Where(itm => itm is CloudBlockBlob)
+                    .Cast<CloudBlockBlob>().OrderByDescending(x => x.Properties.LastModified))
                 {
-                    var blob = itm as CloudBlockBlob;
-                    if (blob != null && blob.Properties.LastModified > offset)
+                    if (blob.Properties.LastModified > offset.TimeOffset)
                     {
+                        var filename = blob.Uri.ToString();
+                        if (!found) // first time running
+                        {
+                            newOffset = new FileOffset(filename, 
+                                blob.Properties.LastModified ?? DateTimeOffset.UtcNow, blob.Properties.Length);
+                        }
+
                         TheTrace.TraceInformation("IisBlobScheduler - found {0}", blob.Uri);
                         found = true;
-                        maxOffset = offset > blob.Properties.LastModified.Value
-                            ? offset
-                            : blob.Properties.LastModified.Value;
-                        events.Add(new Event(new BlobFileArrived() { Source = source.ToSummary(), BlobId = blob.Uri.ToString() }));
+                        events.Add(new Event(new BlobFileArrived()
+                        {
+                            Source = source.ToSummary(), 
+                            BlobId = filename,
+                            Position = (filename == offset.FileName) ? offset.Position : 0 // if same file then pass offset
+                        }));
                     }
                 }
 
@@ -52,10 +64,11 @@ namespace ConveyorBelt.Tooling.Scheduling
                     TheTrace.TraceInformation("IisBlobScheduler - Breaking out with index of {0}", instanceIndex);
                     break;
                 }
+
                 instanceIndex++;
             }
 
-            source.LastOffsetPoint = maxOffset.ToString("O");
+            source.LastOffsetPoint = newOffset == null ? offset.ToString() : newOffset.ToString();
             return events;
         }
 

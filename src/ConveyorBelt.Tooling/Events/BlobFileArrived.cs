@@ -11,5 +11,7 @@ namespace ConveyorBelt.Tooling.Events
         public DiagnosticsSourceSummary Source { get; set; }
 
         public string BlobId { get; set; }
+
+        public long? Position { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace ConveyorBelt.Tooling.Parsing
 {
     public class IisLogParser : IParser
     {
-        public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id)
+        public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0)
         {
             if (body.Position != 0)
                 body.Position = 0;

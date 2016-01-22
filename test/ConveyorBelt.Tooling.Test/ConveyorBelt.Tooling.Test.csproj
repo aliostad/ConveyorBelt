@@ -119,6 +119,7 @@
     <Compile Include="DiagnosticsSourceSummaryTests.cs" />
     <Compile Include="ELasticBatchPusherTests.cs" />
     <Compile Include="FactoryHelperTests.cs" />
+    <Compile Include="FileOffsetTests.cs" />
     <Compile Include="IisLogTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
