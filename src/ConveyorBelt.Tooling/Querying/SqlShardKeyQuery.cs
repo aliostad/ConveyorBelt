@@ -57,8 +57,8 @@ namespace ConveyorBelt.Tooling.Querying
                     }
                     TheTrace.TraceInformation("timestampFieldName => '{0}'", data[timestampFieldName].ToString());
 
-                    var entity = new DynamicTableEntity(data[shardFieldName].DateTime.Value.ToString("yyyyMMddHHmmss"), data[idFieldName].GuidValue.ToString());
-                    entity.Timestamp = new DateTimeOffset(data[timestampFieldName].DateTime.Value);
+                    var entity = new DynamicTableEntity(data[shardFieldName].DateTimeOffsetValue.Value.ToString("yyyyMMddHHmmss"), data[idFieldName].GuidValue.ToString());
+                    entity.Timestamp = data[timestampFieldName].DateTimeOffsetValue.Value;
 
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
