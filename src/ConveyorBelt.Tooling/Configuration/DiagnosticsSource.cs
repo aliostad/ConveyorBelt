@@ -150,9 +150,10 @@ namespace ConveyorBelt.Tooling.Configuration
 
             if (String.IsNullOrEmpty(LastOffsetPoint))
                 LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString("O");
-            var dateTimeOffset = DateTimeOffset.Parse(LastOffsetPoint);
 
-            var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset).TotalDays;
+            var dateTimeOffset = FileOffset.Parse(LastOffsetPoint);
+
+            var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset.TimeOffset).TotalDays;
             if (days <= 0)
                 return Enumerable.Empty<string>();
 
