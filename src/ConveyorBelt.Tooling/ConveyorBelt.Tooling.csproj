@@ -131,6 +131,7 @@
     <Compile Include="IHttpClient.cs" />
     <Compile Include="Internal\ConveyorBeltConstants.cs" />
     <Compile Include="Internal\FactoryHelper.cs" />
+    <Compile Include="Internal\SimpleFilter.cs" />
     <Compile Include="Parsing\IisLogParser.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -148,7 +149,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

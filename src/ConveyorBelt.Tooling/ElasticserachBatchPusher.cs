@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
 using ConveyorBelt.Tooling.Configuration;
+using ConveyorBelt.Tooling.Internal;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,6 +21,8 @@ namespace ConveyorBelt.Tooling
         private int _numberOfRecords = 0;
         private IHttpClient _httpClient;
 
+        // no reason for thread sync/concurrent since this will be called only by a single thread
+        private Dictionary<string, SimpleFilter> _filters = new Dictionary<string, SimpleFilter>();
 
         public ElasticsearchBatchPusher(IHttpClient httpClient, string esUrl, int batchSize = 100)
         {
@@ -54,6 +57,17 @@ namespace ConveyorBelt.Tooling
 
         public async Task PushAsync(DynamicTableEntity entity, DiagnosticsSourceSummary source)
         {
+            if(source.Filter == null)
+                source.Filter = string.Empty;
+
+            if (!_filters.ContainsKey(source.Filter))
+            {
+                _filters.Add(source.Filter, new SimpleFilter(source.Filter));
+            }
+
+            if (!_filters[source.Filter].Satisfies(entity))
+                return;
+
             var op = new
             {
                 index = new

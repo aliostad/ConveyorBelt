@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling
 {
@@ -24,6 +25,12 @@ namespace ConveyorBelt.Tooling
 
         public string IndexName { get; set; }
 
+        /// <summary>
+        /// One or more pipe-delimited (OR) expression containing a field name and a value: [field name]=[value]
+        /// If set, it will only convey such entries meeting the criteria
+        /// </summary>
+        public string Filter { get; set; }
+
         public IDictionary<string, object> DynamicProperties { get; set; } 
         
         public object GetDynamicProperty(string name, object defaultValue = null)
@@ -31,6 +38,5 @@ namespace ConveyorBelt.Tooling
             return (DynamicProperties.ContainsKey(name) ? DynamicProperties[name] : null)
                 ?? defaultValue;
         }
-
     }
 }
