@@ -26,5 +26,20 @@ namespace ConveyorBelt.Tooling
         {
             return _client.PostAsync(requestUri, content);
         }
+
+        public Task<HttpResponseMessage> GetAsync(string uri)
+        {
+            return _client.GetAsync(uri);
+        }
+
+        public Task<HttpResponseMessage> PutAsJsonAsync(string requestUri, string payload)
+        {
+            return _client.PutAsJsonAsync(requestUri, payload);
+        }
+
+        public Task<HttpResponseMessage> PutAsync(string requestUri, HttpContent content)
+        {
+            return _client.PutAsync(requestUri, content);
+        }
     }
 }

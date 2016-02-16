@@ -19,13 +19,16 @@ namespace ConveyorBelt.Tooling.Scheduling
         private IElasticsearchClient _elasticsearchClient;
         private IServiceLocator _locator;
         private ISourceConfiguration _sourceConfiguration;
+        private IHttpClient _httpClient;
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
             IConfigurationValueProvider configurationValueProvider,
             ISourceConfiguration sourceConfiguration,
             IElasticsearchClient elasticsearchClient,
-            IServiceLocator locator)
+            IServiceLocator locator,
+            IHttpClient httpClient)
         {
+            _httpClient = httpClient;
             _sourceConfiguration = sourceConfiguration;
             _locator = locator;
             _elasticsearchClient = elasticsearchClient;
@@ -110,8 +113,17 @@ namespace ConveyorBelt.Tooling.Scheduling
                     var jsonPath = string.Format("{0}{1}.json",
                         _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath),
                         source.GetMappingName());
-                    var client = new WebClient();
-                    var mapping = client.DownloadString(jsonPath).Replace("___type_name___", source.ToTypeKey());
+                    var response = await _httpClient.GetAsync(jsonPath);
+
+                    if (response.Content == null)
+                        throw new ApplicationException(response.ToString());
+
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    if(!response.IsSuccessStatusCode)
+                        throw new InvalidOperationException(content);
+
+                    var mapping = content.Replace("___type_name___", source.ToTypeKey());
                     await _elasticsearchClient.UpdateMappingAsync(esUrl, indexName, source.ToTypeKey(), mapping);
                 }
             }

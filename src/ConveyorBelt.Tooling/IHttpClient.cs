@@ -10,5 +10,12 @@ namespace ConveyorBelt.Tooling
     public interface IHttpClient
     {
         Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent content);
+
+        Task<HttpResponseMessage> GetAsync(string requestUri);
+
+        Task<HttpResponseMessage> PutAsJsonAsync(string requestUri, string payload);
+
+        Task<HttpResponseMessage> PutAsync(string requestUri, HttpContent content);
+
     }
 }

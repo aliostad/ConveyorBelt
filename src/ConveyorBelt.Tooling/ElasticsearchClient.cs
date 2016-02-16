@@ -11,12 +11,16 @@ namespace ConveyorBelt.Tooling
 {
     public class ElasticsearchClient : IElasticsearchClient
     {
+        private IHttpClient _httpClient;
 
-        private HttpClient _httpClient = new HttpClient();
         private const string IndexFormat = "{0}/{1}";
         private const string IndexSearchFormat = "{0}/{1}/_search?size=0";
         private const string MappingFormat = "{0}/{1}/{2}/_mapping";
 
+        public ElasticsearchClient(IHttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
 
         public async Task<bool> CreateIndexIfNotExistsAsync(string baseUrl, string indexName)
         {
