@@ -14,6 +14,7 @@
       <Setting name="ConveyorBelt.Storage.ClusterLockContainer" />
       <Setting name="ConveyorBelt.Storage.ClusterLockRoot" />
       <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" />
+      <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" />
     </ConfigurationSettings>
   </WorkerRole>
 </ServiceDefinition>
