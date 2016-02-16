@@ -41,6 +41,20 @@ namespace ConveyorBelt.Worker
 
             _configurationValueProvider = new AzureConfigurationValueProvider();
             var storageConnectionString = _configurationValueProvider.GetValue(ConfigurationKeys.StorageConnectionString);
+            var clusterLockContainer = _configurationValueProvider.GetValue(ConfigurationKeys.ClusterLockContainer);
+            var clusterLockRootPath = _configurationValueProvider.GetValue(ConfigurationKeys.ClusterLockRootPath);
+            var headersText = _configurationValueProvider.GetValue(ConfigurationKeys.TabSeparatedCustomEsHttpHeaders);
+            var headers = new List<KeyValuePair<string, string>>();
+            if (headersText != null)
+            {
+                foreach (var header in headersText.Split('\t'))
+                {
+                    var strings = header.Split(new []{ ": "}, StringSplitOptions.RemoveEmptyEntries);
+                    if (strings.Length == 2)
+                        headers.Add(new KeyValuePair<string, string>( strings[0], strings[1]));
+                }
+            }
+
             var servicebusConnectionString = _configurationValueProvider.GetValue(ConfigurationKeys.ServiceBusConnectionString);
 
             container.Register(
@@ -92,7 +106,8 @@ namespace ConveyorBelt.Worker
                     .LifestyleTransient(),
                 Component.For<IHttpClient>()
                     .ImplementedBy<DefaultHttpClient>()
-                    .LifestyleSingleton(),
+                    .LifestyleSingleton()
+                    .DependsOn(Dependency.OnValue("defaultHeaders", headers)),
                 Component.For<IElasticsearchBatchPusher>()
                     .ImplementedBy<ElasticsearchBatchPusher>()
                     .LifestyleTransient()
@@ -101,8 +116,8 @@ namespace ConveyorBelt.Worker
                     .Instance(new AzureLockStore(new BlobSource()
                     {
                         ConnectionString = storageConnectionString,
-                        ContainerName = "locks",
-                        Path = "conveyor_belt/locks/master_Keys/"
+                        ContainerName = clusterLockContainer,
+                        Path = clusterLockRootPath
                     })),
                 Component.For<IEventQueueOperator>()
                     .Instance(new ServiceBusOperator(servicebusConnectionString))
@@ -158,7 +173,7 @@ namespace ConveyorBelt.Worker
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            
+
             // schedule every 30 seconds or so
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -171,3 +186,4 @@ namespace ConveyorBelt.Worker
         }
     }
 }
+

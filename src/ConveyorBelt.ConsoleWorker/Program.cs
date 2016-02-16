@@ -33,7 +33,6 @@ namespace ConveyorBelt.ConsoleWorker
     class Program
     {
 
-
         private static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private static readonly ManualResetEvent _runCompleteEvent = new ManualResetEvent(false);
         private static IConfigurationValueProvider _configurationValueProvider;
@@ -48,6 +47,17 @@ namespace ConveyorBelt.ConsoleWorker
             _configurationValueProvider = new AppSettingsConfigProvider();
             var storageConnectionString = _configurationValueProvider.GetValue(ConfigurationKeys.StorageConnectionString);
             var servicebusConnectionString = _configurationValueProvider.GetValue(ConfigurationKeys.ServiceBusConnectionString);
+            var headersText = _configurationValueProvider.GetValue(ConfigurationKeys.TabSeparatedCustomEsHttpHeaders);
+            var headers = new List<KeyValuePair<string, string>>();
+            if (headersText != null)
+            {
+                foreach (var header in headersText.Split('\t'))
+                {
+                    var strings = header.Split(new[] { ": " }, StringSplitOptions.RemoveEmptyEntries);
+                    if (strings.Length == 2)
+                        headers.Add(new KeyValuePair<string, string>(strings[0], strings[1]));
+                }
+            }
 
             container.Register(
                  Component.For<IElasticsearchClient>()
@@ -74,7 +84,8 @@ namespace ConveyorBelt.ConsoleWorker
                     .LifestyleTransient(),
                 Component.For<IHttpClient>()
                     .ImplementedBy<DefaultHttpClient>()
-                    .LifestyleSingleton(),
+                    .LifestyleSingleton()
+                    .DependsOn(Dependency.OnValue("defaultHeaders", headers)),
                 Component.For<ShardKeyActor>()
                     .ImplementedBy<ShardKeyActor>()
                     .LifestyleTransient(),
