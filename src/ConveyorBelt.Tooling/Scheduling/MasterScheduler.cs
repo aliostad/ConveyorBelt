@@ -19,16 +19,14 @@ namespace ConveyorBelt.Tooling.Scheduling
         private IElasticsearchClient _elasticsearchClient;
         private IServiceLocator _locator;
         private ISourceConfiguration _sourceConfiguration;
-        private IHttpClient _httpClient;
+        private IHttpClient _nonAuthenticatingClient = new DefaultHttpClient(); // TODO: make this 
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
             IConfigurationValueProvider configurationValueProvider,
             ISourceConfiguration sourceConfiguration,
             IElasticsearchClient elasticsearchClient,
-            IServiceLocator locator,
-            IHttpClient httpClient)
+            IServiceLocator locator)
         {
-            _httpClient = httpClient;
             _sourceConfiguration = sourceConfiguration;
             _locator = locator;
             _elasticsearchClient = elasticsearchClient;
@@ -113,7 +111,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                     var jsonPath = string.Format("{0}{1}.json",
                         _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath),
                         source.GetMappingName());
-                    var response = await _httpClient.GetAsync(jsonPath);
+
+                    var response = await _nonAuthenticatingClient.GetAsync(jsonPath);
 
                     if (response.Content == null)
                         throw new ApplicationException(response.ToString());
