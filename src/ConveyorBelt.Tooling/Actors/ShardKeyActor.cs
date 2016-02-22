@@ -16,7 +16,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 namespace ConveyorBelt.Tooling.Actors
 {
 
-    [ActorDescription("ShardKeyArrived-Process", 1)]
+    [ActorDescription("ShardKeyArrived-Process", 5)]
     public class ShardKeyActor : IProcessorActor
     {
         private IElasticsearchBatchPusher _pusher;

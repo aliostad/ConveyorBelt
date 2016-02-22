@@ -10,7 +10,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling.Actors
 {
-    [ActorDescription("ShardRangeArrived-Process", 1)]
+    [ActorDescription("ShardRangeArrived-Process", 3)]
     public class ShardRangeActor : IProcessorActor
     {
         private IElasticsearchBatchPusher _pusher;
