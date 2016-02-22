@@ -153,7 +153,7 @@ namespace ConveyorBelt.Tooling.Configuration
 
             var dateTimeOffset = FileOffset.Parse(LastOffsetPoint);
 
-            var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset.TimeOffset).TotalDays;
+            var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset.TimeOffset).TotalDays + 1; // to cover today as well - Aboo was here
             if (days <= 0)
                 return Enumerable.Empty<string>();
 

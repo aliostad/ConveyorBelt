@@ -54,7 +54,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                         {
                             Source = source.ToSummary(), 
                             BlobId = filename,
-                            Position = (filename == offset.FileName) ? offset.Position : 0 // if same file then pass offset
+                            Position = (filename == offset.FileName) ? offset.Position : 0, // if same file then pass offset
+                            EndPosition = blob.Properties.Length
                         }));
                     }
                 }

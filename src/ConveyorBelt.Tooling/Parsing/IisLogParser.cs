@@ -11,16 +11,19 @@ namespace ConveyorBelt.Tooling.Parsing
 {
     public class IisLogParser : IParser
     {
-        public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0)
+        public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0, long endPosition = 0)
         {
             if (body.Position != 0)
                 body.Position = 0;
+
+            if (endPosition == 0)
+                endPosition = long.MaxValue;
 
             var reader = new StreamReader(body);
             string line = null;
             string[] fields = null;
             int lineNumber = 1;
-            while ((line = reader.ReadLine()) != null)
+            while (body.Position < endPosition && (line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("#Fields: "))
                     fields = BuildFields(line);

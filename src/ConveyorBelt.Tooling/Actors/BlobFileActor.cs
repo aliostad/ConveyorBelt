@@ -47,7 +47,7 @@ namespace ConveyorBelt.Tooling.Actors
             var parser = FactoryHelper.Create<IParser>(blobFileArrived.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
             bool hasAnything = false;
 
-            foreach (var entity in parser.Parse(stream, blob.Uri, blobFileArrived.Position ?? 0))
+            foreach (var entity in parser.Parse(stream, blob.Uri, blobFileArrived.Position ?? 0, blobFileArrived.EndPosition ?? 0))
             {
                 await _pusher.PushAsync(entity, blobFileArrived.Source);
                 hasAnything = true;

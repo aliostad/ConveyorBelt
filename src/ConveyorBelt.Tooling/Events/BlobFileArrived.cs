@@ -13,5 +13,7 @@ namespace ConveyorBelt.Tooling.Events
         public string BlobId { get; set; }
 
         public long? Position { get; set; }
+
+        public long? EndPosition { get; set; }
     }
 }

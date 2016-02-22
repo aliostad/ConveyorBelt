@@ -11,6 +11,6 @@ namespace ConveyorBelt.Tooling.Parsing
 {
     public interface IParser
     {
-        IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0);
+        IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0, long endPosition = 0);
     }
 }
