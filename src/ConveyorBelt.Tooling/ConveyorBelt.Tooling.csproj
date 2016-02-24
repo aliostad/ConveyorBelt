@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actors\BlobFileActor.cs" />
+    <Compile Include="Actors\BlobFileConventionActor.cs" />
     <Compile Include="Actors\ShardKeyActor.cs" />
     <Compile Include="Actors\ShardRangeActor.cs" />
     <Compile Include="ConfigurationKeys.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="DiagnosticsSourceSummary.cs" />
     <Compile Include="ElasticsearchClient.cs" />
     <Compile Include="Events\BlobFileArrived.cs" />
+    <Compile Include="Events\BlobFileScheduled.cs" />
     <Compile Include="Events\ShardKeyArrived.cs" />
     <Compile Include="Events\ShardRangeArrived.cs" />
     <Compile Include="FileOffset.cs" />
@@ -130,6 +132,7 @@
     <Compile Include="IElasticsearchBatchPusher.cs" />
     <Compile Include="IHttpClient.cs" />
     <Compile Include="Internal\ConveyorBeltConstants.cs" />
+    <Compile Include="Internal\DateTimeOffsetExtensions.cs" />
     <Compile Include="Internal\FactoryHelper.cs" />
     <Compile Include="Internal\SimpleFilter.cs" />
     <Compile Include="Parsing\IisLogParser.cs" />
@@ -140,6 +143,7 @@
     <Compile Include="Querying\TableStorageShardKeyQuery.cs" />
     <Compile Include="Scheduling\BaseScheduler.cs" />
     <Compile Include="Scheduling\D18MinuteTableShardScheduler.cs" />
+    <Compile Include="Scheduling\IisBlobConventionScheduler.cs" />
     <Compile Include="Scheduling\IisBlobScheduler.cs" />
     <Compile Include="Scheduling\ISourceScheduler.cs" />
     <Compile Include="Scheduling\MasterScheduler.cs" />

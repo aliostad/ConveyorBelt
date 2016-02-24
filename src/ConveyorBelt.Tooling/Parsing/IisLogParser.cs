@@ -26,7 +26,10 @@ namespace ConveyorBelt.Tooling.Parsing
             while (body.Position < endPosition && (line = reader.ReadLine()) != null)
             {
                 if (line.StartsWith("#Fields: "))
+                {
                     fields = BuildFields(line);
+                    continue;                    
+                }
 
                 if (line.StartsWith("#"))
                     continue;

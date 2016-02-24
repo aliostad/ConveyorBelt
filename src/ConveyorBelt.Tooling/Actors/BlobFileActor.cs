@@ -15,7 +15,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace ConveyorBelt.Tooling.Actors
 {
-    [ActorDescription("BlobFileArrived-Process", 3)]
+    [ActorDescription("BlobFileArrived-Process", 6)]
     public class BlobFileActor : IProcessorActor
     {
         private IElasticsearchBatchPusher _pusher;
