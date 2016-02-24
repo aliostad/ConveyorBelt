@@ -52,12 +52,14 @@ namespace ConveyorBelt.Tooling.Scheduling
                 
                 for (int i = 1; i < fullNumberOfHoursInBetween+1; i++)
                 {
-                    var fileToConsume = string.Format(iisLogFileFormatConvention, offset.TimeOffset.AddHours(i).UtcDateTime) + ".log";
-                    var previousFile = string.Format(iisLogFileFormatConvention, offset.TimeOffset.AddHours(i - 1).UtcDateTime) + ".log";
+                    var fileToConsume = offset.TimeOffset.AddHours(i).UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
+                    var previousFile = offset.TimeOffset.AddHours(i - 1).UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
+                    var nextFile = offset.TimeOffset.AddHours(i + 1).UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
                     events.Add(new Event(new BlobFileScheduled()
                     {
                         FileToConsume = path.Replace("wad-iis-logfiles/", "") + fileToConsume,
                         PreviousFile = path.Replace("wad-iis-logfiles/", "") + previousFile,
+                        NextFile = path.Replace("wad-iis-logfiles/", "") + nextFile,
                         Source = source.ToSummary(),
                         StopChasingAfter = DateTimeOffset.Now.Add(TimeSpan.FromMinutes(80))
                     }));

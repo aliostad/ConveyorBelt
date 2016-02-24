@@ -12,8 +12,8 @@ namespace ConveyorBelt.Tooling.Internal
 
         public static int GetFullNumberOfHoursInBetween(this DateTimeOffset from, DateTimeOffset until)
         {
-            var maxUntil = new DateTimeOffset(until.Year, until.Month, until.Day, until.Hour, until.Minute, until.Second, 999, until.Offset);
-            return (until - from).Hours;
+            var maxUntil = new DateTimeOffset(until.Year, until.Month, until.Day, until.Hour, 59, 59, 999, until.Offset);
+            return (int) (maxUntil - from).TotalHours;
         }
     }
 }
