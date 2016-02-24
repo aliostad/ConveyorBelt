@@ -43,10 +43,16 @@ namespace ConveyorBelt.Tooling.Actors
             var mainBlobExists = await mainBlob.ExistsAsync();
 
             if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
+            {
+                TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0}", blobFileScheduled.FileToConsume);
                 return events; // Stop chasing it.
+            }
 
             if (!previousBlobExists && !mainBlobExists)
-                return events; // will never be here. Stop chasing it.
+            {
+                TheTrace.TraceInformation("BlobFileConventionActor - previous blob does not exist. Stopped chasing {0}", blobFileScheduled.FileToConsume);
+                return events; // will never be here. Stop chasing it.                
+            }
 
             long currentLength = 0;
             if (mainBlobExists)
@@ -55,7 +61,10 @@ namespace ConveyorBelt.Tooling.Actors
                 if (currentLength == blobFileScheduled.LastPosition)
                 {
                     if (nextBlobExists)
+                    {
+                        TheTrace.TraceInformation("BlobFileConventionActor - Next blob exists. Stopped chasing {0}", blobFileScheduled.FileToConsume);
                         return events; // done and dusted. Stop chasing it.
+                    }
                 }
                 else
                 {
@@ -74,6 +83,7 @@ namespace ConveyorBelt.Tooling.Actors
                     if (hasAnything)
                     {
                         await _pusher.FlushAsync();
+                        TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0}", blobFileScheduled.FileToConsume);
                     }
                 }
             }
@@ -85,6 +95,8 @@ namespace ConveyorBelt.Tooling.Actors
             {
                 EnqueueTime = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(30))
             });
+
+            TheTrace.TraceInformation("BlobFileConventionActor - deferred processing {0}. Length => {1}", blobFileScheduled.FileToConsume, currentLength);
 
             return events;
         }

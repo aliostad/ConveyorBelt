@@ -95,8 +95,14 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<BlobFileActor>()
                     .ImplementedBy<BlobFileActor>()
                     .LifestyleTransient(),
+                Component.For<BlobFileConventionActor>()
+                    .ImplementedBy<BlobFileConventionActor>()
+                    .LifestyleTransient(),
                 Component.For<IisBlobScheduler>()
                     .ImplementedBy<IisBlobScheduler>()
+                    .LifestyleTransient(),
+                Component.For<IisBlobConventionScheduler>()
+                    .ImplementedBy<IisBlobConventionScheduler>()
                     .LifestyleTransient(),
                 Component.For<RangeShardKeyScheduler>()
                     .ImplementedBy<RangeShardKeyScheduler>()

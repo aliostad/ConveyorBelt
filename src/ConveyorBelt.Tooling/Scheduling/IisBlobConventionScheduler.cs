@@ -54,7 +54,6 @@ namespace ConveyorBelt.Tooling.Scheduling
                 {
                     var fileToConsume = string.Format(iisLogFileFormatConvention, offset.TimeOffset.AddHours(i).UtcDateTime) + ".log";
                     var previousFile = string.Format(iisLogFileFormatConvention, offset.TimeOffset.AddHours(i - 1).UtcDateTime) + ".log";
-                    var nextFile = string.Format(iisLogFileFormatConvention, offset.TimeOffset.AddHours(i + 1).UtcDateTime) + ".log";
                     events.Add(new Event(new BlobFileScheduled()
                     {
                         FileToConsume = path.Replace("wad-iis-logfiles/", "") + fileToConsume,
@@ -62,6 +61,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                         Source = source.ToSummary(),
                         StopChasingAfter = DateTimeOffset.Now.Add(TimeSpan.FromMinutes(80))
                     }));
+
+                    TheTrace.TraceInformation("IisBlobConventionScheduler - Scheduled Event: {0}", fileToConsume);
                 }
             }
 
