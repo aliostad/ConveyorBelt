@@ -35,12 +35,14 @@ namespace ConveyorBelt.Tooling.Actors
             var account = CloudStorageAccount.Parse(blobFileScheduled.Source.ConnectionString);
             var client = account.CreateCloudBlobClient();
             var container = client.GetContainerReference("wad-iis-logfiles");
-            var nextBlob = container.GetBlockBlobReference(blobFileScheduled.NextFile);
-            var previousBlob = container.GetBlockBlobReference(blobFileScheduled.PreviousFile);
-            var mainBlob = container.GetBlockBlobReference(blobFileScheduled.FileToConsume);
-            var nextBlobExists = await nextBlob.ExistsAsync();
-            var previousBlobExists = await previousBlob.ExistsAsync();
-            var mainBlobExists = await mainBlob.ExistsAsync();
+            
+            bool nextBlobExists;
+            bool previousBlobExists;
+            bool mainBlobExists;
+            Func<string, string> alternater = s => s.Replace(".log", "_x.log");
+            var nextBlob = container.GetBlobReferenceWithAlternateName(blobFileScheduled.NextFile, alternater, out nextBlobExists);
+            var previousBlob = container.GetBlobReferenceWithAlternateName(blobFileScheduled.PreviousFile, alternater, out previousBlobExists);
+            var mainBlob = container.GetBlobReferenceWithAlternateName(blobFileScheduled.FileToConsume, alternater, out mainBlobExists);
 
             if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
             {

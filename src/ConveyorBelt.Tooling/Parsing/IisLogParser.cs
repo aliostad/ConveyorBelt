@@ -25,6 +25,7 @@ namespace ConveyorBelt.Tooling.Parsing
             int lineNumber = 1;
             while (body.Position < endPosition && (line = reader.ReadLine()) != null)
             {
+                lineNumber++;
                 if (line.StartsWith("#Fields: "))
                 {
                     fields = BuildFields(line);
@@ -32,6 +33,9 @@ namespace ConveyorBelt.Tooling.Parsing
                 }
 
                 if (line.StartsWith("#"))
+                    continue;
+
+                if (body.Position < position)
                     continue;
 
                 var idSegments = id.Segments.Skip(2).Select(x => x.Replace("/", "")).ToArray();
@@ -59,7 +63,6 @@ namespace ConveyorBelt.Tooling.Parsing
                         entity.Properties.Add(name, new EntityProperty(value));
                 }
 
-                lineNumber++;
                 yield return entity;
             }
         }
