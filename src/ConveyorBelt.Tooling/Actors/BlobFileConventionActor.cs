@@ -16,6 +16,7 @@ namespace ConveyorBelt.Tooling.Actors
     [ActorDescription("BlobFileScheduled-Process", 6)]
     public class BlobFileConventionActor : IProcessorActor
     {
+        private const string DownloadLocation = @"c:\Applications";
         private IElasticsearchBatchPusher _pusher;
 
         public BlobFileConventionActor(IElasticsearchBatchPusher pusher)
@@ -44,15 +45,11 @@ namespace ConveyorBelt.Tooling.Actors
             var previousBlob = container.GetBlobReferenceWithAlternateName(blobFileScheduled.PreviousFile, alternater, out previousBlobExists);
             var mainBlob = container.GetBlobReferenceWithAlternateName(blobFileScheduled.FileToConsume, alternater, out mainBlobExists);
 
-            if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
-            {
-                TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0}", blobFileScheduled.FileToConsume);
-                return events; // Stop chasing it.
-            }
+            
 
             if (!previousBlobExists && !mainBlobExists)
             {
-                TheTrace.TraceInformation("BlobFileConventionActor - previous blob does not exist. Stopped chasing {0}", blobFileScheduled.FileToConsume);
+                TheTrace.TraceInformation("BlobFileConventionActor - previous blob does not exist. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
                 return events; // will never be here. Stop chasing it.                
             }
 
@@ -64,14 +61,19 @@ namespace ConveyorBelt.Tooling.Actors
                 {
                     if (nextBlobExists)
                     {
-                        TheTrace.TraceInformation("BlobFileConventionActor - Next blob exists. Stopped chasing {0}", blobFileScheduled.FileToConsume);
+                        TheTrace.TraceInformation("BlobFileConventionActor - Next blob exists. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
                         return events; // done and dusted. Stop chasing it.
+                    }
+
+                    if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
+                    {
+                        TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
+                        return events; // Stop chasing it.
                     }
                 }
                 else
                 {
-                    var stream = new MemoryStream();
-                    await mainBlob.DownloadToStreamAsync(stream);
+                    var stream = await DownloadToFileAsync(mainBlob);
                     currentLength = stream.Length;
                     var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
                     bool hasAnything = false;
@@ -85,8 +87,11 @@ namespace ConveyorBelt.Tooling.Actors
                     if (hasAnything)
                     {
                         await _pusher.FlushAsync();
-                        TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0}", blobFileScheduled.FileToConsume);
+                        TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
                     }
+
+                    stream.Dispose();
+                    File.Delete(stream.Name);
                 }
             }
 
@@ -98,9 +103,21 @@ namespace ConveyorBelt.Tooling.Actors
                 EnqueueTime = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(30))
             });
 
-            TheTrace.TraceInformation("BlobFileConventionActor - deferred processing {0}. Length => {1}", blobFileScheduled.FileToConsume, currentLength);
+            TheTrace.TraceInformation("BlobFileConventionActor - deferred processing {0}. Length => {1}  at {2}", blobFileScheduled.FileToConsume, currentLength, DateTimeOffset.Now);
 
             return events;
+        }
+
+        private async Task<FileStream> DownloadToFileAsync(CloudBlockBlob blob)
+        {
+            if (!Directory.Exists(DownloadLocation))
+                Directory.CreateDirectory(DownloadLocation);
+
+            string fileName = Path.Combine(DownloadLocation, Guid.NewGuid().ToString("N"));
+            var fileStream = new FileStream(fileName, FileMode.Create);
+            await blob.DownloadToStreamAsync(fileStream);
+            fileStream.Position = 0;
+            return fileStream;
         }
     }
 }

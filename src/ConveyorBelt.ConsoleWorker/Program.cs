@@ -138,10 +138,15 @@ namespace ConveyorBelt.ConsoleWorker
 
         public static void Run()
         {
+            
             Trace.TraceInformation("ConveyorBelt.Worker is running");
             try
             {
                 RunAsync(_cancellationTokenSource.Token).Wait();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
             }
             finally
             {
