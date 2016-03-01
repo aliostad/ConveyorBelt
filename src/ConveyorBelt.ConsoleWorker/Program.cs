@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -98,6 +99,9 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<BlobFileConventionActor>()
                     .ImplementedBy<BlobFileConventionActor>()
                     .LifestyleTransient(),
+                Component.For<ITempDownloadLocationProvider>()
+                    .ImplementedBy<TempDownloadLocationProvider>()
+                    .LifestyleSingleton(),                    
                 Component.For<IisBlobScheduler>()
                     .ImplementedBy<IisBlobScheduler>()
                     .LifestyleTransient(),
@@ -207,6 +211,14 @@ namespace ConveyorBelt.ConsoleWorker
                     Console.WriteLine("Waiting ...");                    
                 }
             }
+        }
+    }
+
+    public class TempDownloadLocationProvider : ITempDownloadLocationProvider
+    {
+        public string GetDownloadFolder()
+        {
+            return Path.GetTempPath();
         }
     }
 }

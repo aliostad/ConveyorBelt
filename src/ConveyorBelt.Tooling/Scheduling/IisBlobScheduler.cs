@@ -15,7 +15,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class IisBlobScheduler : BaseScheduler
     {
-        protected async override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
+        protected override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             TheTrace.TraceInformation("IisBlobScheduler - Starting scheduling");
             var account = CloudStorageAccount.Parse(source.ConnectionString);
@@ -70,7 +70,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             }
 
             source.LastOffsetPoint = newOffset == null ? offset.ToString() : newOffset.ToString();
-            return events;
+            return Task.FromResult((IEnumerable<Event>) events);
         }
 
         public IisBlobScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)

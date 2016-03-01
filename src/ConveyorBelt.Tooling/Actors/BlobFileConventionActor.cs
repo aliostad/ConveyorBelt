@@ -16,11 +16,12 @@ namespace ConveyorBelt.Tooling.Actors
     [ActorDescription("BlobFileScheduled-Process", 6)]
     public class BlobFileConventionActor : IProcessorActor
     {
-        private const string DownloadLocation = @"c:\Applications";
         private IElasticsearchBatchPusher _pusher;
+        private ITempDownloadLocationProvider _tempDownloadLocationProvider;
 
-        public BlobFileConventionActor(IElasticsearchBatchPusher pusher)
+        public BlobFileConventionActor(IElasticsearchBatchPusher pusher, ITempDownloadLocationProvider tempDownloadLocationProvider)
         {
+            _tempDownloadLocationProvider = tempDownloadLocationProvider;
             _pusher = pusher;
         }
 
@@ -110,10 +111,8 @@ namespace ConveyorBelt.Tooling.Actors
 
         private async Task<FileStream> DownloadToFileAsync(CloudBlockBlob blob)
         {
-            if (!Directory.Exists(DownloadLocation))
-                Directory.CreateDirectory(DownloadLocation);
-
-            string fileName = Path.Combine(DownloadLocation, Guid.NewGuid().ToString("N"));
+            var downloadFolder = _tempDownloadLocationProvider.GetDownloadFolder();
+            string fileName = Path.Combine(downloadFolder, Guid.NewGuid().ToString("N"));
             var fileStream = new FileStream(fileName, FileMode.Create);
             await blob.DownloadToStreamAsync(fileStream);
             fileStream.Position = 0;

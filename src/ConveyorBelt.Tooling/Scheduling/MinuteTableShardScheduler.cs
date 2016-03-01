@@ -18,7 +18,7 @@ namespace ConveyorBelt.Tooling.Scheduling
         {
         }
 
-        protected async override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
+        protected override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             if (source.LastOffsetPoint == null)
                 source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-7).ToString("O");
@@ -40,7 +40,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                     break;
             }
             source.LastOffsetPoint = ofsted.ToString("O");
-            return events;
+            return Task.FromResult((IEnumerable<Event>)events);
         }
 
         protected virtual string GetShardKey(DateTimeOffset offset)

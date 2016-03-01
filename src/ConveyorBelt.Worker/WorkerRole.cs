@@ -114,6 +114,9 @@ namespace ConveyorBelt.Worker
                     .ImplementedBy<DefaultHttpClient>()
                     .LifestyleSingleton()
                     .DependsOn(Dependency.OnValue("defaultHeaders", headers)),
+                Component.For<ITempDownloadLocationProvider>()
+                    .ImplementedBy<AzureTempDownloadLocationProvider>()
+                    .LifestyleSingleton(),                    
                 Component.For<IElasticsearchBatchPusher>()
                     .ImplementedBy<ElasticsearchBatchPusher>()
                     .LifestyleTransient()
@@ -189,6 +192,14 @@ namespace ConveyorBelt.Worker
                 if (seconds < 30)
                     await Task.Delay(TimeSpan.FromSeconds(30 - seconds), cancellationToken);
             }
+        }
+    }
+
+    public class AzureTempDownloadLocationProvider : ITempDownloadLocationProvider
+    {
+        public string GetDownloadFolder()
+        {
+            return RoleEnvironment.GetLocalResource("DownloadFolder").RootPath;
         }
     }
 }

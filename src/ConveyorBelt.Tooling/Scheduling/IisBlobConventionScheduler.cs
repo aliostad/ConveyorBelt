@@ -16,7 +16,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class IisBlobConventionScheduler : BaseScheduler
     {
-        protected override async Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
+        protected override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             const string DefaultIisLogFileFormatConvention = "u_exyyMMddHH";
 
@@ -38,11 +38,10 @@ namespace ConveyorBelt.Tooling.Scheduling
             var events = new List<Event>();
             var fullNumberOfHoursInBetween = offset.TimeOffset.GetFullNumberOfHoursInBetween(nextOffset);
             if (fullNumberOfHoursInBetween == 0)
-                return events;
+                return Task.FromResult((IEnumerable<Event>)events);
 
             while (true)
             {
-                bool found = false;
                 var path = string.Format(pathFormat, instanceIndex);
                 instanceIndex++;
                 TheTrace.TraceInformation("IisBlobConventionScheduler - Looking into {0}", path);
@@ -69,7 +68,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             }
 
             source.LastOffsetPoint = new FileOffset(string.Empty, nextOffset).ToString();
-            return events;
+            return Task.FromResult((IEnumerable<Event>)events);
         }
 
         public IisBlobConventionScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
