@@ -30,7 +30,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             var events = new List<Event>();
             var totalMinutes = DateTimeOffset.UtcNow.Subtract(offset.AddMinutes(source.GracePeriodMinutes.Value)).TotalMinutes;
 
-            var ofsted = new DateTimeOffset();
+            var ofsted = DateTimeOffset.UtcNow;
             for (int i = 0; i < totalMinutes; i++)
             {
                 ofsted = offset.AddMinutes(i + 1);
@@ -39,6 +39,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 if(source.MaxItemsInAScheduleRun.HasValue && i >= source.MaxItemsInAScheduleRun)
                     break;
             }
+
             source.LastOffsetPoint = ofsted.ToString("O");
             return Task.FromResult((IEnumerable<Event>)events);
         }
