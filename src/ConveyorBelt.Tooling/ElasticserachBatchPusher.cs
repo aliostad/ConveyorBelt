@@ -60,7 +60,7 @@ namespace ConveyorBelt.Tooling
                     statuses = items.Children<JObject>().Select(x => x.Properties().First().Value["status"].Value<int>())
                         .Select(y => y >= 200 && y <= 299).ToList();
 
-                    TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing to {0}", _esUrl);
+                    TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing {1} records to {0} [retry: {2}]", _esUrl, _batch.Count, retry);
                 } while (_batch.Prune(statuses) > 0 && retry++ < 3);
 
                 if (_batch.Count > 0)
@@ -121,8 +121,7 @@ namespace ConveyorBelt.Tooling
             if (_batch.Count >= _batchSize)
             {
                 await PushbatchAsync();
-                TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed {0} records to ElasticSearch for {1}-{2}",
-                    _batch.Count,
+                TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed records to ElasticSearch for {0}-{1}",
                     source.PartitionKey,
                     source.RowKey);
             }
