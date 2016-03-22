@@ -1,0 +1,42 @@
+﻿{
+  "took": 137,
+  "errors": true,
+  "items": [
+    {
+      "index": {
+        "_index": "test",
+        "_type": "type1",
+        "_id": "1",
+        "_version": 1,
+        "status": 201
+      }
+    },
+    {
+      "delete": {
+        "_index": "test",
+        "_type": "type1",
+        "_id": "2",
+        "_version": 1,
+        "status": 200,
+        "found": false
+      }
+    },
+    {
+      "create": {
+        "_index": "test",
+        "_type": "type1",
+        "_id": "3",
+        "_version": 1,
+        "status": 201
+      }
+    },
+    {
+      "update": {
+        "_index": "index1",
+        "_type": "type1",
+        "_id": "1",
+        "status": 202
+      }
+    }
+  ]
+}
