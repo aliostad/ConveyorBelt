@@ -60,6 +60,11 @@ namespace ConveyorBelt.Tooling
                     statuses = items.Children<JObject>().Select(x => x.Properties().First().Value["status"].Value<int>())
                         .Select(y => y >= 200 && y <= 299).ToList();
 
+                    if (statuses.Any(x => !x))
+                    {
+                       TheTrace.TraceWarning("LOOK!! We had some errors from ES bulk at retry {1}: {0}", content, retry);
+                    }
+
                     TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing {1} records to {0} [retry: {2}]", _esUrl, _batch.Count, retry);
                 } while (_batch.Prune(statuses) > 0 && retry++ < 3);
 
