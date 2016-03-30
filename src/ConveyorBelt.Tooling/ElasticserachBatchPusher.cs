@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Scheduling;
 using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Internal;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -23,6 +25,7 @@ namespace ConveyorBelt.Tooling
 
         // no reason for thread sync/concurrent since this will be called only by a single thread
         private Dictionary<string, SimpleFilter> _filters = new Dictionary<string, SimpleFilter>();
+        private IInterval _interval = new DoublyIncreasingInterval(TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(300), 5);
 
         public ElasticsearchBatchPusher(IHttpClient httpClient, string esUrl, int batchSize = 100)
         {
@@ -40,7 +43,7 @@ namespace ConveyorBelt.Tooling
             try
             {
                 int retry = 0;
-                List<bool> statuses = null;
+                List<int> statuses = null;
                 do
                 {
                     var responseMessage = await  _httpClient.PostAsync(_esUrl + "_bulk",
@@ -57,15 +60,26 @@ namespace ConveyorBelt.Tooling
                         throw new ApplicationException(string.Format("Unsuccessful ES bulk - items null: {0}", content));
 
                     var items = (JArray) j.items;
-                    statuses = items.Children<JObject>().Select(x => x.Properties().First().Value["status"].Value<int>())
-                        .Select(y => y >= 200 && y <= 299).ToList();
+                    statuses = items.Children<JObject>().Select(x => x.Properties().First().Value["status"].Value<int>()).ToList();
 
-                    if (statuses.Any(x => !x))
+                    if (statuses.Any(y => y >= 200 && y <= 299))
                     {
                        TheTrace.TraceWarning("LOOK!! We had some errors from ES bulk at retry {1}: {0}", content, retry);
                     }
 
+                    if (statuses.Any(x => x == 429))
+                    {
+                        var timeSpan = _interval.Next();
+                        TheTrace.TraceWarning("LOOK!! Got 429 -> backing off for {0} seconds", timeSpan.TotalSeconds);
+                        Thread.Sleep(timeSpan);
+                    }
+                    else
+                    {
+                        _interval.Reset();
+                    }
+
                     TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing {1} records to {0} [retry: {2}]", _esUrl, _batch.Count, retry);
+
                 } while (_batch.Prune(statuses) > 0 && retry++ < 3);
 
                 if (_batch.Count > 0)
@@ -182,7 +196,7 @@ namespace ConveyorBelt.Tooling
                 return sb.ToString();
             }
 
-            public int Prune(IList<bool> statuses)
+            public int Prune(IList<int> statuses)
             {
                 if(statuses.Count != _list.Count)
                     throw new InvalidOperationException(string.Format(
@@ -190,7 +204,8 @@ namespace ConveyorBelt.Tooling
 
                 for (var i = _list.Count-1; i >= 0; i--) // start from the end
                 {
-                    if(statuses[i])
+                    var si = statuses[i];
+                    if(si >= 200 || si <= 299) // if success
                         _list.RemoveAt(i);
                 }
 
