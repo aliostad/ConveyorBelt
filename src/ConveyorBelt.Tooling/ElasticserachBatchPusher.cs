@@ -25,7 +25,7 @@ namespace ConveyorBelt.Tooling
 
         // no reason for thread sync/concurrent since this will be called only by a single thread
         private Dictionary<string, SimpleFilter> _filters = new Dictionary<string, SimpleFilter>();
-        private IInterval _interval = new DoublyIncreasingInterval(TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(300), 5);
+        private IInterval _interval = new DoublyIncreasingInterval(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(300), 5);
 
         public ElasticsearchBatchPusher(IHttpClient httpClient, string esUrl, int batchSize = 100)
         {
