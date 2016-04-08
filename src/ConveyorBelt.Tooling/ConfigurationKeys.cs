@@ -21,5 +21,9 @@ namespace ConveyorBelt.Tooling
         /// These are tab separated with header and value separated by ": " similar to HTTP headers
         /// </summary>
         public const string TabSeparatedCustomEsHttpHeaders = "ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders";
+
+        public const string EsBackOffMinSeconds = "ConveyorBelt.ElasticSearch.BackOffMinSeconds";
+        public const string EsBackOffMaxSeconds = "ConveyorBelt.ElasticSearch.BackOffMaxSeconds";
+
     }
 }

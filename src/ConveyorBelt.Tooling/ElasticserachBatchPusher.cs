@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Configuration;
 using BeeHive.Scheduling;
 using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Internal;
@@ -25,13 +26,19 @@ namespace ConveyorBelt.Tooling
 
         // no reason for thread sync/concurrent since this will be called only by a single thread
         private Dictionary<string, SimpleFilter> _filters = new Dictionary<string, SimpleFilter>();
-        private IInterval _interval = new DoublyIncreasingInterval(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(300), 5);
+        private IInterval _interval;
 
-        public ElasticsearchBatchPusher(IHttpClient httpClient, string esUrl, int batchSize = 100)
+        public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, int batchSize = 100)
         {
             _httpClient = httpClient;
             _batchSize = batchSize;
             _esUrl = esUrl;
+            var esBackOffMinSecondsString = configurationValueProvider.GetValue(ConfigurationKeys.EsBackOffMinSeconds);
+            var esBackOffMaxSecondsString = configurationValueProvider.GetValue(ConfigurationKeys.EsBackOffMaxSeconds);
+            var esBackOffMinSeconds = string.IsNullOrWhiteSpace(esBackOffMinSecondsString) ? 5 : int.Parse(esBackOffMinSecondsString);
+            var esBackOffMaxSeconds = string.IsNullOrWhiteSpace(esBackOffMaxSecondsString) ? 100 : int.Parse(esBackOffMaxSecondsString);
+
+            _interval = new DoublyIncreasingInterval(TimeSpan.FromSeconds(esBackOffMinSeconds), TimeSpan.FromSeconds(esBackOffMaxSeconds), 5);
         }
 
         private async Task PushbatchAsync()

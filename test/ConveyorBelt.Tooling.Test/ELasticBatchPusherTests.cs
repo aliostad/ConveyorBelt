@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using BeeHive.Azure;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using Xunit;
@@ -18,7 +19,7 @@ namespace ConveyorBelt.Tooling.Test
         public void TriesMultipleTimes()
         {
             var client = new Mock<IHttpClient>(MockBehavior.Loose);
-            var pusher = new ElasticsearchBatchPusher(client.Object, "http://google.com");
+            var pusher = new ElasticsearchBatchPusher(client.Object, new AzureConfigurationValueProvider(),  "http://google.com");
             var summary = new DiagnosticsSourceSummary()
             {
                 ConnectionString = String.Empty,
@@ -44,7 +45,7 @@ namespace ConveyorBelt.Tooling.Test
         public void TriesMultipleTimesAndSucceed()
         {
             var client = new Mock<IHttpClient>(MockBehavior.Loose);
-            var pusher = new ElasticsearchBatchPusher(client.Object, "http://google.com");
+            var pusher = new ElasticsearchBatchPusher(client.Object, new AzureConfigurationValueProvider(),  "http://google.com");
             var summary = new DiagnosticsSourceSummary()
             {
                 ConnectionString = String.Empty,
