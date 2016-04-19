@@ -18,6 +18,7 @@
       <Setting name="ConveyorBelt.Storage.ClusterLockRoot" value="conveyor_belt/locks/master_Keys/" />
       <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" value="30" />
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" value="" />
+      <Setting name="ConveyorBelt.BulkBatchSize" value="100" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

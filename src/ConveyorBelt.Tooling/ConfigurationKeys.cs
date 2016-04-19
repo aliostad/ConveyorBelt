@@ -11,6 +11,7 @@ namespace ConveyorBelt.Tooling
         public const string FrequencyInSeconds = "ConveyorBelt.FrequencyInSeconds";
         public const string TableName = "ConveyorBelt.TableName";
         public const string ElasticSearchUrl = "ConveyorBelt.ElasticSearchUrl";
+        public const string BulkBatchSize = "ConveyorBelt.BulkBatchSize";        
         public const string StorageConnectionString = "ConveyorBelt.Storage.ConnectionString";
         public const string ServiceBusConnectionString = "ConveyorBelt.ServiceBus.ConnectionString";
         public const string MappingsPath = "ConveyorBelt.MappingsPath";

@@ -15,6 +15,7 @@
       <Setting name="ConveyorBelt.Storage.ClusterLockRoot" />
       <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" />
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" />
+      <Setting name="ConveyorBelt.BulkBatchSize" />
     </ConfigurationSettings>
     <LocalResources>
       <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />
