@@ -46,8 +46,6 @@ namespace ConveyorBelt.Tooling.Actors
             var previousBlob = container.GetBlobReferenceWithAlternateName(blobFileScheduled.PreviousFile, alternater, out previousBlobExists);
             var mainBlob = container.GetBlobReferenceWithAlternateName(blobFileScheduled.FileToConsume, alternater, out mainBlobExists);
 
-            
-
             if (!previousBlobExists && !mainBlobExists)
             {
                 TheTrace.TraceInformation("BlobFileConventionActor - previous blob does not exist. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
@@ -75,24 +73,30 @@ namespace ConveyorBelt.Tooling.Actors
                 else
                 {
                     var stream = await DownloadToFileAsync(mainBlob);
-                    currentLength = stream.Length;
-                    var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
-                    bool hasAnything = false;
-
-                    foreach (var entity in parser.Parse(stream, mainBlob.Uri, blobFileScheduled.LastPosition))
+                    try
                     {
-                        await _pusher.PushAsync(entity, blobFileScheduled.Source);
-                        hasAnything = true;
+                        currentLength = stream.Length;
+                        var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
+                        bool hasAnything = false;
+
+                        foreach (var entity in parser.Parse(stream, mainBlob.Uri, blobFileScheduled.LastPosition))
+                        {
+                            await _pusher.PushAsync(entity, blobFileScheduled.Source);
+                            hasAnything = true;
+                        }
+
+                        if (hasAnything)
+                        {
+                            await _pusher.FlushAsync();
+                            TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
+                        }
+                    }
+                    finally 
+                    {
+                        stream.Close();
+                        File.Delete(stream.Name);
                     }
 
-                    if (hasAnything)
-                    {
-                        await _pusher.FlushAsync();
-                        TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
-                    }
-
-                    stream.Dispose();
-                    File.Delete(stream.Name);
                 }
             }
 

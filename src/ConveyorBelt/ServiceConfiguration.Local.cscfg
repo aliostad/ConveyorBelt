@@ -18,6 +18,8 @@
       <Setting name="ConveyorBelt.Storage.ClusterLockRoot" value="conveyor_belt/locks/master_Keys/" />
       <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" value="30" />
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" value="" />
+      <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" value="5" />
+      <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" value="100" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
