@@ -20,6 +20,7 @@
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" value="" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" value="5" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" value="100" />
+      <Setting name="ConveyorBelt.BulkBatchSize" value="100" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

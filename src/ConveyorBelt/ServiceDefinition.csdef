@@ -17,6 +17,7 @@
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" />
+      <Setting name="ConveyorBelt.BulkBatchSize" />
     </ConfigurationSettings>
     <LocalResources>
       <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />
