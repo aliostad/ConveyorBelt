@@ -51,7 +51,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                 
                 for (int i = 1; i < fullNumberOfHoursInBetween+1; i++)
                 {
-                    var fileToConsume = offset.TimeOffset.AddHours(i).UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
+                    var fileOffset = offset.TimeOffset.AddHours(i);
+                    var fileToConsume = fileOffset.UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
                     var previousFile = offset.TimeOffset.AddHours(i - 1).UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
                     var nextFile = offset.TimeOffset.AddHours(i + 1).UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
                     events.Add(new Event(new BlobFileScheduled()
@@ -60,7 +61,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                         PreviousFile = path.Replace("wad-iis-logfiles/", "") + previousFile,
                         NextFile = path.Replace("wad-iis-logfiles/", "") + nextFile,
                         Source = source.ToSummary(),
-                        StopChasingAfter = DateTimeOffset.Now.Add(TimeSpan.FromMinutes(80))
+                        StopChasingAfter = fileOffset.Add(TimeSpan.FromMinutes(80))
                     }));
 
                     TheTrace.TraceInformation("IisBlobConventionScheduler - Scheduled Event: {0}", fileToConsume);

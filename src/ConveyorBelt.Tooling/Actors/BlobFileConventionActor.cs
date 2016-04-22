@@ -99,6 +99,15 @@ namespace ConveyorBelt.Tooling.Actors
 
                 }
             }
+            else
+            {
+                if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
+                {
+                    TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
+                    return events; // Stop chasing it.
+                }
+
+            }
 
             blobFileScheduled.LastPosition = currentLength;
 
