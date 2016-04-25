@@ -158,7 +158,7 @@ namespace ConveyorBelt.Worker
         public override bool OnStart()
         {
             // Set the maximum number of concurrent connections
-            ServicePointManager.DefaultConnectionLimit = 12;
+            ServicePointManager.DefaultConnectionLimit = 1200;
 
             // For information on handling configuration changes
             // see the MSDN topic at http://go.microsoft.com/fwlink/?LinkId=166357.

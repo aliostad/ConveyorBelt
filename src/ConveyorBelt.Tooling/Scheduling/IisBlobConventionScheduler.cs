@@ -34,7 +34,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
             int instanceIndex = 0;
             
-            var nextOffset = DateTimeOffset.Now;
+            var nextOffset = DateTimeOffset.UtcNow;
             var events = new List<Event>();
             var fullNumberOfHoursInBetween = offset.TimeOffset.GetFullNumberOfHoursInBetween(nextOffset);
             if (fullNumberOfHoursInBetween == 0)
