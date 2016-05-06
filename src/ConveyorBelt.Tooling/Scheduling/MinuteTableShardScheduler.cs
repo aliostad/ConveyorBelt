@@ -8,6 +8,7 @@ using BeeHive.Configuration;
 using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Events;
+using ConveyorBelt.Tooling.Internal;
 
 namespace ConveyorBelt.Tooling.Scheduling
 {
@@ -21,12 +22,9 @@ namespace ConveyorBelt.Tooling.Scheduling
         protected override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             if (source.LastOffsetPoint == null)
-                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-7).ToString("O");
+                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-7).DropSecondAndMilliseconds().ToString("O");
 
             var offset = DateTimeOffset.Parse(source.LastOffsetPoint);
-            offset =
-                offset.Subtract(TimeSpan.FromSeconds(offset.Second))
-                    .Subtract(TimeSpan.FromMilliseconds(offset.Millisecond));
             var events = new List<Event>();
             var totalMinutes = DateTimeOffset.UtcNow.Subtract(offset.AddMinutes(source.GracePeriodMinutes.Value)).TotalMinutes;
 
@@ -40,7 +38,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                     break;
             }
 
-            source.LastOffsetPoint = ofsted.ToString("O");
+            source.LastOffsetPoint = ofsted.DropSecondAndMilliseconds().ToString("O");
             return Task.FromResult((IEnumerable<Event>)events);
         }
 

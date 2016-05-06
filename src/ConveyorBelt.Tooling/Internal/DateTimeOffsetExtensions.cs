@@ -15,5 +15,17 @@ namespace ConveyorBelt.Tooling.Internal
             var maxUntil = new DateTimeOffset(until.Year, until.Month, until.Day, until.Hour, 59, 59, 999, until.Offset);
             return (int) (maxUntil - from).TotalHours;
         }
+
+        public static DateTimeOffset DropSecondAndMilliseconds(this DateTimeOffset offset)
+        {
+            return new DateTimeOffset(offset.Year,
+                offset.Month,
+                offset.Day,
+                offset.Hour,
+                offset.Minute,
+                0,
+                0,
+                offset.Offset);
+        }
     }
 }
