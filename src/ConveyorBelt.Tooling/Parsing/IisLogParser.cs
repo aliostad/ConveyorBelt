@@ -58,7 +58,7 @@ namespace ConveyorBelt.Tooling.Parsing
                     string value = rest[i];
 
                     if (value == "-") // to get around the missing fields in IIS... this is how it does its
-                        value = null;
+                        continue;
 
                     if (Regex.IsMatch(value, @"^[1-9]\d*$")) // numeric
                         entity.Properties.Add(name, new EntityProperty(Convert.ToInt64(value)));
