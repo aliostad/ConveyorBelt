@@ -1,0 +1,28 @@
+{
+    "___type_name___": {
+        "properties": {
+            "@timestamp": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "PartitionKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RowKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+			"ProcessId": {
+                "type": "string",
+            },
+			"Level": {
+                "type": "string",
+            },
+			"Message": {
+                "type": "string",
+            },
+            
+        }
+    }
+}

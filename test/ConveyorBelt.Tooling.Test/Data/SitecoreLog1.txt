@@ -1,0 +1,1 @@
+﻿ManagedPoolThread #0 17:12:32 INFO  Trying to load XML configuration /App_Config/Security/GlobalRoles.config

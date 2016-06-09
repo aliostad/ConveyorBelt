@@ -1,0 +1,117 @@
+﻿21008 10:49:23 INFO  
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  Sitecore started
+21008 10:49:23 INFO  Sitecore.NET 8.1 (rev. 151207)
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\antlr3.runtime.dll (Antlr3.Runtime)
+21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\sitecore.logging.client.dll (Sitecore CMS, Lets you insert loggers in your JavaScript, and automatically sends the log messages to a server side component that stores them in your existing server side logs. Interfaces with Sitecore.Logging.
+
+Ideal for logging JavaScript exceptions to the server, including a stack trace. Documentation and examples are at jsnlog.com)
+21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\sitecore.logging.dll (Sitecore CMS, Sitecore Logging Framework, 8.0 rev. 141020)
+ManagedPoolThread #11 11:09:29 INFO  Job ended: Master_Database_Agent (units processed: 5)
+18076 11:09:44 WARN  The "Security.ShareAuthenticationTicket" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "False"
+10644 11:09:44 INFO  HttpModule is being initialized
+17180 11:09:44 INFO  HttpModule is being initialized
+17436 11:10:02 WARN  The "Sitecore.Web.IsAuthorizationBypassAllowed" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "False"
+21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\yahoo.yui.compressor.dll (YUI Compressor, A .NET port of the Yahoo! YUI Compressor project)
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  Operating system Microsoft Windows NT 6.1.7601 Service Pack 1
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  Microsoft.NET version 4.0.30319.18444
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  UTC offset: 01:00:00
+21008 10:49:23 INFO  Machine name: asglh-wl-11148
+21008 10:49:23 INFO  App pool ID: Asos.Content.Sitecore
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  Process ID: 20984
+21008 10:49:23 INFO  Windows identity used by the process: IIS APPPOOL\Asos.Content.Sitecore. Impersonation: False
+21008 10:49:23 INFO  Managed pipeline mode: Integrated
+21008 10:49:23 INFO  
+21008 10:49:23 WARN  The "EventQueue.Enabled" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "True"
+21008 10:49:23 INFO  EventQueues enabled: True
+21008 10:49:23 INFO  Instance Name:ASGLH-WL-11148-Asos.Content.Sitecore
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  Threshold settings
+21008 10:49:23 INFO    Show threshold warnings: False
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  Databases
+21008 10:49:23 INFO    core
+21008 10:49:23 INFO    master
+21008 10:49:23 INFO    web
+21008 10:49:23 INFO    filesystem
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  Domains
+21008 10:49:23 INFO  Heartbeat - Initializing
+21008 10:49:23 INFO  Heartbeat - Interval set to: 00:00:02
+21008 10:49:23 INFO  Heartbeat - Worker thread started
+21008 10:49:23 INFO  Trying to load XML configuration /App_Config/Security/Domains.config
+21008 10:49:23 INFO    sitecore
+21008 10:49:23 INFO    extranet
+21008 10:49:23 INFO    default
+21008 10:49:23 INFO  
+21008 10:49:23 WARN  Note that asp.net debugging is enabled. This can decrease performance considerably.
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  xDB is disabled.
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  Tracking is disabled.
+21008 10:49:23 INFO  
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  **********************************************************************
+21008 10:49:23 INFO  Attempting to get ASP.NET process history
+21008 10:49:23 WARN  No process history available
+21008 10:49:23 WARN  The "Caching.DebugEnabled" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "False"
+ManagedPoolThread #2 10:49:23 WARN  Failed to create counter 'Sitecore.Caching\Cache Clearings / sec'. Sitecore has no necessary permissions for reading/creating counters.
+		Message: Access to the registry key 'Global' is denied.
+20084 10:49:34 FATAL [Experience Analytics]: Failed to synchronize segments. Message: Exception has been thrown by the target of an invocation.. Details:    at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor)
+   at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Sitecore.Reflection.ReflectionUtil.CreateObject(Type type, Object[] parameters)
+   at Sitecore.Configuration.Factory.CreateFromTypeName(XmlNode configNode, String[] parameters, Boolean assert)
+   at Sitecore.Configuration.Factory.CreateObject(XmlNode configNode, String[] parameters, Boolean assert, IFactoryHelper helper)
+   at Sitecore.Configuration.Factory.GetInnerObject(XmlNode paramNode, String[] parameters, Boolean assert)
+   at Sitecore.Configuration.Factory.AssignProperties(XmlNode configNode, String[] parameters, Object obj, Boolean assert, Boolean deferred, IFactoryHelper helper)
+   at Sitecore.Configuration.Factory.CreateObject(XmlNode configNode, String[] parameters, Boolean assert, IFactoryHelper helper)
+   at Sitecore.Configuration.Factory.CreateObject[T](XmlNode configNode)
+   at Sitecore.ExperienceAnalytics.Core.Repositories.DataProviderSegmentDefinitionService.GetSegmentDefinitions(Boolean skipCache)
+   at Sitecore.ExperienceAnalytics.Client.Deployment.SegmentUtil.GetSegmentsToSynchronize()
+   at Sitecore.ExperienceAnalytics.Client.Deployment.SegmentUtil.SynchronizeAllSegments()
+   at System.Threading.Tasks.Task.Execute()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Sitecore.ExperienceAnalytics.Client.Deployment.SyncSegmentsProcessor.<Process>d__2.MoveNext()
+DefaultQuartzScheduler_Worker-1 11:00:00 WARN  The "Publishing.Recovery.PublisherPerformsDump" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "False"
+17436 11:10:02 ERROR Test Error message
+17436 11:10:02 ERROR Test Error with exception
+Exception: System.Exception
+Message: Test message
+Source: Asos.Content.Sitecore.EntityService
+   at Asos.Content.Sitecore.EntityService.Repositories.ContentItemRepository.Exists(String database, String path) in c:\Dev\AsosContent\Dev\Solutions\Asos.Content.Sitecore.Base\EntityService\Repositories\ContentItemRepository.cs:line 113
+
+Nested Exception
+
+Exception: System.ArgumentNullException
+Message: Value cannot be null.
+Parameter name: database
+
+
+17436 11:10:02 DEBUG Test Debug message
+17436 11:10:02 INFO  Test Info message
+17436 11:10:02 WARN  Test Warning message
+17436 11:10:02 INFO  AUDIT (extranet\Anonymous): Test Audit message
+17436 11:10:02 FATAL Test Fatal message
+17436 11:10:02 FATAL Test Fatal with exception
+Exception: System.ArgumentNullException
+Message: Value cannot be null.
+Parameter name: database
+
+14964 11:15:00 INFO  Job started: Publish to 'web'
+17436 11:40:12 INFO  **************************************************
+17436 11:40:12 WARN  Sitecore shutting down
+17436 11:40:12 WARN  Shutdown message: HostingEnvironment initiated shutdown
