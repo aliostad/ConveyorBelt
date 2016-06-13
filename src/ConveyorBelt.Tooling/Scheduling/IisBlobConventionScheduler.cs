@@ -26,30 +26,33 @@ namespace ConveyorBelt.Tooling.Scheduling
             var pathFormat = source.GetProperty<string>("BlobPathFormat");
             TheTrace.TraceInformation("IisBlobConventionScheduler - pathformat: {0}", pathFormat);
             pathFormat = pathFormat.TrimEnd('/') + "/"; // ensure path ends with /
-            var iisLogFileFormatConvention = source.GetProperty<string>("IisLogFileFormatConvention") ?? DefaultIisLogFileFormatConvention;
+            var iisLogFileFormatConvention = source.GetProperty<string>("IisLogFileFormatConvention") ??
+                                             DefaultIisLogFileFormatConvention;
 
             var offset = FileOffset.Parse(source.LastOffsetPoint);
             if (offset == null)
                 throw new InvalidOperationException("FileOffset failed parsing: => " + source.LastOffsetPoint);
 
             int instanceIndex = 0;
-            
+
             var nextOffset = DateTimeOffset.UtcNow;
             var events = new List<Event>();
             var fullNumberOfHoursInBetween = offset.TimeOffset.GetFullNumberOfHoursInBetween(nextOffset);
             if (fullNumberOfHoursInBetween == 0)
-                return Task.FromResult((IEnumerable<Event>)events);
+                return Task.FromResult((IEnumerable<Event>) events);
 
             while (true)
             {
                 var path = string.Format(pathFormat, instanceIndex);
+                var isSingleInstance = path == pathFormat;
+
                 instanceIndex++;
                 TheTrace.TraceInformation("IisBlobConventionScheduler - Looking into {0}", path);
                 var any = client.ListBlobs(path).Any(itm => itm is CloudBlockBlob);
                 if (!any)
                     break;
-                
-                for (int i = 1; i < fullNumberOfHoursInBetween+1; i++)
+
+                for (int i = 1; i < fullNumberOfHoursInBetween + 1; i++)
                 {
                     var fileOffset = offset.TimeOffset.AddHours(i);
                     var fileToConsume = fileOffset.UtcDateTime.ToString(iisLogFileFormatConvention) + ".log";
@@ -66,10 +69,13 @@ namespace ConveyorBelt.Tooling.Scheduling
 
                     TheTrace.TraceInformation("IisBlobConventionScheduler - Scheduled Event: {0}", fileToConsume);
                 }
+
+                if (isSingleInstance)
+                    break;
             }
 
             source.LastOffsetPoint = new FileOffset(string.Empty, nextOffset).ToString();
-            return Task.FromResult((IEnumerable<Event>)events);
+            return Task.FromResult((IEnumerable<Event>) events);
         }
 
         public IisBlobConventionScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
