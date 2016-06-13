@@ -110,7 +110,7 @@ namespace ConveyorBelt.Tooling.Parsing
 
             foreach (var datePart in fileNameSegments.Skip(fileNameSegments.Length - 2))
             {
-                if (DateTime.TryParseExact(datePart, "yyyyddMM", new DateTimeFormatInfo(),
+                if (DateTime.TryParseExact(datePart, "yyyyMMdd", new DateTimeFormatInfo(),
                     DateTimeStyles.AssumeUniversal, out fileDate))
                 {
                     break;

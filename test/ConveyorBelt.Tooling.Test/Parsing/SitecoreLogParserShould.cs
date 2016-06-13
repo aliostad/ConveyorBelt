@@ -19,7 +19,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             using (var stream = new MemoryStream(File.ReadAllBytes(@"data\SitecoreLog1.txt")))
             {
                 var sitecoreLogParser = new SitecoreLogParser();
-                var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172129.txt");
+                var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160613.172129.txt");
 
                 var result = sitecoreLogParser.Parse(stream, uri);
                 Assert.NotNull(result);
@@ -27,7 +27,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 Assert.NotNull(parsedLog);
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.ProcessId].StringValue, "ManagedPoolThread #0");
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "INFO");
-                Assert.Equal(parsedLog.Timestamp, DateTimeOffset.Parse("2016-06-06 17:12:32"));
+                Assert.Equal(parsedLog.Timestamp, DateTimeOffset.Parse("2016-06-13 17:12:32"));
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, "Trying to load XML configuration /App_Config/Security/GlobalRoles.config");
             }
         }
@@ -38,7 +38,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             using (var stream = new MemoryStream(File.ReadAllBytes(@"data\SitecoreLog2.txt")))
             {
                 var sitecoreLogParser = new SitecoreLogParser();
-                var uri = new Uri("http://localhost/data/asosbaselogfile.20160606.180755.txt");
+                var uri = new Uri("http://localhost/data/asosbaselogfile.20160613.180755.txt");
 
                 var result = sitecoreLogParser.Parse(stream, uri);
                 Assert.NotNull(result);
@@ -54,7 +54,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             using (var stream = new MemoryStream(File.ReadAllBytes(@"data\SitecoreLog3.txt")))
             {
                 var sitecoreLogParser = new SitecoreLogParser();
-                var uri = new Uri("http://localhost/data/sitecoredev228CA/xyz/asosbaselogfile.20160606.180755.txt");
+                var uri = new Uri("http://localhost/data/sitecoredev228CA/xyz/asosbaselogfile.20160101.180755.txt");
 
                 var result = sitecoreLogParser.Parse(stream, uri).ToList();
                 Assert.NotNull(result);

@@ -13,13 +13,13 @@ namespace ConveyorBelt.Tooling.Test.Parsing
 {
     public class SitecoreLogLineParserShould
     {
-        private readonly DateTime _logFileDate = new DateTime(2016, 6, 6);
+        private readonly DateTime _logFileDate = new DateTime(2016, 6, 14);
 
         private readonly DateTime[] _logDates =
         {
-            new DateTime(2016, 6, 6, 17, 12, 32),
-            new DateTime(2016, 6, 6, 11, 10, 2),
-            new DateTime(2016, 6, 6, 19, 31, 16)
+            new DateTime(2016, 6, 14, 17, 12, 32),
+            new DateTime(2016, 6, 14, 11, 10, 2),
+            new DateTime(2016, 6, 14, 19, 31, 16)
         };
 
         private SitecoreLogLineParser _parser;
