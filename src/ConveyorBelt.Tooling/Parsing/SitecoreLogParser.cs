@@ -12,9 +12,9 @@ namespace ConveyorBelt.Tooling.Parsing
     {
         public static class SitecoreLogFields
         {
-            public static readonly string Level = "Level";
-            public static readonly string Message = "Message";
-            public static readonly string ProcessId = "ProcessId";
+            public static readonly string Level = "SitecoreLevel";
+            public static readonly string Message = "Payload";
+            public static readonly string ProcessId = "SitecoreProcessId";
         }
 
         public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0, long endPosition = 0)
