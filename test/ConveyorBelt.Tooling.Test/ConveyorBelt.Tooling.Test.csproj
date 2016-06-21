@@ -113,6 +113,7 @@
     <Compile Include="IisLogTests.cs" />
     <Compile Include="Parsing\SitecoreLogLineParserShould.cs" />
     <Compile Include="Parsing\SitecoreLogParserShould.cs" />
+    <Compile Include="MinuteTableShardSchedulerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

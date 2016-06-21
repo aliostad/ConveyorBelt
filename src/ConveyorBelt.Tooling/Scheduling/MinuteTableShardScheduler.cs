@@ -22,23 +22,27 @@ namespace ConveyorBelt.Tooling.Scheduling
         protected override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             if (source.LastOffsetPoint == null)
-                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-7).DropSecondAndMilliseconds().ToString("O");
+                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-1).DropSecondAndMilliseconds().ToString("O");
 
-            var offset = DateTimeOffset.Parse(source.LastOffsetPoint);
+            var lastOffset = DateTimeOffset.Parse(source.LastOffsetPoint);
             var events = new List<Event>();
-            var totalMinutes = DateTimeOffset.UtcNow.Subtract(offset.AddMinutes(source.GracePeriodMinutes.Value)).TotalMinutes;
+            var graceMinutes = source.GracePeriodMinutes ?? 3;
 
-            var ofsted = DateTimeOffset.UtcNow;
-            for (int i = 0; i < totalMinutes; i++)
+            var now = DateTimeOffset.UtcNow.DropSecondAndMilliseconds();
+            var newLastOffset = lastOffset;
+            int n = 1; // start from a minute after
+            while (now >= lastOffset.Add(TimeSpan.FromMinutes(graceMinutes + n)))
             {
-                ofsted = offset.AddMinutes(i + 1);
-                var shardKey = GetShardKey(ofsted);
-                events.Add(new Event(new ShardKeyArrived(){ Source = source.ToSummary(), ShardKey = shardKey}));
-                if(source.MaxItemsInAScheduleRun.HasValue && i >= source.MaxItemsInAScheduleRun)
+                newLastOffset = lastOffset.Add(TimeSpan.FromMinutes(n))
+                    .DropSecondAndMilliseconds(); // just to be sure
+                var shardKey = GetShardKey(newLastOffset);
+                events.Add(new Event(new ShardKeyArrived() { Source = source.ToSummary(), ShardKey = shardKey }));
+                if (source.MaxItemsInAScheduleRun.HasValue && n >= source.MaxItemsInAScheduleRun)
                     break;
+                n++;
             }
 
-            source.LastOffsetPoint = ofsted.DropSecondAndMilliseconds().ToString("O");
+            source.LastOffsetPoint = newLastOffset.ToString("O");
             return Task.FromResult((IEnumerable<Event>)events);
         }
 
