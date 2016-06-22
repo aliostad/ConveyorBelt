@@ -1,0 +1,14 @@
+﻿17436 11:10:02 ERROR Test Error with exception
+Exception: System.Exception
+Message: Test message
+Source: Asos.Content.Sitecore.EntityService
+   at Asos.Content.Sitecore.EntityService.Repositories.ContentItemRepository.Exists(String database, String path) in c:\Dev\AsosContent\Dev\Solutions\Asos.Content.Sitecore.Base\EntityService\Repositories\ContentItemRepository.cs:line 113
+
+Nested Exception
+
+Exception: System.ArgumentNullException
+Message: Value cannot be null.
+Parameter name: database
+
+
+17436 11:10:02 ERROR Test Error message

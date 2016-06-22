@@ -1,0 +1,92 @@
+{
+    "___type_name___": {
+        "properties": {
+            "@timestamp": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "PartitionKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RowKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "c-ip": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs-bytes": {
+                "type": "long"
+            },
+            "cs-host": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs-method": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs-uri-query": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs-uri-stem": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs-username": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs-version": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs_Cookie": {
+                "type": "string",
+                "index": "not_analyzed",
+				"store" : false
+            },
+            "cs_Referer": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "cs_User-Agent": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "s-computername": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "s-ip": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "s-port": {
+                "type": "long"
+            },
+            "s-sitename": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "sc-bytes": {
+                "type": "long"
+            },
+            "sc-status": {
+                "type": "long"
+            },
+            "sc-substatus": {
+                "type": "long"
+            },
+            "sc-win32-status": {
+                "type": "long"
+            },
+            "time-taken": {
+                "type": "long"
+            }
+        }
+    }
+}

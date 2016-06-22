@@ -1,0 +1,27 @@
+{
+    "___type_name___": {
+        "properties": {
+            "@timestamp": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "PartitionKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "RowKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "SitecoreProcessId": {
+                "type": "string"
+            },
+            "SitecoreLevel": {
+                "type": "string"
+            },
+            "Payload": {
+                "type": "string"
+            }
+        }
+    }
+}

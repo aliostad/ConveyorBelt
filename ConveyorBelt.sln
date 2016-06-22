@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "ConveyorBelt", "src\ConveyorBelt\ConveyorBelt.ccproj", "{F3342E9C-4479-4676-81AA-3297BEE00DF7}"
 EndProject
@@ -12,6 +12,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConveyorBelt.Tooling.Test", "test\ConveyorBelt.Tooling.Test\ConveyorBelt.Tooling.Test.csproj", "{5FB4A4FE-A161-4EAC-8B2F-497BAE7DAFB9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConveyorBelt.ConsoleWorker", "src\ConveyorBelt.ConsoleWorker\ConveyorBelt.ConsoleWorker.csproj", "{15F6DBF7-942D-455C-9AE3-5C2DBFFEFEDC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mappings", "Mappings", "{40815318-CCAC-4F46-9F2E-C7962A19DB0B}"
+	ProjectSection(SolutionItems) = preProject
+		mappings\AzureIisLog.json = mappings\AzureIisLog.json
+		mappings\SitecoreLogTable.json = mappings\SitecoreLogTable.json
+		mappings\WADLogsTable.json = mappings\WADLogsTable.json
+		mappings\WADPerformanceCountersTable.json = mappings\WADPerformanceCountersTable.json
+		mappings\WADWindowsEventLogsTable.json = mappings\WADWindowsEventLogsTable.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

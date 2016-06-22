@@ -122,10 +122,14 @@
     <Compile Include="Internal\ConveyorBeltConstants.cs" />
     <Compile Include="Internal\DateTimeOffsetExtensions.cs" />
     <Compile Include="Internal\FactoryHelper.cs" />
+    <Compile Include="Internal\SitecoreLogEntry.cs" />
+    <Compile Include="Internal\ParserHelper.cs" />
     <Compile Include="Internal\SimpleFilter.cs" />
     <Compile Include="ITempDownloadLocationProvider.cs" />
     <Compile Include="Parsing\IisLogParser.cs" />
     <Compile Include="Parsing\IParser.cs" />
+    <Compile Include="Internal\SitecoreLogLineParser.cs" />
+    <Compile Include="Parsing\SitecoreLogParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Querying\IShardKeyQuery.cs" />
     <Compile Include="Querying\SqlShardKeyQuery.cs" />
