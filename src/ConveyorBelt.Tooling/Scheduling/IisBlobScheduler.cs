@@ -34,7 +34,11 @@ namespace ConveyorBelt.Tooling.Scheduling
             while (true)
             {
                 bool found = false;
+
                 var path = string.Format(pathFormat, instanceIndex);
+                var isSingleInstance = path == pathFormat;
+
+
                 TheTrace.TraceInformation("IisBlobScheduler - Looking into {0}", path);
                 foreach (var blob in client.ListBlobs(path).Where(itm => itm is CloudBlockBlob)
                     .Cast<CloudBlockBlob>().OrderByDescending(x => x.Properties.LastModified))
@@ -60,7 +64,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                     }
                 }
 
-                if (!found)
+                if (!found || isSingleInstance)
                 {
                     TheTrace.TraceInformation("IisBlobScheduler - Breaking out with index of {0}", instanceIndex);
                     break;
