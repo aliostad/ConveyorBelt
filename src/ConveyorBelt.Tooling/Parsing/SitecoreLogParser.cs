@@ -47,6 +47,19 @@ namespace ConveyorBelt.Tooling.Parsing
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
+                //remove connection string passwords in exceptions etc (thanks sitecore)
+                var passwordIndex = line.IndexOf("password=", StringComparison.InvariantCultureIgnoreCase);
+                if (passwordIndex >= 0)
+                {
+                    var endOfPasswordIndex = line.IndexOf(";", passwordIndex, StringComparison.InvariantCulture);
+                    if (endOfPasswordIndex < 0)
+                    {
+                        endOfPasswordIndex = line.Length;
+                    }
+                    line = line.Substring(0, passwordIndex + 9) + "**PASSWORD**REDACTED**" + line.Substring(endOfPasswordIndex, line.Length - endOfPasswordIndex);
+
+                }
+
                 var logItem = logLineParser.ParseLine(line, fileDate);
                 if (logItem != null)
                 {
