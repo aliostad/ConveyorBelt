@@ -23,7 +23,8 @@ namespace ConveyorBelt.Tooling.Internal
             }
             else
             {
-                _text.AppendLine(line);
+                _text.AppendLine();
+                _text.Append(line);
             }
         }
     }
