@@ -117,6 +117,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
                 Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("SINGLE MSG: Sitecore heartbeat:\r\n"));
                 Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains(";Password=**PASSWORD**REDACTED**;"));
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("User ID=**USER**REDACTED**;"));
                 Assert.False(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("Not!actuallyApa$$word"));
 
                 foreach (var log in result)

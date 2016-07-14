@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using ConveyorBelt.Tooling.Internal;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -24,7 +25,7 @@ namespace ConveyorBelt.Tooling.Parsing
 
             if (endPosition == 0)
                 endPosition = long.MaxValue;
-            
+
             string line;
             var lineNumber = 0;
             var fileName = GetFileName(id);
@@ -48,17 +49,8 @@ namespace ConveyorBelt.Tooling.Parsing
                     continue;
 
                 //remove connection string passwords in exceptions etc (thanks sitecore)
-                var passwordIndex = line.IndexOf("password=", StringComparison.InvariantCultureIgnoreCase);
-                if (passwordIndex >= 0)
-                {
-                    var endOfPasswordIndex = line.IndexOf(";", passwordIndex, StringComparison.InvariantCulture);
-                    if (endOfPasswordIndex < 0)
-                    {
-                        endOfPasswordIndex = line.Length;
-                    }
-                    line = line.Substring(0, passwordIndex + 9) + "**PASSWORD**REDACTED**" + line.Substring(endOfPasswordIndex, line.Length - endOfPasswordIndex);
-
-                }
+                line = ReplaceSecureInformation(line, "password=", "**PASSWORD**REDACTED**");
+                line = ReplaceSecureInformation(line, "user id=", "**USER**REDACTED**");
 
                 var logItem = logLineParser.ParseLine(line, fileDate);
                 if (logItem != null)
@@ -90,7 +82,32 @@ namespace ConveyorBelt.Tooling.Parsing
             }
 
             if (currentEntry != null)
-                yield return MapLogItemToTableEntity(currentEntry, partionKey, fileName); 
+                yield return MapLogItemToTableEntity(currentEntry, partionKey, fileName);
+        }
+
+        /// <summary>
+        /// Replace connection string type user and password,
+        /// 
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="token">What part of connection string to find eg "Password="</param>
+        /// <param name="replacementString">what to replace the secure information with eg "--REMOVED--"</param>
+        /// <returns></returns>
+        private static string ReplaceSecureInformation(string line, string token, string replacementString)
+        {
+            var tokenIndex = line.IndexOf(token, StringComparison.InvariantCultureIgnoreCase);
+            if (tokenIndex >= 0)
+            {
+                var endofSecureInformation = line.IndexOf(";", tokenIndex, StringComparison.InvariantCulture);
+                if (endofSecureInformation < 0)
+                {
+                    endofSecureInformation = line.Length;
+                }
+                line = line.Substring(0, tokenIndex + token.Length) + replacementString +
+                       line.Substring(endofSecureInformation, line.Length - endofSecureInformation);
+            }
+
+            return line;
         }
 
         private static DynamicTableEntity MapLogItemToTableEntity(SitecoreLogEntry logItem, string partitionKey,
@@ -129,7 +146,7 @@ namespace ConveyorBelt.Tooling.Parsing
                     break;
                 }
             }
-           
+
             return fileDate;
         }
 
