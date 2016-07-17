@@ -61,7 +61,8 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var parsedLog = result.FirstOrDefault();
                 Assert.NotNull(parsedLog);
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.EndsWith("Parameter name: database\r\n"));
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("Test Error with exception\r\n"));
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.EndsWith("Parameter name: database"));
                 Assert.True(result.Count() == 2);
             }
         }
@@ -81,6 +82,43 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 Assert.NotNull(parsedLog);
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "WARN");
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, "Shutdown message: HostingEnvironment initiated shutdown");
+
+                foreach (var log in result)
+                {
+                    Assert.NotNull(log);
+                    Assert.NotEqual(log.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, string.Empty);
+                    Assert.False(log.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("****"));
+                }
+            }
+        }
+
+        [Fact]
+        public void ParseExceptionMessage()
+        {
+            using (var stream = new MemoryStream(File.ReadAllBytes(@"data\SitecoreLog5.txt")))
+            {
+                var sitecoreLogParser = new SitecoreLogParser();
+                var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172133.txt");
+
+                var result = sitecoreLogParser.Parse(stream, uri).ToList();
+                Assert.NotNull(result);
+                Assert.Equal(result.Count, 2);
+
+                var parsedLog = result.First();
+                Assert.NotNull(parsedLog);
+                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("Test Message1:\r\n"));
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("The password failed.  Password=**PASSWORD**REDACTED**\r\n"));
+                Assert.False(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("TESTPassword"));
+
+
+                parsedLog = result.Last();
+                Assert.NotNull(parsedLog);
+                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("SINGLE MSG: Sitecore heartbeat:\r\n"));
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains(";Password=**PASSWORD**REDACTED**;"));
+                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("User ID=**USER**REDACTED**;"));
+                Assert.False(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("Not!actuallyApa$$word"));
 
                 foreach (var log in result)
                 {

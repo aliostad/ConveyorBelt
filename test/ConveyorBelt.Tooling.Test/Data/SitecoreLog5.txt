@@ -1,0 +1,37 @@
+﻿Heartbeat 15:17:55 ERROR Test Message1:
+Exception: System.Exception
+Message: The password failed.  Password=TESTPassword blah test message
+Nested Exception
+Exception: System.Data.SqlClient.SqlException
+Message: Timeout expired.  The timeout period elapsed prior to completion of the operation or the server is not responding.  This failure occurred while attempting to connect to the routing destination. The duration spent while attempting to connect to the original server was - [Pre-Login] initialization=1; handshake=16; [Login] initialization=0; authentication=0; [Post-Login] complete=0;  
+Source: .Net SqlClient Data Provider
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlCommand.RunExecuteNonQueryTds(String methodName, Boolean async, Int32 timeout, Boolean asyncWrite)
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, String methodName, Boolean sendToPipe, Int32 timeout, Boolean asyncWrite)
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Sitecore.Web.Services.Heartbeat.HeartbeatHelper.CheckDatabase(String connectionString)
+   at Sitecore.Web.Services.Heartbeat.HeartbeatHelper.CheckDatabases(BeatResults results)
+Nested Exception
+Exception: System.ComponentModel.Win32Exception
+Message: The wait operation timed out
+
+Heartbeat 15:18:55 ERROR SINGLE MSG: Sitecore heartbeat:
+Exception: System.Exception
+Message: Database Server=tcp:localdbserver,1433;Database=sitecore-content-web-db;User ID=dbuser;Password=Not!actuallyApa$$word;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30; is not available
+Nested Exception
+Exception: System.Data.SqlClient.SqlException
+Message: Timeout expired.  The timeout period elapsed prior to completion of the operation or the server is not responding.  This failure occurred while attempting to connect to the routing destination. The duration spent while attempting to connect to the original server was - [Pre-Login] initialization=1; handshake=16; [Login] initialization=0; authentication=0; [Post-Login] complete=0;  
+Source: .Net SqlClient Data Provider
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlCommand.RunExecuteNonQueryTds(String methodName, Boolean async, Int32 timeout, Boolean asyncWrite)
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, String methodName, Boolean sendToPipe, Int32 timeout, Boolean asyncWrite)
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Sitecore.Web.Services.Heartbeat.HeartbeatHelper.CheckDatabase(String connectionString)
+   at Sitecore.Web.Services.Heartbeat.HeartbeatHelper.CheckDatabases(BeatResults results)
+Nested Exception
+Exception: System.ComponentModel.Win32Exception
+Message: The wait operation timed out
