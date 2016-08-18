@@ -143,6 +143,7 @@
     <Compile Include="Scheduling\MinuteTableShardScheduler.cs" />
     <Compile Include="Scheduling\RangeShardKeyScheduler.cs" />
     <Compile Include="Scheduling\ReverseTimestampMinuteTableShardScheduler.cs" />
+    <Compile Include="Scheduling\SimpleBlobScheduler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

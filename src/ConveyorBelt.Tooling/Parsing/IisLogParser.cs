@@ -39,7 +39,7 @@ namespace ConveyorBelt.Tooling.Parsing
                     continue;
 
                 var idSegments = id.Segments.Skip(2).Select(x => x.Replace("/", "")).ToArray();
-                var entries = line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+                var entries = line.Split(new[] {' ', '\t'}, StringSplitOptions.RemoveEmptyEntries); // added TAB for reading AKAMAI files
                 var datetime = string.Join(" ", entries.Take(2));
                 var rest = entries.Skip(2).ToArray();
                 var entity = new DynamicTableEntity();
