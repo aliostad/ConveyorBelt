@@ -39,7 +39,17 @@ namespace ConveyorBelt.Tooling
             {
                 var url = string.Format(IndexFormat, baseUrl, indexName);
                 var result = await _httpClient.PutAsJsonAsync(url, string.Empty);
-                result.EnsureSuccessStatusCode();
+                try
+                {
+                    result.EnsureSuccessStatusCode();
+                }
+                catch
+                {
+                    text = response.Content.ReadAsStringAsync().Result;
+                    throw new ApplicationException(string.Format("Error {0}: {1}",
+                     result.StatusCode,
+                     text));
+                }
                 return true;
             }
             else

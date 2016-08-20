@@ -105,6 +105,9 @@ namespace ConveyorBelt.Worker
                 Component.For<RangeShardKeyScheduler>()
                     .ImplementedBy<RangeShardKeyScheduler>()
                     .LifestyleTransient(),
+                Component.For<SimpleBlobScheduler>()
+                    .ImplementedBy<SimpleBlobScheduler>()
+                    .LifestyleTransient(),
                 Component.For<MinuteTableShardScheduler>()
                     .ImplementedBy<MinuteTableShardScheduler>()
                     .LifestyleTransient(),
@@ -113,6 +116,9 @@ namespace ConveyorBelt.Worker
                     .LifestyleTransient(),
                 Component.For<IisLogParser>()
                     .ImplementedBy<IisLogParser>()
+                    .LifestyleTransient(),
+                Component.For<AkamaiLogParser>()
+                    .ImplementedBy<AkamaiLogParser>()
                     .LifestyleTransient(),
                 Component.For<IHttpClient>()
                     .ImplementedBy<DefaultHttpClient>()

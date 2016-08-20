@@ -123,6 +123,9 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<IisLogParser>()
                     .ImplementedBy<IisLogParser>()
                     .LifestyleTransient(),
+                Component.For<AkamaiLogParser>()
+                    .ImplementedBy<AkamaiLogParser>()
+                    .LifestyleTransient(),
                 Component.For<IElasticsearchBatchPusher>()
                     .ImplementedBy<ElasticsearchBatchPusher>()
                     .LifestyleTransient()

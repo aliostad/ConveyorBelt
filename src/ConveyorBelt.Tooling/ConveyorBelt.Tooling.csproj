@@ -126,6 +126,7 @@
     <Compile Include="Internal\ParserHelper.cs" />
     <Compile Include="Internal\SimpleFilter.cs" />
     <Compile Include="ITempDownloadLocationProvider.cs" />
+    <Compile Include="Parsing\AkamaiLogParser.cs" />
     <Compile Include="Parsing\IisLogParser.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Internal\SitecoreLogLineParser.cs" />

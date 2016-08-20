@@ -39,7 +39,7 @@ namespace ConveyorBelt.Tooling.Parsing
                     continue;
 
                 var idSegments = id.Segments.Skip(2).Select(x => x.Replace("/", "")).ToArray();
-                var entries = line.Split(new[] {' ', '\t'}, StringSplitOptions.RemoveEmptyEntries); // added TAB for reading AKAMAI files
+                var entries = GetEntries(line); 
                 var datetime = string.Join(" ", entries.Take(2));
                 var rest = entries.Skip(2).ToArray();
                 var entity = new DynamicTableEntity();
@@ -70,7 +70,12 @@ namespace ConveyorBelt.Tooling.Parsing
             }
         }
 
-        private static string[] BuildFields(string line)
+        protected virtual IEnumerable<string> GetEntries(string line)
+        {
+            return line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        protected virtual string[] BuildFields(string line)
         {
             line = line.Replace("#Fields: ", "");
             if (!line.StartsWith("date time "))

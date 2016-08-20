@@ -111,6 +111,7 @@
     <Compile Include="FileOffsetTests.cs" />
     <Compile Include="FilterTests.cs" />
     <Compile Include="IisLogTests.cs" />
+    <Compile Include="IntegrationTests.cs" />
     <Compile Include="Parsing\SitecoreLogLineParserShould.cs" />
     <Compile Include="Parsing\SitecoreLogParserShould.cs" />
     <Compile Include="MinuteTableShardSchedulerTests.cs" />
