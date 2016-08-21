@@ -35,7 +35,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             var events = new List<Event>();
 
             foreach (var blob in client.ListBlobs(blobPath).Where(itm => itm is CloudBlockBlob)
-                    .Cast<CloudBlockBlob>().OrderByDescending(x => x.Properties.LastModified))
+                    .Cast<CloudBlockBlob>().OrderBy(x => x.Properties.LastModified))
             {
                 if (blob.Properties.LastModified > offset.TimeOffset)
                 {
