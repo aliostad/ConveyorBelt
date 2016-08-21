@@ -10,7 +10,7 @@ namespace ConveyorBelt.Tooling.Parsing
     {
         protected override IEnumerable<string> GetEntries(string line)
         {
-            return line.Split('\t').Select(x => x.Trim('"')); // TODO: does not cover the case where there is a TAB inside fields
+            return line.Split('\t').Select(x => x.Trim('"')).ToArray(); // TODO: does not cover the case where there is a TAB inside fields
         }
     }
 }

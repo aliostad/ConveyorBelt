@@ -47,9 +47,11 @@ namespace ConveyorBelt.Tooling.Scheduling
                     {
                         Source = source.ToSummary(),
                         BlobId = filename,
-                        Position = (filename == offset.FileName) ? offset.Position : 0, // if same file then pass offset
+                        Position = 0,
                         EndPosition = blob.Properties.Length
                     }));
+
+                    TheTrace.TraceInformation("Created BlobFileArrived for file: {0}", filename);
                 }
             }
 
