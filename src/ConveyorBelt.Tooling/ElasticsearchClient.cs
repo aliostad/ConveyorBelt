@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using BeeHive;
 using Newtonsoft.Json.Serialization;
 
 namespace ConveyorBelt.Tooling
@@ -26,6 +27,7 @@ namespace ConveyorBelt.Tooling
         {
             baseUrl = baseUrl.TrimEnd('/');
             string searchUrl = string.Format(IndexSearchFormat, baseUrl, indexName);
+            TheTrace.TraceInformation("Just wanna check if this index exists: {0}. URL: {1}", indexName, searchUrl);
             var response = await _httpClient.GetAsync(searchUrl);
 
             var text = await response.Content.ReadAsStringAsync();
@@ -35,7 +37,7 @@ namespace ConveyorBelt.Tooling
                 return false;
             }
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
+            if (response.StatusCode == HttpStatusCode.NotFound || response.StatusCode == HttpStatusCode.BadRequest) // sometimes send as bad request
             {
                 var url = string.Format(IndexFormat, baseUrl, indexName);
                 var result = await _httpClient.PutAsJsonAsync(url, string.Empty);
