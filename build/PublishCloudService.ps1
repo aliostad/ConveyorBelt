@@ -8,7 +8,7 @@ Param(  $serviceName = "",
         $alwaysDeleteExistingDeployments = 1,
         $enableDeploymentUpgrade = 1,
         $selectedsubscription = "",
-        $subscriptionDataFile = "cloud.publishsettings",
+        $subscriptionDataFile = "",
         $slot = "Production",
         $affinityGroupName = "",
         $tokensFile = "tokens.json"
@@ -256,6 +256,7 @@ Import-Module Azure
 # configure powershell with publishsettings for your subscription
 $pubsettings = $subscriptionDataFile
 if($pubsettings){
+	Write-Host $pubsettings
 	Import-AzurePublishSettingsFile $pubsettings
 }
 else{
