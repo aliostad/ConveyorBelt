@@ -255,14 +255,12 @@ Import-Module Azure
 
 # configure powershell with publishsettings for your subscription
 $pubsettings = $subscriptionDataFile
-if($pubsettings){
-	Write-Host $pubsettings
+if ($pubsettings){
 	Import-AzurePublishSettingsFile $pubsettings
 }
 else{
 	Add-AzureAccount
 }
-
 Select-AzureSubscription -SubscriptionName $selectedsubscription
 
 Write-Host "Storage account name is $storageAccountName" -ForegroundColor Yellow
