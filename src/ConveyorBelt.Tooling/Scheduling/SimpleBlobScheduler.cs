@@ -35,7 +35,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             var events = new List<Event>();
 
             foreach (var blob in client.ListBlobs(blobPath).Where(itm => itm is CloudBlockBlob)
-                    .Cast<CloudBlockBlob>().OrderByDescending(x => x.Properties.LastModified))
+                    .Cast<CloudBlockBlob>().OrderBy(x => x.Properties.LastModified))
             {
                 if (blob.Properties.LastModified > offset.TimeOffset)
                 {
@@ -47,9 +47,11 @@ namespace ConveyorBelt.Tooling.Scheduling
                     {
                         Source = source.ToSummary(),
                         BlobId = filename,
-                        Position = (filename == offset.FileName) ? offset.Position : 0, // if same file then pass offset
+                        Position = 0,
                         EndPosition = blob.Properties.Length
                     }));
+
+                    TheTrace.TraceInformation("Created BlobFileArrived for file: {0}", filename);
                 }
             }
 

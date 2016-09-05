@@ -114,11 +114,17 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<MinuteTableShardScheduler>()
                     .ImplementedBy<MinuteTableShardScheduler>()
                     .LifestyleTransient(),
+                Component.For<SimpleBlobScheduler>()
+                    .ImplementedBy<SimpleBlobScheduler>()
+                    .LifestyleTransient(),
                 Component.For<ReverseTimestampMinuteTableShardScheduler>()
                     .ImplementedBy<ReverseTimestampMinuteTableShardScheduler>()
                     .LifestyleTransient(),
                 Component.For<IisLogParser>()
                     .ImplementedBy<IisLogParser>()
+                    .LifestyleTransient(),
+                Component.For<AkamaiLogParser>()
+                    .ImplementedBy<AkamaiLogParser>()
                     .LifestyleTransient(),
                 Component.For<IElasticsearchBatchPusher>()
                     .ImplementedBy<ElasticsearchBatchPusher>()

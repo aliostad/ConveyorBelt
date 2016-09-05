@@ -72,19 +72,23 @@ namespace ConveyorBelt.Tooling.Scheduling
                     {
                         source.ErrorMessage = "Could not find SchedulerType: " + source.SchedulerType;
                     }
-                    var scheduler = (ISourceScheduler) _locator.GetService(schedulerType);
-                    var result = await scheduler.TryScheduleAsync(source);
-                    TheTrace.TraceInformation(
-                        "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
-                        source.ToTypeKey(), result.Item1);
-
-                    if (result.Item2)
+                    else
                     {
-                        await _eventQueueOperator.PushBatchAsync(result.Item1);
-                    }
+                        var scheduler = (ISourceScheduler)_locator.GetService(schedulerType);
+                        var result = await scheduler.TryScheduleAsync(source);
+                        TheTrace.TraceInformation(
+                            "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
+                            source.ToTypeKey(), result.Item1);
 
-                    source.ErrorMessage = string.Empty;
-                    TheTrace.TraceInformation("MasterScheduler - Finished Scheduling {0}", source.ToTypeKey());
+                        if (result.Item2)
+                        {
+                            await _eventQueueOperator.PushBatchAsync(result.Item1);
+                        }
+
+                        source.ErrorMessage = string.Empty;
+                        TheTrace.TraceInformation("MasterScheduler - Finished Scheduling {0}", source.ToTypeKey());
+                    }
+                   
                     source.LastScheduled = DateTimeOffset.UtcNow;
                 }
                 catch (Exception e)
