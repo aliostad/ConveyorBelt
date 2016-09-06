@@ -47,8 +47,8 @@ namespace ConveyorBelt.Tooling
                 }
                 catch
                 {
-                    text = response.Content.ReadAsStringAsync().Result;
-                    throw new ApplicationException(string.Format("Error {0}: {1}",
+                    text = result.Content.ReadAsStringAsync().Result;
+                    throw new ApplicationException(string.Format("Error [WHICH] {0}: {1}",
                      result.StatusCode,
                      text));
                 }
@@ -56,7 +56,8 @@ namespace ConveyorBelt.Tooling
             }
             else
             {
-                throw new ApplicationException(string.Format("Error {0}: {1}",
+                TheTrace.TraceInformation("It sent Back this {0}", (int) response.StatusCode);
+                throw new ApplicationException(string.Format("Error [WHAT] {0}: {1}",
                     response.StatusCode,
                     text));
             }
