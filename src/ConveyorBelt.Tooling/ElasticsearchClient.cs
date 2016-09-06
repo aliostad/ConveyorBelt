@@ -41,15 +41,16 @@ namespace ConveyorBelt.Tooling
             {
                 var url = string.Format(IndexFormat, baseUrl, indexName);
                 var result = await _httpClient.PutAsJsonAsync(url, string.Empty);
-
+                if(result.Content != null)
+                    text = await result.Content.ReadAsStringAsync();
+                TheTrace.TraceInformation("It sent Back this {0} and text => {1}", (int)response.StatusCode, text);
+ 
                 if (result.IsSuccessStatusCode)
                 {
-                    result.Dispose();
                     return true;
                 }
                 else
                 {
-                    text = await result.Content.ReadAsStringAsync();
                     throw new ApplicationException(string.Format("Error [WHICH] {0}: {1}",
                         result.StatusCode,
                         text));
