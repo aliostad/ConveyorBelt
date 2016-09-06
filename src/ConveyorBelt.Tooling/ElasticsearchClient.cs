@@ -28,40 +28,42 @@ namespace ConveyorBelt.Tooling
             baseUrl = baseUrl.TrimEnd('/');
             string searchUrl = string.Format(IndexSearchFormat, baseUrl, indexName);
             TheTrace.TraceInformation("Just wanna check if this index exists: {0}. URL: {1}", indexName, searchUrl);
-            var response = await _httpClient.GetAsync(searchUrl);
+            var getResponse = await _httpClient.GetAsync(searchUrl);
 
-            var text = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
+            var getText = await getResponse.Content.ReadAsStringAsync();
+            if (getResponse.IsSuccessStatusCode)
             {
                 return false;
             }
 
-            if (response.StatusCode == HttpStatusCode.NotFound || response.StatusCode == HttpStatusCode.BadRequest) // sometimes send as bad request
+            if (getResponse.StatusCode == HttpStatusCode.NotFound || getResponse.StatusCode == HttpStatusCode.BadRequest) // sometimes send as bad request
             {
+                TheTrace.TraceInformation("It sent Back this {0} and text => {1}", (int)getResponse.StatusCode, getText); 
+
                 var url = string.Format(IndexFormat, baseUrl, indexName);
-                var result = await _httpClient.PutAsJsonAsync(url, string.Empty);
-                if(result.Content != null)
-                    text = await result.Content.ReadAsStringAsync();
-                TheTrace.TraceInformation("It sent Back this {0} and text => {1}", (int)response.StatusCode, text);
- 
-                if (result.IsSuccessStatusCode)
+                var putResponse = await _httpClient.PutAsJsonAsync(url, string.Empty);
+                var putText = "[NO CONTENT]";
+
+                if (putResponse.Content != null)
+                    putText = await putResponse.Content.ReadAsStringAsync();
+    
+                if (putResponse.IsSuccessStatusCode)
                 {
                     return true;
                 }
                 else
                 {
                     throw new ApplicationException(string.Format("Error [WHICH] {0}: {1}",
-                        result.StatusCode,
-                        text));
+                        putResponse.StatusCode,
+                        putText));
                 }
             }
             else
             {
-                TheTrace.TraceInformation("It sent Back this {0}", (int) response.StatusCode);
+                TheTrace.TraceInformation("It sent Back this {0}", (int) getResponse.StatusCode);
                 throw new ApplicationException(string.Format("Error [WHAT] {0}: {1}",
-                    response.StatusCode,
-                    text));
+                    getResponse.StatusCode,
+                    getText));
             }
         }
 
