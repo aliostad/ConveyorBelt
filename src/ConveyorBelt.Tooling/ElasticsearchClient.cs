@@ -36,7 +36,7 @@ namespace ConveyorBelt.Tooling
                 return false;
             }
 
-            if (getResponse.StatusCode == HttpStatusCode.NotFound || getResponse.StatusCode == HttpStatusCode.BadRequest) // sometimes send as bad request
+            if (getResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 TheTrace.TraceInformation("It sent Back this {0} and text => {1}", (int)getResponse.StatusCode, getText); 
 
@@ -47,13 +47,13 @@ namespace ConveyorBelt.Tooling
                 if (putResponse.Content != null)
                     putText = await putResponse.Content.ReadAsStringAsync();
     
-                if (putResponse.IsSuccessStatusCode)
+                if (putResponse.IsSuccessStatusCode || (putResponse.StatusCode == HttpStatusCode.BadRequest && putText.Contains("already exists")))
                 {
                     return true;
                 }
                 else
                 {
-                    throw new ApplicationException(string.Format("Error [WHICH] {0}: {1}",
+                    throw new ApplicationException(string.Format("Error in PUT {0}: {1}",
                         putResponse.StatusCode,
                         putText));
                 }
@@ -61,7 +61,7 @@ namespace ConveyorBelt.Tooling
             else
             {
                 TheTrace.TraceInformation("It sent Back this {0}", (int) getResponse.StatusCode);
-                throw new ApplicationException(string.Format("Error [WHAT] {0}: {1}",
+                throw new ApplicationException(string.Format("Error in GET: {0}: {1}",
                     getResponse.StatusCode,
                     getText));
             }
