@@ -33,7 +33,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             var lockToken = new LockToken(source.ToTypeKey());
             int seconds =
                 Convert.ToInt32(_configurationValueProvider.GetValue(ConfigurationKeys.ClusterLockDurationSeconds));
-            if (!(await _lockStore.TryLockAsync(lockToken, 2, 1000, seconds * 1000)))
+            if (!(await _lockStore.TryLockAsync(lockToken, 0, 1000, seconds * 1000))) // if tries < 1 it puts to 1 in beehive
             {
                 TheTrace.TraceInformation("I could NOT be master for {0}", source.ToTypeKey());
                 return new Tuple<IEnumerable<Event>, bool>(Enumerable.Empty<Event>(), false);

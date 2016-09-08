@@ -70,7 +70,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                     TheTrace.TraceInformation("IisBlobConventionScheduler - Scheduled Event: {0}", fileToConsume);
                 }
 
-                if (isSingleInstance)
+                if (isSingleInstance) // this is for when you want to consume IIS logs from only a single VM and not used {0} in blbb format
                     break;
             }
 

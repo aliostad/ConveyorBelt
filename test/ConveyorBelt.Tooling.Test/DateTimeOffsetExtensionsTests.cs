@@ -14,6 +14,8 @@ namespace ConveyorBelt.Tooling.Test
         [Theory]
         [InlineData("2016-02-12 05:02:06", "2016-02-12 06:01:06", 1)]
         [InlineData("2016-02-11 05:02:06", "2016-02-12 06:01:06", 25)]
+        [InlineData("2016-02-11 05:59:59", "2016-02-12 06:00:00", 25)]
+        [InlineData("2016-02-11 05:00:00", "2016-02-12 05:59:59", 24)]
         public void CalculatesCorrectly(string from, string until, int hours)
         {
             var fromd = DateTimeOffset.Parse(from);
