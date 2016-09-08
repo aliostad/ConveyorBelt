@@ -64,7 +64,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                         PreviousFile = path.Replace("wad-iis-logfiles/", "") + previousFile,
                         NextFile = path.Replace("wad-iis-logfiles/", "") + nextFile,
                         Source = source.ToSummary(),
-                        StopChasingAfter = fileOffset.Add(TimeSpan.FromMinutes(80))
+                        StopChasingAfter = fileOffset.Add(TimeSpan.FromMinutes(80)),
+                        IsRepeat = true
                     }));
 
                     TheTrace.TraceInformation("IisBlobConventionScheduler - Scheduled Event: {0}", fileToConsume);

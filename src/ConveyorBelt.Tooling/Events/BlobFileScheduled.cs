@@ -19,5 +19,7 @@ namespace ConveyorBelt.Tooling.Events
         public long LastPosition { get; set; }
 
         public DateTimeOffset StopChasingAfter { get; set; }
+
+        public bool? IsRepeat { get; set; } // for tracing purposes
     }
 }
