@@ -8,6 +8,11 @@ namespace ConveyorBelt.Tooling.Events
 {
     public class BlobFileScheduled
     {
+        public BlobFileScheduled()
+        {
+            Sender = Environment.MachineName;
+        }
+
         public string FileToConsume { get; set; }
 
         public string PreviousFile { get; set; }
@@ -21,5 +26,7 @@ namespace ConveyorBelt.Tooling.Events
         public DateTimeOffset StopChasingAfter { get; set; }
 
         public bool? IsRepeat { get; set; } // for tracing purposes
+
+        public string Sender { get; set; } // for tracing
     }
 }
