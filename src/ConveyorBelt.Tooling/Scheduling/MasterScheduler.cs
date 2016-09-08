@@ -37,9 +37,10 @@ namespace ConveyorBelt.Tooling.Scheduling
         public async Task ScheduleSourcesAsync()
         {
             var sources = _sourceConfiguration.GetSources();
-            foreach (var source in sources)
+            foreach (var sauce in sources)
             {
                 Func<Task> unlock = null;
+                var source = _sourceConfiguration.RefreshSource(sauce);
                 try
                 {
 
@@ -100,7 +101,9 @@ namespace ConveyorBelt.Tooling.Scheduling
                 }
 
                 _sourceConfiguration.UpdateSource(source);
-                
+
+                await Task.Delay(000); // wait until dust settles then unlock
+
                 if(unlock!=null)
                     await unlock();
                 

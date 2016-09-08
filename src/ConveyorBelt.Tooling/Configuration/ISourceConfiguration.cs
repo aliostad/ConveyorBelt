@@ -13,5 +13,7 @@ namespace ConveyorBelt.Tooling.Configuration
         IEnumerable<DiagnosticsSource> GetSources();
 
         void UpdateSource(DiagnosticsSource source);
+
+        DiagnosticsSource RefreshSource(DiagnosticsSource source); // goes to data store to get the latest version
     }
 }

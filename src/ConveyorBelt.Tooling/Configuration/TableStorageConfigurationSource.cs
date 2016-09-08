@@ -29,6 +29,16 @@ namespace ConveyorBelt.Tooling.Configuration
             _table.Execute(TableOperation.InsertOrReplace(source.ToEntity()));
         }
 
+        public DiagnosticsSource RefreshSource(DiagnosticsSource source)
+        {
+            var s = _table.ExecuteQuery(new TableQuery().Where(TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey", "eq", source.PartitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey", "eq", source.RowKey)
+                ))).Single();
+            return new DiagnosticsSource(s);
+        }
+
         private void MakeSureTableIsThere(IConfigurationValueProvider configurationValueProvider)
         {
             if (_table == null)
