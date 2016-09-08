@@ -24,29 +24,23 @@ namespace ConveyorBelt.Tooling.Scheduling
         protected abstract Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source);
 
 
-        public async Task<Tuple<IEnumerable<Event>, bool>> TryScheduleAsync(DiagnosticsSource source)
+        public async Task<Tuple<IEnumerable<Event>, bool, Func<Task>>> TryScheduleAsync(DiagnosticsSource source)
         {
             // if Stop offset has been reached
             if (!string.IsNullOrEmpty(source.StopOffsetPoint) && source.LastOffsetPoint != null && source.LastOffsetPoint.CompareTo(source.StopOffsetPoint) >= 0)
-                return new Tuple<IEnumerable<Event>, bool>(Enumerable.Empty<Event>(), false);
+                return new Tuple<IEnumerable<Event>, bool, Func<Task>>(Enumerable.Empty<Event>(), false, () => Task.Delay(0));
 
             var lockToken = new LockToken(source.ToTypeKey());
             int seconds =
                 Convert.ToInt32(_configurationValueProvider.GetValue(ConfigurationKeys.ClusterLockDurationSeconds));
-            if (!(await _lockStore.TryLockAsync(lockToken, 0, 1000, seconds * 1000))) // if tries < 1 it puts to 1 in beehive
+            if (!(await _lockStore.TryLockAsync(lockToken, tries: 0, timeoutMilliseconds: seconds * 1000))) // if tries < 1 it puts to 1 in beehive
             {
                 TheTrace.TraceInformation("I could NOT be master for {0}", source.ToTypeKey());
-                return new Tuple<IEnumerable<Event>, bool>(Enumerable.Empty<Event>(), false);
+                return new Tuple<IEnumerable<Event>, bool, Func<Task>>(Enumerable.Empty<Event>(), false, () => Task.Delay(0));
             }
-            try
-            {
-                var events = await DoSchedule(source);
-                return new Tuple<IEnumerable<Event>, bool>(events, true);
-            }
-            finally
-            {
-                Task.Run( () => _lockStore.ReleaseLockAsync(lockToken)).Wait();
-            }
+
+            var events = await DoSchedule(source);
+            return new Tuple<IEnumerable<Event>, bool, Func<Task>>(events, true, () => _lockStore.ReleaseLockAsync(lockToken));
         }
     }
 }

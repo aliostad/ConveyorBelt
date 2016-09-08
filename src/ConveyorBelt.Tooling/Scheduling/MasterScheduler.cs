@@ -39,6 +39,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             var sources = _sourceConfiguration.GetSources();
             foreach (var source in sources)
             {
+                Func<Task> unlock = null;
                 try
                 {
 
@@ -80,6 +81,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                             "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
                             source.ToTypeKey(), result.Item1);
 
+                        unlock = result.Item3;
                         if (result.Item2)
                         {
                             await _eventQueueOperator.PushBatchAsync(result.Item1);
@@ -98,6 +100,10 @@ namespace ConveyorBelt.Tooling.Scheduling
                 }
 
                 _sourceConfiguration.UpdateSource(source);
+                
+                if(unlock!=null)
+                    await unlock();
+                
                 TheTrace.TraceInformation("MasterScheduler - Updated {0}", source.ToTypeKey());
             }
         }
