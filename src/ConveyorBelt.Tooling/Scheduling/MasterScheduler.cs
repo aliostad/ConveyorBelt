@@ -110,6 +110,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 {
                     var scheduler = (ISourceScheduler)_locator.GetService(schedulerType);
                     var result = await scheduler.TryScheduleAsync(source);
+                    source.LastScheduled = DateTimeOffset.UtcNow;
                     TheTrace.TraceInformation(
                         "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
                         source.ToTypeKey(), result.Item1);
@@ -123,7 +124,6 @@ namespace ConveyorBelt.Tooling.Scheduling
                     TheTrace.TraceInformation("MasterScheduler - Finished Scheduling {0}", source.ToTypeKey());
                 }
                    
-                source.LastScheduled = DateTimeOffset.UtcNow;
                 return source;
             }
             catch (Exception e)
