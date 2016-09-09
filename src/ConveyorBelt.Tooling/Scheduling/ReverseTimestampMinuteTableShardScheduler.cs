@@ -10,8 +10,8 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class ReverseTimestampMinuteTableShardScheduler : MinuteTableShardScheduler
     {
-        public ReverseTimestampMinuteTableShardScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
-            : base(lockStore, configurationValueProvider)
+        public ReverseTimestampMinuteTableShardScheduler(IConfigurationValueProvider configurationValueProvider)
+            : base(configurationValueProvider)
         {
         }
 

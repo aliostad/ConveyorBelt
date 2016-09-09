@@ -27,21 +27,5 @@ namespace ConveyorBelt.Tooling.Test
                 throw new Exception("PLEASE SETUP ENVVAR!!! MasterSchedulerReads_es");
         }
 
-        [Fact]
-        public void MasterSchedulerReads()
-        {
-            var mockQ = new Mock<IEventQueueOperator>();
-            var mockCfg = new Mock<IConfigurationValueProvider>();
-            mockCfg.Setup(x => x.GetValue(It.Is<string>(c => c == ConfigurationKeys.StorageConnectionString))).Returns(_connectionString);
-            mockCfg.Setup(x => x.GetValue(It.Is<string>(c => c == ConfigurationKeys.TableName))).Returns("DagnosticsSourceSimpleBlob");
-            mockCfg.Setup(x => x.GetValue(It.Is<string>(c => c == ConfigurationKeys.ElasticSearchUrl))).Returns(_elasticsearchHost);
-            var sources = new TableStorageConfigurationSource(mockCfg.Object);
-            var mockES = new Mock<IElasticsearchClient>();
-            var mockSL = new Mock<IServiceLocator>();
-            var scheduler = new MasterScheduler(mockQ.Object, mockCfg.Object, sources, mockES.Object, mockSL.Object);
-
-
-            scheduler.ScheduleSourcesAsync().Wait();
-        }
     }
 }

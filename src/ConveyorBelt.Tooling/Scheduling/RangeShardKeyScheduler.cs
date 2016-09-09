@@ -15,8 +15,8 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class RangeShardKeyScheduler : BaseScheduler
     {
-        public RangeShardKeyScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
-            : base(lockStore, configurationValueProvider)
+        public RangeShardKeyScheduler(IConfigurationValueProvider configurationValueProvider)
+            : base(configurationValueProvider)
         {
         }
 

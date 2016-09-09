@@ -79,8 +79,8 @@ namespace ConveyorBelt.Tooling.Scheduling
             return Task.FromResult((IEnumerable<Event>) events);
         }
 
-        public IisBlobConventionScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
-            : base(lockStore, configurationValueProvider)
+        public IisBlobConventionScheduler(IConfigurationValueProvider configurationValueProvider)
+            : base(configurationValueProvider)
         {
         }
     }

@@ -10,6 +10,6 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public interface ISourceScheduler
     {
-        Task<Tuple<IEnumerable<Event>, bool, Func<Task>>> TryScheduleAsync(DiagnosticsSource source);
+        Task<Tuple<IEnumerable<Event>, bool>> TryScheduleAsync(DiagnosticsSource source);
     }
 }

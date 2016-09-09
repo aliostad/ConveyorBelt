@@ -26,7 +26,7 @@ namespace ConveyorBelt.Tooling.Test
             lockStore.Setup(
                 x => x.TryLockAsync(It.IsAny<LockToken>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(Task.FromResult(true));
             var config = new Mock<IConfigurationValueProvider>();
-            var scheduler = new MinuteTableShardScheduler(lockStore.Object, config.Object);
+            var scheduler = new MinuteTableShardScheduler( config.Object);
             var entity = new DynamicTableEntity("dd","fff");
             entity.Properties.Add("GracePeriodMinutes", EntityProperty.GeneratePropertyForInt(3));
             entity.Properties.Add("IsActive", EntityProperty.GeneratePropertyForBool(true));

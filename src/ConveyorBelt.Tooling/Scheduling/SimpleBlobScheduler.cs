@@ -59,7 +59,8 @@ namespace ConveyorBelt.Tooling.Scheduling
             return Task.FromResult((IEnumerable<Event>)events);
         }
 
-        public SimpleBlobScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider) : base(lockStore, configurationValueProvider)
+        public SimpleBlobScheduler(IConfigurationValueProvider configurationValueProvider) 
+            : base(configurationValueProvider)
         {
         }
     }

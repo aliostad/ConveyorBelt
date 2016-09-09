@@ -10,8 +10,8 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class D18MinuteTableShardScheduler : MinuteTableShardScheduler
     {
-        public D18MinuteTableShardScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
-            : base(lockStore, configurationValueProvider)
+        public D18MinuteTableShardScheduler(IConfigurationValueProvider configurationValueProvider)
+            : base(configurationValueProvider)
         {
         }
 

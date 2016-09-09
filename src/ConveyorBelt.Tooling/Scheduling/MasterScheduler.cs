@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Configuration;
+using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Configuration;
 
 
@@ -20,13 +21,16 @@ namespace ConveyorBelt.Tooling.Scheduling
         private IServiceLocator _locator;
         private ISourceConfiguration _sourceConfiguration;
         private IHttpClient _nonAuthenticatingClient = new DefaultHttpClient(); // TODO: make this 
+        private ILockStore _lockStore;
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
             IConfigurationValueProvider configurationValueProvider,
             ISourceConfiguration sourceConfiguration,
             IElasticsearchClient elasticsearchClient,
-            IServiceLocator locator)
+            IServiceLocator locator,
+            ILockStore lockStore)
         {
+            _lockStore = lockStore;
             _sourceConfiguration = sourceConfiguration;
             _locator = locator;
             _elasticsearchClient = elasticsearchClient;
@@ -36,14 +40,23 @@ namespace ConveyorBelt.Tooling.Scheduling
 
         public async Task ScheduleSourcesAsync()
         {
+            int seconds =
+                Convert.ToInt32(_configurationValueProvider.GetValue(ConfigurationKeys.ClusterLockDurationSeconds));
             var sources = _sourceConfiguration.GetSources();
             foreach (var sauce in sources)
             {
-                Func<Task> unlock = null;
+                var lockToken = new LockToken(sauce.ToTypeKey());
+
+                if (!(await _lockStore.TryLockAsync(lockToken, tries: 0, timeoutMilliseconds: seconds * 1000))) // if tries < 1 it puts to 1 in beehive
+                {
+                    TheTrace.TraceInformation("I could NOT be master for {0}", sauce.ToTypeKey());
+                    continue;
+                }
+                
                 var source = _sourceConfiguration.RefreshSource(sauce);
+
                 try
                 {
-
                     TheTrace.TraceInformation("MasterScheduler - Scheduling {0}", source.ToTypeKey());
 
                     if (!source.IsActive.HasValue || !source.IsActive.Value)
@@ -57,7 +70,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
 
                     if (!source.LastScheduled.HasValue)
-                        source.LastScheduled = DateTimeOffset.UtcNow.AddYears(-1);
+                        source.LastScheduled = DateTimeOffset.UtcNow.AddDays(-1);
 
                     // if has been recently scheduled
                     if (source.LastScheduled.Value.AddMinutes(source.SchedulingFrequencyMinutes.Value) >
@@ -82,7 +95,6 @@ namespace ConveyorBelt.Tooling.Scheduling
                             "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
                             source.ToTypeKey(), result.Item1);
 
-                        unlock = result.Item3;
                         if (result.Item2)
                         {
                             await _eventQueueOperator.PushBatchAsync(result.Item1);
@@ -101,12 +113,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                 }
 
                 _sourceConfiguration.UpdateSource(source);
+                await _lockStore.ReleaseLockAsync(lockToken);
 
-                await Task.Delay(000); // wait until dust settles then unlock
-
-                if(unlock!=null)
-                    await unlock();
-                
                 TheTrace.TraceInformation("MasterScheduler - Updated {0}", source.ToTypeKey());
             }
         }

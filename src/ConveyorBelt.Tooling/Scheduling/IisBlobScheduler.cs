@@ -78,7 +78,7 @@ namespace ConveyorBelt.Tooling.Scheduling
         }
 
         public IisBlobScheduler(ILockStore lockStore, IConfigurationValueProvider configurationValueProvider)
-            : base(lockStore, configurationValueProvider)
+            : base(configurationValueProvider)
         {
         }
     }
