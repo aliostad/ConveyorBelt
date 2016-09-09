@@ -45,77 +45,92 @@ namespace ConveyorBelt.Tooling.Scheduling
             var sources = _sourceConfiguration.GetSources();
             foreach (var sauce in sources)
             {
-                var lockToken = new LockToken(sauce.ToTypeKey());
-
-                if (!(await _lockStore.TryLockAsync(lockToken, tries: 0, timeoutMilliseconds: seconds * 1000))) // if tries < 1 it puts to 1 in beehive
-                {
-                    TheTrace.TraceInformation("I could NOT be master for {0}", sauce.ToTypeKey());
-                    continue;
-                }
-                
-                var source = _sourceConfiguration.RefreshSource(sauce); // by this time source could be old
-
                 try
                 {
-                    TheTrace.TraceInformation("MasterScheduler - Scheduling {0}", source.ToTypeKey());
+                    var lockToken = new LockToken(sauce.ToTypeKey());
 
-                    if (!source.IsActive.HasValue || !source.IsActive.Value)
+                    if (!(await _lockStore.TryLockAsync(lockToken, tries: 0, timeoutMilliseconds: seconds * 1000))) // if tries < 1 it puts to 1 in beehive
                     {
-                        TheTrace.TraceInformation("MasterScheduler - NOT active: {0}", source.ToTypeKey());                        
-                        continue;                        
+                        TheTrace.TraceInformation("I could NOT be master for {0}", sauce.ToTypeKey());
+                        continue;
                     }
 
-                    await SetupMappingsAsync(source);
-                    TheTrace.TraceInformation("MasterScheduler - Finished Mapping setup: {0}", source.ToTypeKey());
-
-
-                    if (!source.LastScheduled.HasValue)
-                        source.LastScheduled = DateTimeOffset.UtcNow.AddDays(-1);
-
-                    // if has been recently scheduled
-                    if (source.LastScheduled.Value.AddMinutes(source.SchedulingFrequencyMinutes.Value) >
-                        DateTimeOffset.UtcNow)
+                    var resultSource = await TryScheduleSourceAsync(sauce);
+                    if (resultSource != null)
                     {
-                        TheTrace.TraceInformation("MasterScheduler - Nothing to do with {0}. LastScheduled in Future {1}", 
-                            source.ToTypeKey(), source.LastScheduled.Value);
-                        continue;                        
+                        _sourceConfiguration.UpdateSource(resultSource);
+                        TheTrace.TraceInformation("MasterScheduler - Updated {0}", resultSource.ToTypeKey());
                     }
 
-                    var schedulerType = Assembly.GetExecutingAssembly().GetType(source.SchedulerType) ??
-                                        Type.GetType(source.SchedulerType);
-                    if (schedulerType == null)
-                    {
-                        source.ErrorMessage = "Could not find SchedulerType: " + source.SchedulerType;
-                    }
-                    else
-                    {
-                        var scheduler = (ISourceScheduler)_locator.GetService(schedulerType);
-                        var result = await scheduler.TryScheduleAsync(source);
-                        TheTrace.TraceInformation(
-                            "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
-                            source.ToTypeKey(), result.Item1);
-
-                        if (result.Item2)
-                        {
-                            await _eventQueueOperator.PushBatchAsync(result.Item1);
-                        }
-
-                        source.ErrorMessage = string.Empty;
-                        TheTrace.TraceInformation("MasterScheduler - Finished Scheduling {0}", source.ToTypeKey());
-                    }
-                   
-                    source.LastScheduled = DateTimeOffset.UtcNow;
+                    await _lockStore.ReleaseLockAsync(lockToken);
                 }
                 catch (Exception e)
                 {
                     TheTrace.TraceError(e.ToString());
-                    source.ErrorMessage = e.ToString();
+                }
+            }
+        }
+
+        private async Task<DiagnosticsSource> TryScheduleSourceAsync(DiagnosticsSource source)
+        {
+            try
+            {
+                source = _sourceConfiguration.RefreshSource(source);
+                TheTrace.TraceInformation("MasterScheduler - Scheduling {0}", source.ToTypeKey());
+
+                if (!source.IsActive.HasValue || !source.IsActive.Value)
+                {
+                    TheTrace.TraceInformation("MasterScheduler - NOT active: {0}", source.ToTypeKey());                        
+                    return null;                        
                 }
 
-                _sourceConfiguration.UpdateSource(source);
-                await _lockStore.ReleaseLockAsync(lockToken);
+                await SetupMappingsAsync(source);
+                TheTrace.TraceInformation("MasterScheduler - Finished Mapping setup: {0}", source.ToTypeKey());
 
-                TheTrace.TraceInformation("MasterScheduler - Updated {0}", source.ToTypeKey());
+
+                if (!source.LastScheduled.HasValue)
+                    source.LastScheduled = DateTimeOffset.UtcNow.AddDays(-1);
+
+                // if has been recently scheduled
+                if (source.LastScheduled.Value.AddMinutes(source.SchedulingFrequencyMinutes.Value) >
+                    DateTimeOffset.UtcNow)
+                {
+                    TheTrace.TraceInformation("MasterScheduler - Nothing to do with {0}. LastScheduled in Future {1}", 
+                        source.ToTypeKey(), source.LastScheduled.Value);
+                    return null;                        
+                }
+
+                var schedulerType = Assembly.GetExecutingAssembly().GetType(source.SchedulerType) ??
+                                    Type.GetType(source.SchedulerType);
+                if (schedulerType == null)
+                {
+                    source.ErrorMessage = "Could not find SchedulerType: " + source.SchedulerType;
+                }
+                else
+                {
+                    var scheduler = (ISourceScheduler)_locator.GetService(schedulerType);
+                    var result = await scheduler.TryScheduleAsync(source);
+                    TheTrace.TraceInformation(
+                        "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
+                        source.ToTypeKey(), result.Item1);
+
+                    if (result.Item2)
+                    {
+                        await _eventQueueOperator.PushBatchAsync(result.Item1);
+                    }
+
+                    source.ErrorMessage = string.Empty;
+                    TheTrace.TraceInformation("MasterScheduler - Finished Scheduling {0}", source.ToTypeKey());
+                }
+                   
+                source.LastScheduled = DateTimeOffset.UtcNow;
+                return source;
+            }
+            catch (Exception e)
+            {
+                TheTrace.TraceError(e.ToString());
+                source.ErrorMessage = e.ToString();
+                return source;
             }
         }
 
