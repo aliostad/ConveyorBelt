@@ -53,7 +53,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                     continue;
                 }
                 
-                var source = _sourceConfiguration.RefreshSource(sauce);
+                var source = _sourceConfiguration.RefreshSource(sauce); // by this time source could be old
 
                 try
                 {
