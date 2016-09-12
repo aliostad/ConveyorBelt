@@ -113,6 +113,9 @@ namespace ConveyorBelt.ConsoleWorker
                     .LifestyleTransient(),
                 Component.For<MinuteTableShardScheduler>()
                     .ImplementedBy<MinuteTableShardScheduler>()
+                    .LifestyleTransient(),                
+                Component.For<Modulo10MinuteTableShardScheduler>()
+                    .ImplementedBy<Modulo10MinuteTableShardScheduler>()
                     .LifestyleTransient(),
                 Component.For<SimpleBlobScheduler>()
                     .ImplementedBy<SimpleBlobScheduler>()

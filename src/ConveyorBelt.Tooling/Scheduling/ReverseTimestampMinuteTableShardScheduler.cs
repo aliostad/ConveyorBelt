@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BeeHive.Configuration;
-using BeeHive.DataStructures;
 
 namespace ConveyorBelt.Tooling.Scheduling
 {
@@ -15,9 +11,9 @@ namespace ConveyorBelt.Tooling.Scheduling
         {
         }
 
-        protected override string GetShardKey(DateTimeOffset offset)
+        protected override IEnumerable<string> GetShardKeys(DateTimeOffset offset)
         {
-            return (DateTimeOffset.MaxValue.Ticks - offset.Ticks).ToString("D19");
+            return new [] { string.Format("{0:D19}", (DateTimeOffset.MaxValue.Ticks - offset.Ticks)) };
         }
     }
 }

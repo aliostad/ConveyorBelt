@@ -142,6 +142,7 @@
     <Compile Include="Scheduling\ISourceScheduler.cs" />
     <Compile Include="Scheduling\MasterScheduler.cs" />
     <Compile Include="Scheduling\MinuteTableShardScheduler.cs" />
+    <Compile Include="Scheduling\Modulo10MinuteTableShardScheduler.cs" />
     <Compile Include="Scheduling\RangeShardKeyScheduler.cs" />
     <Compile Include="Scheduling\ReverseTimestampMinuteTableShardScheduler.cs" />
     <Compile Include="Scheduling\SimpleBlobScheduler.cs" />
