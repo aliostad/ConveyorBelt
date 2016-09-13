@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Configuration;
-using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Events;
 using ConveyorBelt.Tooling.Internal;
@@ -35,8 +33,8 @@ namespace ConveyorBelt.Tooling.Scheduling
             {
                 newLastOffset = lastOffset.Add(TimeSpan.FromMinutes(n))
                     .DropSecondAndMilliseconds(); // just to be sure
-                var shardKey = GetShardKey(newLastOffset);
-                events.Add(new Event(new ShardKeyArrived() { Source = source.ToSummary(), ShardKey = shardKey }));
+                var shardKeys = GetShardKeys(newLastOffset);
+                events.AddRange(shardKeys.Select(shardKey => new Event(new ShardKeyArrived { Source = source.ToSummary(), ShardKey = shardKey })));
                 if (source.MaxItemsInAScheduleRun.HasValue && n >= source.MaxItemsInAScheduleRun)
                     break;
                 n++;
@@ -46,9 +44,9 @@ namespace ConveyorBelt.Tooling.Scheduling
             return Task.FromResult((IEnumerable<Event>)events);
         }
 
-        protected virtual string GetShardKey(DateTimeOffset offset)
+        protected virtual IEnumerable<string> GetShardKeys(DateTimeOffset offset)
         {
-            return offset.Ticks.ToString("D19");
+            return new[] { string.Format("{0:D19}", offset.Ticks) };
         }
     }
 }

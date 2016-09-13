@@ -8,7 +8,7 @@ namespace ConveyorBelt.Tooling.Configuration
 {
     public class DiagnosticsSource
     {
-        private DynamicTableEntity _entity;
+        private readonly DynamicTableEntity _entity;
         internal const string CustomAttributesFieldName = "CustomAttributes";
 
         public DiagnosticsSource(DynamicTableEntity entity)
