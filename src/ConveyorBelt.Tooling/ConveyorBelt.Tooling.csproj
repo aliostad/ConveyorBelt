@@ -112,7 +112,6 @@
     <Compile Include="Events\ShardKeyArrived.cs" />
     <Compile Include="Events\ShardRangeArrived.cs" />
     <Compile Include="FileOffset.cs" />
-    <Compile Include="IBlobExtensions.cs" />
     <Compile Include="Configuration\DiagnosticsSource.cs" />
     <Compile Include="ElasticserachBatchPusher.cs" />
     <Compile Include="IElasticsearchClient.cs" />
