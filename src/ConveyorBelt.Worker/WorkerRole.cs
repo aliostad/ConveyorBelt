@@ -78,7 +78,7 @@ namespace ConveyorBelt.Worker
                 Component.For<IActorConfiguration>()
                     .Instance(
                     ActorDescriptors.FromAssemblyContaining<ShardRangeActor>()
-                    .ToConfiguration()),
+                    .ToConfiguration().UpdateParallelism(_configurationValueProvider)),
                 Component.For<ISourceConfiguration>()
                     .ImplementedBy<TableStorageConfigurationSource>(),
                 Component.For<IFactoryActor>()
