@@ -8,6 +8,7 @@ using BeeHive.Configuration;
 using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Events;
+using ConveyorBelt.Tooling.Internal;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -60,7 +61,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                             BlobId = filename,
                             Position = (filename == offset.FileName) ? offset.Position : 0, // if same file then pass offset
                             EndPosition = blob.Properties.Length
-                        }));
+                        }, new Dictionary<string, object> { { ConveyorBeltConstants.ElasticsearchTypeHeader, source.ToTypeKey() } }));
                     }
                 }
 

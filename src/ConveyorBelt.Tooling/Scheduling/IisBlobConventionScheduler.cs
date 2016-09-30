@@ -66,7 +66,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                         Source = source.ToSummary(),
                         StopChasingAfter = fileOffset.Add(TimeSpan.FromMinutes(80)),
                         IsRepeat = true
-                    }));
+                    }, new Dictionary<string, object> {{ConveyorBeltConstants.ElasticsearchTypeHeader, source.ToTypeKey()}}));
 
                     TheTrace.TraceInformation("IisBlobConventionScheduler - Scheduled Event: {0}", fileToConsume);
                 }

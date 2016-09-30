@@ -113,7 +113,7 @@ namespace ConveyorBelt.Tooling.Actors
             blobFileScheduled.LastPosition = currentLength;
 
             // let's defer
-            events.Add(new Event(blobFileScheduled)
+            events.Add(new Event(blobFileScheduled, new Dictionary<string, object> {{ConveyorBeltConstants.ElasticsearchTypeHeader, blobFileScheduled.Source.TypeName}})
             {
                 EnqueueTime = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(30))
             });

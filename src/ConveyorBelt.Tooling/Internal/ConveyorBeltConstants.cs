@@ -14,6 +14,6 @@ namespace ConveyorBelt.Tooling.Internal
         public const string ShardFieldName = "ShardFieldName";
         public const string TimestampFieldName = "TimestampFieldName";
         public const string IdFieldName = "IdFieldName";
-        
+        public const string ElasticsearchTypeHeader = "es_type";
     }
 }
