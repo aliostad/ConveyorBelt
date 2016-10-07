@@ -23,6 +23,7 @@ using Castle.MicroKernel.Registration;
 using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
+using ConveyorBelt.Tooling.Telemetry;
 
 namespace ConveyorBelt.Worker
 {
@@ -143,7 +144,10 @@ namespace ConveyorBelt.Worker
                         Path = clusterLockRootPath
                     })),
                 Component.For<IEventQueueOperator>()
-                    .Instance(new ServiceBusOperator(servicebusConnectionString))
+                    .Instance(new ServiceBusOperator(servicebusConnectionString)),
+                Component.For<ITelemetryProvider>()
+                    .ImplementedBy<TelemetryProvider>()
+                    .LifestyleSingleton()
                 );
 
             _orchestrator = container.Resolve<Orchestrator>();

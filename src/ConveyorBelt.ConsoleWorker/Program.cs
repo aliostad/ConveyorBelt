@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BeeHive;
@@ -20,6 +18,7 @@ using ConveyorBelt.Tooling.Actors;
 using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
+using ConveyorBelt.Tooling.Telemetry;
 
 namespace ConveyorBelt.ConsoleWorker
 {
@@ -141,8 +140,10 @@ namespace ConveyorBelt.ConsoleWorker
                         Path = "conveyor_belt/locks/master_Keys/"
                     })),
                 Component.For<IEventQueueOperator>()
-                    .Instance(new ServiceBusOperator(servicebusConnectionString))
-
+                    .Instance(new ServiceBusOperator(servicebusConnectionString)),
+                Component.For<ITelemetryProvider>()
+                    .ImplementedBy<TelemetryProvider>()
+                    .LifestyleSingleton()
                 );
 
             _orchestrator = container.Resolve<Orchestrator>();
