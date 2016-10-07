@@ -18,6 +18,7 @@
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" />
       <Setting name="ConveyorBelt.BulkBatchSize" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
+      <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJson" />
     </ConfigurationSettings>
     <LocalResources>
       <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />
