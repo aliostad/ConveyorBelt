@@ -104,7 +104,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 _telemetryProvider.WriteTelemetry(
                     "MasterScheduler duration since last scheduled",
                     (long)(DateTime.UtcNow - source.LastScheduled).Value.TotalMilliseconds, 
-                    source.RowKey);
+                    source.ToTypeKey());
 
                 var schedulerType = Assembly.GetExecutingAssembly().GetType(source.SchedulerType) ??
                                     Type.GetType(source.SchedulerType);

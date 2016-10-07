@@ -37,7 +37,7 @@ namespace ConveyorBelt.Tooling.Actors
             _telemetryProvider.WriteTelemetry(
                "ShardKey receive message delay duration",
                (long)(DateTime.UtcNow - evnt.Timestamp).TotalMilliseconds, 
-               shardKeyArrived.Source.RowKey);
+               shardKeyArrived.Source.TypeName);
 
             await _durationInstrumentor.InstrumentAsync(async () =>
             {
@@ -64,7 +64,7 @@ namespace ConveyorBelt.Tooling.Actors
                     _telemetryProvider.WriteTelemetry(
                         "ShardKeyArrivedActor log delay duration",
                         (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
-                        shardKeyArrived.Source.RowKey);
+                        shardKeyArrived.Source.TypeName);
                 }
             });
 
