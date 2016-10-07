@@ -1,5 +1,4 @@
-﻿using ConveyorBelt.Tooling.Scheduling;
-using PerfIt;
+﻿using PerfIt;
 
 namespace ConveyorBelt.Tooling.Telemetry
 {
