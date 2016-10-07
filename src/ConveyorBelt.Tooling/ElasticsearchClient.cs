@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Configuration;
 using Newtonsoft.Json.Serialization;
 
 namespace ConveyorBelt.Tooling
@@ -21,9 +22,10 @@ namespace ConveyorBelt.Tooling
         public ElasticsearchClient(IHttpClient httpClient)
         {
             _httpClient = httpClient;
+
         }
 
-        public async Task<bool> CreateIndexIfNotExistsAsync(string baseUrl, string indexName)
+        public async Task<bool> CreateIndexIfNotExistsAsync(string baseUrl, string indexName, string jsonCommand = "")
         {
             baseUrl = baseUrl.TrimEnd('/');
             string searchUrl = string.Format(IndexSearchFormat, baseUrl, indexName);
@@ -41,7 +43,7 @@ namespace ConveyorBelt.Tooling
                 TheTrace.TraceInformation("It sent Back this {0} and text => {1}", (int)getResponse.StatusCode, getText); 
 
                 var url = string.Format(IndexFormat, baseUrl, indexName);
-                var putResponse = await _httpClient.PutAsJsonAsync(url, string.Empty);
+                var putResponse = await _httpClient.PutAsJsonAsync(url, jsonCommand);
                 var putText = "[NO CONTENT]";
 
                 if (putResponse.Content != null)
