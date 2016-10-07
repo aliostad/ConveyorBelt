@@ -78,7 +78,7 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<IActorConfiguration>()
                     .Instance(
                     ActorDescriptors.FromAssemblyContaining<ShardRangeActor>()
-                    .ToConfiguration()),
+                    .ToConfiguration().UpdateParallelism(_configurationValueProvider)),
                 Component.For<IFactoryActor>()
                     .ImplementedBy<FactoryActor>()
                     .LifestyleTransient(),

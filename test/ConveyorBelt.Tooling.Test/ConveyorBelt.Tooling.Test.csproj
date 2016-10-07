@@ -33,16 +33,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BeeHive, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\BeeHive-common.1.0.4\lib\net45\BeeHive.dll</HintPath>
+    <Reference Include="BeeHive, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\BeeHive-common.1.0.6\lib\net45\BeeHive.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BeeHive.Azure, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\BeeHive.Azure.1.0.4\lib\net45\BeeHive.Azure.dll</HintPath>
+    <Reference Include="BeeHive.Azure, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\BeeHive.Azure.1.0.6\lib\net45\BeeHive.Azure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BeeHive.DataStructures, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\BeeHive.DataStructures.1.0.4\lib\net45\BeeHive.DataStructures.dll</HintPath>
+    <Reference Include="BeeHive.DataStructures, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\BeeHive.DataStructures.1.0.6\lib\net45\BeeHive.DataStructures.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">

@@ -7,6 +7,7 @@ using ConveyorBelt.Tooling.Events;
 using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Telemetry;
+using ConveyorBelt.Tooling.Scheduling;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using PerfIt;
@@ -89,7 +90,7 @@ namespace ConveyorBelt.Tooling.Actors
                         try
                         {
                             currentLength = stream.Length;
-                            var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
+                        var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisBlobConventionScheduler));
                             var hasAnything = false;
                             var minDateTime = DateTimeOffset.MaxValue;
                             foreach (var entity in parser.Parse(stream, mainBlob.Uri, blobFileScheduled.LastPosition))

@@ -13,7 +13,7 @@ namespace ConveyorBelt.Tooling.Parsing
     {
         public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0, long endPosition = 0)
         {
-            if (body.Position != 0)
+            if (body.Position != 0) // this is just to make sure we read the fields. If we start in the middle, we will miss the fields
                 body.Position = 0;
 
             if (endPosition == 0)
