@@ -18,6 +18,8 @@ namespace ConveyorBelt.Tooling
         public const string ClusterLockContainer = "ConveyorBelt.Storage.ClusterLockContainer";
         public const string ClusterLockRootPath = "ConveyorBelt.Storage.ClusterLockRoot";
         public const string ClusterLockDurationSeconds = "ConveyorBelt.Storage.ClusterLockDurationSeconds";
+
+
         /// <summary>
         /// These are tab separated with header and value separated by ": " similar to HTTP headers
         /// </summary>
@@ -26,6 +28,5 @@ namespace ConveyorBelt.Tooling
         public const string EsBackOffMinSeconds = "ConveyorBelt.ElasticSearch.BackOffMinSeconds";
         public const string EsBackOffMaxSeconds = "ConveyorBelt.ElasticSearch.BackOffMaxSeconds";
         public const string EsIndexCreationJson = "ConveyorBelt.ElasticSearch.IndexCreationJson";
-
     }
 }

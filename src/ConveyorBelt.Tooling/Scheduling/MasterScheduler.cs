@@ -147,42 +147,13 @@ namespace ConveyorBelt.Tooling.Scheduling
             }
         }
 
-        private async Task<string> GetCreateIndexJsonCommand()
-        {
-            // no locking here since it clashes with async code
-            if (_createIndexJsonCommand == null)
-            {
-                
-                var jsonPath = string.Format("{0}{1}.json", _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath), "__index_settings");
-                var response = await _nonAuthenticatingClient.GetAsync(jsonPath);
-
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    TheTrace.TraceWarning("The json for index creation at {0} was not found", jsonPath);
-                    return string.Empty;
-                }
-
-                if (response.Content == null)
-                    throw new ApplicationException(response.ToString());
-
-                var content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                    throw new InvalidOperationException(content);
-
-                _createIndexJsonCommand = content;
-            }
-
-            return _createIndexJsonCommand;
-        } 
-
         private async Task SetupMappingsAsync(DiagnosticsSource source)
         {
             foreach (var indexName in source.GetIndexNames())
             {
                 var esUrl = _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl);
 
-                await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, await GetCreateIndexJsonCommand());
+                await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, _configurationValueProvider.GetValue(ConfigurationKeys.EsIndexCreationJson));
                 if (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey()))
                 {
                     var jsonPath = string.Format("{0}{1}.json",
