@@ -17,7 +17,7 @@
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" value="5" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" value="100" />
       <Setting name="ConveyorBelt.BulkBatchSize" value="100" />
-      <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJson" value="" />
+      <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" value="" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

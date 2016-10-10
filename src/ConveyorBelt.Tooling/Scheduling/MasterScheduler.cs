@@ -147,13 +147,47 @@ namespace ConveyorBelt.Tooling.Scheduling
             }
         }
 
+        private async Task<string> GetIndexSettings()
+        {
+            const string defaultSettingsJsonFileName = "__index_settings";
+            var settingsJson = _configurationValueProvider.GetValue(ConfigurationKeys.EsIndexCreationJsonFileName);
+            if (string.IsNullOrEmpty(settingsJson))
+            {
+                settingsJson = defaultSettingsJsonFileName;
+            }
+
+            var jsonPath = string.Format("{0}{1}.json",
+                        _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath), settingsJson);
+
+            var response = await _nonAuthenticatingClient.GetAsync(jsonPath);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                TheTrace.TraceWarning("Could not find the index settings file: {0}", jsonPath);
+                return string.Empty;
+            }
+
+            if (response.Content == null)
+                throw new ApplicationException(response.ToString());
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new InvalidOperationException(content);
+
+            TheTrace.TraceInformation("This is the index settings JSON: {0}", content);
+
+            return content;
+
+        } 
+
         private async Task SetupMappingsAsync(DiagnosticsSource source)
         {
             foreach (var indexName in source.GetIndexNames())
             {
                 var esUrl = _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl);
 
-                await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, _configurationValueProvider.GetValue(ConfigurationKeys.EsIndexCreationJson));
+                await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, await GetIndexSettings());
                 if (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey()))
                 {
                     var jsonPath = string.Format("{0}{1}.json",
