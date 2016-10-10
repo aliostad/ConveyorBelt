@@ -21,6 +21,9 @@ namespace ConveyorBelt.Tooling
 
         public string RowKey { get; set; }
 
+        /// <summary>
+        /// Elasticsearch type name
+        /// </summary>
         public string TypeName { get; set; }
 
         public string IndexName { get; set; }

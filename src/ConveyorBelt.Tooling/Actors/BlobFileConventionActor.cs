@@ -44,7 +44,7 @@ namespace ConveyorBelt.Tooling.Actors
             _telemetryProvider.WriteTelemetry(
                "BlobFileScheduled receive message delay duration",
                (long)(DateTime.UtcNow - evnt.Timestamp).TotalMilliseconds, 
-               blobFileScheduled.Source.RowKey);
+               blobFileScheduled.Source.TypeName);
 
             await _durationInstrumentor.InstrumentAsync(async () =>
             {
@@ -107,7 +107,7 @@ namespace ConveyorBelt.Tooling.Actors
                                 _telemetryProvider.WriteTelemetry(
                                     "BlobFileConventionActor log delay duration",
                                     (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
-                                    blobFileScheduled.Source.RowKey);
+                                    blobFileScheduled.Source.TypeName);
                             }
                         }
                         finally

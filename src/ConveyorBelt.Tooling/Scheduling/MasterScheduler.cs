@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using BeeHive;
@@ -21,6 +22,9 @@ namespace ConveyorBelt.Tooling.Scheduling
         private readonly ILockStore _lockStore;
         private readonly ITelemetryProvider _telemetryProvider;
         private readonly SimpleInstrumentor _scheduleDurationInstrumentor;
+        private string _createIndexJsonCommand = null;
+        private readonly object _padLock = new object();
+
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
             IConfigurationValueProvider configurationValueProvider,
@@ -104,7 +108,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 _telemetryProvider.WriteTelemetry(
                     "MasterScheduler duration since last scheduled",
                     (long)(DateTime.UtcNow - source.LastScheduled).Value.TotalMilliseconds, 
-                    source.RowKey);
+                    source.ToTypeKey());
 
                 var schedulerType = Assembly.GetExecutingAssembly().GetType(source.SchedulerType) ??
                                     Type.GetType(source.SchedulerType);
@@ -118,7 +122,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                     {
                         var scheduler = (ISourceScheduler) _locator.GetService(schedulerType);
                         var result = await scheduler.TryScheduleAsync(source);
-                    source.LastScheduled = DateTimeOffset.UtcNow;
+                        source.LastScheduled = DateTimeOffset.UtcNow;
                         TheTrace.TraceInformation(
                             "MasterScheduler - Got result for TryScheduleAsync in {0}. Success => {1}",
                             source.ToTypeKey(), result.Item1);
@@ -130,7 +134,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
                         source.ErrorMessage = string.Empty;
                         TheTrace.TraceInformation("MasterScheduler - Finished Scheduling {0}", source.ToTypeKey());
-                    }, source.RowKey);
+                    }, source.ToTypeKey());
                 }
                    
                 return source;
@@ -143,13 +147,47 @@ namespace ConveyorBelt.Tooling.Scheduling
             }
         }
 
+        private async Task<string> GetIndexSettings()
+        {
+            const string defaultSettingsJsonFileName = "__index_settings";
+            var settingsJson = _configurationValueProvider.GetValue(ConfigurationKeys.EsIndexCreationJsonFileName);
+            if (string.IsNullOrEmpty(settingsJson))
+            {
+                settingsJson = defaultSettingsJsonFileName;
+            }
+
+            var jsonPath = string.Format("{0}{1}.json",
+                        _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath), settingsJson);
+
+            var response = await _nonAuthenticatingClient.GetAsync(jsonPath);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                TheTrace.TraceWarning("Could not find the index settings file: {0}", jsonPath);
+                return string.Empty;
+            }
+
+            if (response.Content == null)
+                throw new ApplicationException(response.ToString());
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new InvalidOperationException(content);
+
+            TheTrace.TraceInformation("This is the index settings JSON: {0}", content);
+
+            return content;
+
+        } 
 
         private async Task SetupMappingsAsync(DiagnosticsSource source)
         {
             foreach (var indexName in source.GetIndexNames())
             {
                 var esUrl = _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl);
-                await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName);
+
+                await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, await GetIndexSettings());
                 if (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey()))
                 {
                     var jsonPath = string.Format("{0}{1}.json",
