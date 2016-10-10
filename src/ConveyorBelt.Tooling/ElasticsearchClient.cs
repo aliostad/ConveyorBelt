@@ -43,7 +43,7 @@ namespace ConveyorBelt.Tooling
                 TheTrace.TraceInformation("It sent Back this {0} and text => {1}", (int)getResponse.StatusCode, getText); 
 
                 var url = string.Format(IndexFormat, baseUrl, indexName);
-                var putResponse = await _httpClient.PutAsJsonAsync(url, jsonCommand);
+                var putResponse = await _httpClient.PutAsync(url, new StringContent(jsonCommand, Encoding.UTF8, "application/json"));
                 var putText = "[NO CONTENT]";
 
                 if (putResponse.Content != null)
