@@ -1,6 +1,6 @@
 param(
     $buildFile   = (join-path (Split-Path -parent $MyInvocation.MyCommand.Definition) "ConveyorBelt.msbuild"),
-    $buildParams = "/p:Configuration=Release",
+    $buildParams = "/p:Configuration=Release;VisualStudioVersion=14.0",
     $buildTarget = "/t:Default"
 )
 
