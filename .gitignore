@@ -39,3 +39,4 @@ script.sql
 build/deploy.ps1
 /build/tokens.json
 mappings/NuzLog.json
+.vs/config/applicationhost.config
