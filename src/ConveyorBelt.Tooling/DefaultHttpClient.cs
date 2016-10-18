@@ -14,7 +14,9 @@ namespace ConveyorBelt.Tooling
 
         public DefaultHttpClient(IEnumerable<KeyValuePair<string, string>> defaultHeaders = null)
         {
-            _client = new HttpClient();
+            var handler = new WebRequestHandler();
+            handler.ServerCertificateValidationCallback += (sender, certificate, chain, errors) => true; // accept any cert
+            _client = new HttpClient(handler);
             if (defaultHeaders != null)
             {
                 foreach (var header in defaultHeaders)
