@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ServiceConfiguration serviceName="ConveyorBelt" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2014-06.2.4">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="ConveyorBelt" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
   <Role name="ConveyorBelt.Worker">
     <Instances count="1" />
     <ConfigurationSettings>
@@ -21,6 +21,7 @@
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" value="5" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" value="100" />
       <Setting name="ConveyorBelt.BulkBatchSize" value="100" />
+      <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" value="" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

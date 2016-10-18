@@ -29,7 +29,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             var offset = FileOffset.Parse(source.LastOffsetPoint);
             if (offset == null)
                 throw new InvalidOperationException("FileOffset failed parsing: => " + source.LastOffsetPoint);
-            int instanceIndex = 0;
+
             DateTimeOffset maxOffset = offset.TimeOffset;
             FileOffset newOffset = null;
             var events = new List<Event>();
