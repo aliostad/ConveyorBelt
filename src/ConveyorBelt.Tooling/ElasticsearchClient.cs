@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,6 +19,7 @@ namespace ConveyorBelt.Tooling
         private const string IndexFormat = "{0}/{1}";
         private const string IndexSearchFormat = "{0}/{1}/_search?size=0";
         private const string MappingFormat = "{0}/{1}/{2}/_mapping";
+        private readonly ConcurrentDictionary<string, string> _existingIndices = new ConcurrentDictionary<string, string>();
 
         public ElasticsearchClient(IHttpClient httpClient)
         {
@@ -27,6 +29,9 @@ namespace ConveyorBelt.Tooling
 
         public async Task<bool> CreateIndexIfNotExistsAsync(string baseUrl, string indexName, string jsonCommand = "")
         {
+            if (_existingIndices.ContainsKey(indexName))
+                return false;
+
             baseUrl = baseUrl.TrimEnd('/');
             string searchUrl = string.Format(IndexSearchFormat, baseUrl, indexName);
             TheTrace.TraceInformation("Just wanna check if this index exists: {0}. URL: {1}", indexName, searchUrl);
@@ -35,6 +40,7 @@ namespace ConveyorBelt.Tooling
             var getText = await getResponse.Content.ReadAsStringAsync();
             if (getResponse.IsSuccessStatusCode)
             {
+                _existingIndices.TryAdd(indexName, null);
                 return false;
             }
 
@@ -51,6 +57,7 @@ namespace ConveyorBelt.Tooling
     
                 if (putResponse.IsSuccessStatusCode || (putResponse.StatusCode == HttpStatusCode.BadRequest && putText.Contains("already exists")))
                 {
+                    _existingIndices.TryAdd(indexName, null);
                     return true;
                 }
                 else
