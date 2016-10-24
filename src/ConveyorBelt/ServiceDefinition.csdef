@@ -19,6 +19,8 @@
       <Setting name="ConveyorBelt.BulkBatchSize" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" />
+      <Setting name="Beehive.ActorParallelism.ShardKeyActor" />
+      <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" />
     </ConfigurationSettings>
     <LocalResources>
       <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />

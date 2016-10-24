@@ -18,6 +18,8 @@
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" value="100" />
       <Setting name="ConveyorBelt.BulkBatchSize" value="100" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" value="" />
+      <Setting name="Beehive.ActorParallelism.ShardKeyActor" value="5" />
+      <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" value="6" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
