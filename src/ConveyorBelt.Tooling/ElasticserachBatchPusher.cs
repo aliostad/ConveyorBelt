@@ -120,8 +120,7 @@ namespace ConveyorBelt.Tooling
                 index = new
                 {
                     _index = source.IndexName ?? entity.Timestamp.ToString("yyyyMMdd"),
-                    _type = source.TypeName,
-                    _id = entity.PartitionKey + entity.RowKey
+                    _type = source.TypeName
                 }
             };
 
