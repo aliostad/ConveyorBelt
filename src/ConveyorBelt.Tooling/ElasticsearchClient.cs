@@ -94,7 +94,8 @@ namespace ConveyorBelt.Tooling
 
             if (response.IsSuccessStatusCode && text != "{}")
             {
-                mappings?.TryAdd(typeName, null);
+                if(mappings != null)
+                    mappings.TryAdd(typeName, null);
                 return true;
             }
             if (response.StatusCode == HttpStatusCode.NotFound || text == "{}")
