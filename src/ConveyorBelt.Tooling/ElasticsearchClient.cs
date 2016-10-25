@@ -111,6 +111,8 @@ namespace ConveyorBelt.Tooling
 
         public async Task<bool> UpdateMappingAsync(string baseUrl, string indexName, string typeName, string mapping)
         {
+            TheTrace.TraceInformation("Adding {0} type to {1} index.", typeName, indexName);
+
             baseUrl = baseUrl.TrimEnd('/');
             var url = string.Format(MappingFormat, baseUrl, indexName, typeName);
             var response = await _httpClient.PutAsync(url, 
