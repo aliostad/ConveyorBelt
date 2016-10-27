@@ -25,7 +25,7 @@
       <Setting name="Beehive.ActorParallelism.ShardKeyActor" value="5" />
       <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" value="6" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" value="" />
-      <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerMapping" value="false" />
+      <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" value="false" />
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="true" />
     </ConfigurationSettings>
   </Role>

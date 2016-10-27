@@ -19,7 +19,8 @@ namespace ConveyorBelt.Tooling.Test
         public void TriesMultipleTimes()
         {
             var client = new Mock<IHttpClient>(MockBehavior.Loose);
-            var pusher = new ElasticsearchBatchPusher(client.Object, new AzureConfigurationValueProvider(),  "http://google.com");
+            var indexNamer = new IndexNamer(new AzureConfigurationValueProvider());
+            var pusher = new ElasticsearchBatchPusher(client.Object, new AzureConfigurationValueProvider(),  "http://google.com", indexNamer);
             var summary = new DiagnosticsSourceSummary()
             {
                 ConnectionString = String.Empty,
@@ -45,7 +46,8 @@ namespace ConveyorBelt.Tooling.Test
         public void TriesMultipleTimesAndSucceed()
         {
             var client = new Mock<IHttpClient>(MockBehavior.Loose);
-            var pusher = new ElasticsearchBatchPusher(client.Object, new AzureConfigurationValueProvider(),  "http://google.com");
+            var indexNamer = new IndexNamer(new AzureConfigurationValueProvider());
+            var pusher = new ElasticsearchBatchPusher(client.Object, new AzureConfigurationValueProvider(),  "http://google.com", indexNamer);
             var summary = new DiagnosticsSourceSummary()
             {
                 ConnectionString = String.Empty,

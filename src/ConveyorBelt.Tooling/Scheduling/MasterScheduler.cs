@@ -161,8 +161,11 @@ namespace ConveyorBelt.Tooling.Scheduling
                 settingsJson = defaultSettingsJsonFileName;
             }
 
-            var jsonPath = string.Format("{0}{1}.json",
-                        _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath), settingsJson);
+            var mappingsPath = _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath);
+            var jsonPath = string.Format("{0}{1}.json", mappingsPath, settingsJson);
+
+            if (string.IsNullOrEmpty(mappingsPath)) // not defined return default
+                return string.Empty;
 
             var response = await _nonAuthenticatingClient.GetAsync(jsonPath);
 

@@ -27,9 +27,11 @@ namespace ConveyorBelt.Tooling
         // no reason for thread sync/concurrent since this will be called only by a single thread
         private Dictionary<string, SimpleFilter> _filters = new Dictionary<string, SimpleFilter>();
         private IInterval _interval;
+        private IIndexNamer _indexNamer;
 
-        public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, int batchSize = 100)
+        public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, IIndexNamer indexNamer, int batchSize = 100)
         {
+            _indexNamer = indexNamer;
             _httpClient = httpClient;
             _batchSize = batchSize;
             _esUrl = esUrl;
@@ -119,7 +121,7 @@ namespace ConveyorBelt.Tooling
             {
                 index = new
                 {
-                    _index = source.IndexName ?? entity.Timestamp.ToString("yyyyMMdd"),
+                    _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.TypeName),
                     _type = source.TypeName,
                     _id = entity.PartitionKey + entity.RowKey
                 }
