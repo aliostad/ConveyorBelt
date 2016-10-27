@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -24,6 +26,7 @@ namespace ConveyorBelt.Tooling.Scheduling
         private readonly SimpleInstrumentor _scheduleDurationInstrumentor;
         private string _createIndexJsonCommand = null;
         private readonly object _padLock = new object();
+        private readonly IIndexNamer _indexNamer;
 
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
@@ -32,8 +35,10 @@ namespace ConveyorBelt.Tooling.Scheduling
             IElasticsearchClient elasticsearchClient,
             IServiceLocator locator,
             ILockStore lockStore,
-            ITelemetryProvider telemetryProvider)
+            ITelemetryProvider telemetryProvider,
+            IIndexNamer indexNamer)
         {
+            _indexNamer = indexNamer;
             _lockStore = lockStore;
             _telemetryProvider = telemetryProvider;
             _sourceConfiguration = sourceConfiguration;
@@ -183,12 +188,14 @@ namespace ConveyorBelt.Tooling.Scheduling
 
         private async Task SetupMappingsAsync(DiagnosticsSource source)
         {
-            foreach (var indexName in source.GetIndexNames())
+            foreach (var indexName in GetIndexNames(source))
             {
                 var esUrl = _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl);
-
                 await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, await GetIndexSettings());
-                if (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey()))
+
+                var createMappings = _configurationValueProvider.GetValue(ConfigurationKeys.EsCreateMappings);
+
+                if (Convert.ToBoolean(createMappings) && (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey())))
                 {
                     var jsonPath = string.Format("{0}{1}.json",
                         _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath),
@@ -211,5 +218,25 @@ namespace ConveyorBelt.Tooling.Scheduling
 
             TheTrace.TraceInformation("MasterScheduler - Finished Mapping setup: {0}", source.ToTypeKey());
         }
+
+        public IEnumerable<string> GetIndexNames(DiagnosticsSource source, int daysToGoBack = 7)
+        {
+            // static index name
+            if (!string.IsNullOrEmpty(source.IndexName))
+                return new[] { source.IndexName };
+
+            if (String.IsNullOrEmpty(source.LastOffsetPoint))
+                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString("O");
+
+            var dateTimeOffset = FileOffset.Parse(source.LastOffsetPoint);
+
+            var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset.TimeOffset).TotalDays + 1; // to cover today as well - Aboo was here
+            if (days <= 0)
+                return Enumerable.Empty<string>();
+
+            return Enumerable.Range(0, days).Select(x => DateTimeOffset.UtcNow.AddDays(1).AddDays(-x))
+                .Select(z => _indexNamer.BuildName(dateTimeOffset.TimeOffset, source.ToTypeKey()));
+        }
+
     }
 }

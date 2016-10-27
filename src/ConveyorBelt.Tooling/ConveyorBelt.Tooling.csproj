@@ -135,6 +135,8 @@
     <Compile Include="IElasticsearchClient.cs" />
     <Compile Include="IElasticsearchBatchPusher.cs" />
     <Compile Include="IHttpClient.cs" />
+    <Compile Include="IIndexNamer.cs" />
+    <Compile Include="IndexNamer.cs" />
     <Compile Include="Internal\CloudBlobContainerExtensions.cs" />
     <Compile Include="Internal\ConveyorBeltConstants.cs" />
     <Compile Include="Internal\DateTimeOffsetExtensions.cs" />

@@ -107,6 +107,9 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<IisBlobConventionScheduler>()
                     .ImplementedBy<IisBlobConventionScheduler>()
                     .LifestyleTransient(),
+                Component.For<IIndexNamer>()
+                    .ImplementedBy<IndexNamer>()
+                    .LifestyleSingleton(),
                 Component.For<RangeShardKeyScheduler>()
                     .ImplementedBy<RangeShardKeyScheduler>()
                     .LifestyleTransient(),

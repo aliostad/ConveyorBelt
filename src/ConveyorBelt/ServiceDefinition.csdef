@@ -21,6 +21,9 @@
       <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" />
       <Setting name="Beehive.ActorParallelism.ShardKeyActor" />
       <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" />
+      <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" />
+      <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerMapping" />
+      <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" />
     </ConfigurationSettings>
     <LocalResources>
       <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />

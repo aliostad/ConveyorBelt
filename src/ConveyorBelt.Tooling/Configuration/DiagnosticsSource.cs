@@ -143,24 +143,6 @@ namespace ConveyorBelt.Tooling.Configuration
             _entity.Properties[name] = EntityProperty.CreateEntityPropertyFromObject(value);
         }
 
-        public IEnumerable<string> GetIndexNames(int daysToGoBack = 7)
-        {
-            if (!string.IsNullOrEmpty(IndexName))
-                return new [] {IndexName};
-
-            if (String.IsNullOrEmpty(LastOffsetPoint))
-                LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-daysToGoBack).ToString("O");
-
-            var dateTimeOffset = FileOffset.Parse(LastOffsetPoint);
-
-            var days = (int)(DateTimeOffset.UtcNow.AddDays(1) - dateTimeOffset.TimeOffset).TotalDays + 1; // to cover today as well - Aboo was here
-            if (days <= 0)
-                return Enumerable.Empty<string>();
-
-            return Enumerable.Range(0, days).Select(x => DateTimeOffset.UtcNow.AddDays(1).AddDays(-x))
-                .Select(y => y.ToString("yyyyMMdd"));
-        }
-
         public string GetMappingName()
         {
             return GetProperty<string>("MappingName") ??

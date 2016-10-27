@@ -16,10 +16,13 @@
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" value="" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" value="5" />
       <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" value="100" />
-      <Setting name="ConveyorBelt.BulkBatchSize" value="100" />
+      <Setting name="ConveyorBelt.BulkBatchSize" value="1000" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" value="" />
       <Setting name="Beehive.ActorParallelism.ShardKeyActor" value="5" />
       <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" value="6" />
+      <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" value="" />
+      <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerMapping" value="false" />
+      <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="true" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

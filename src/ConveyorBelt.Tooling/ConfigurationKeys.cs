@@ -28,5 +28,8 @@ namespace ConveyorBelt.Tooling
         public const string EsBackOffMinSeconds = "ConveyorBelt.ElasticSearch.BackOffMinSeconds";
         public const string EsBackOffMaxSeconds = "ConveyorBelt.ElasticSearch.BackOffMaxSeconds";
         public const string EsIndexCreationJsonFileName = "ConveyorBelt.ElasticSearch.IndexCreationJsonFileName";
+        public const string EsOneIndexPerType = "ConveyorBelt.ElasticSearch.OneIndexPerType";
+        public const string EsIndexPrefix = "ConveyorBelt.ElasticSearch.IndexPrefix";
+        public const string EsCreateMappings = "ConveyorBelt.ElasticSearch.CreateMappings";
     }
 }

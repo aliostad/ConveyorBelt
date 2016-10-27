@@ -124,6 +124,9 @@ namespace ConveyorBelt.Worker
                 Component.For<AkamaiLogParser>()
                     .ImplementedBy<AkamaiLogParser>()
                     .LifestyleTransient(),
+                Component.For<IIndexNamer>()
+                    .ImplementedBy<IndexNamer>()
+                    .LifestyleSingleton(),
                 Component.For<IHttpClient>()
                     .ImplementedBy<DefaultHttpClient>()
                     .LifestyleSingleton()
