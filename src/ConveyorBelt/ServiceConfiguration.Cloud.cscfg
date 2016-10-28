@@ -22,7 +22,7 @@
       <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" value="6" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" value="" />
       <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerMapping" value="false" />
-      <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="true" />
+      <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="false" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
