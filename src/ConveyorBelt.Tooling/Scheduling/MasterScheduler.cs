@@ -60,7 +60,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 {
                     var lockToken = new LockToken(source.ToTypeKey());
 
-                    if (!(await _lockStore.TryLockAsync(lockToken, tries: 0, timeoutMilliseconds: seconds * 1000))) // if tries < 1 it puts to 1 in beehive
+                    if (!(await _lockStore.TryLockAsync(lockToken, tries: 0, aquireTimeoutMilliseconds: 100, timeoutMilliseconds: seconds * 1000))) // if tries < 1 it puts to 1 in beehive
                     {
                         TheTrace.TraceInformation("I could NOT be master for {0}", source.ToTypeKey());
                         continue;
