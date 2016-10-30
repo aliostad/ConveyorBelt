@@ -81,8 +81,8 @@
       <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.0.0\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.1.0.4, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\WindowsAzure.Storage.2.1.0.4\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=4.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\WindowsAzure.Storage.4.3.0\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -144,6 +144,7 @@
     <Compile Include="Internal\SitecoreLogEntry.cs" />
     <Compile Include="Internal\ParserHelper.cs" />
     <Compile Include="Internal\SimpleFilter.cs" />
+    <Compile Include="Internal\TableEntityExtensions.cs" />
     <Compile Include="ITempDownloadLocationProvider.cs" />
     <Compile Include="Parsing\AkamaiLogParser.cs" />
     <Compile Include="Parsing\IisLogParser.cs" />

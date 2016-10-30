@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConveyorBelt.Tooling.Events;
 using Xunit;
 using Xunit.Extensions;
 using ConveyorBelt.Tooling.Internal;
@@ -21,6 +22,18 @@ namespace ConveyorBelt.Tooling.Test
             var fromd = DateTimeOffset.Parse(from);
             var untild = DateTimeOffset.Parse(until);
             Assert.Equal(hours, fromd.GetFullNumberOfHoursInBetween(untild));
+        }
+
+        [Fact]
+        public void DateTimeOffset_GetsReturnedCorrectly()
+        {
+            
+            var shardKeyArrived = new ShardKeyArrived()
+            {
+                ShardKey = "0635901169200000000"
+            };
+
+            Assert.Equal("201602031722", shardKeyArrived.GetDateTimeOffset().ToString("yyyyMMddHHmm"));
         }
     }
 }

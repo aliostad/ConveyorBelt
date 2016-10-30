@@ -38,6 +38,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 if (source.MaxItemsInAScheduleRun.HasValue && n >= source.MaxItemsInAScheduleRun)
                     break;
                 n++;
+                TheTrace.TraceInformation("Scheduling {0} for minute {1} and shardkey {2} => {0}_{1} AND {0}_{2}", source.ToTypeKey(), newLastOffset.ToString("yyyyMMddHHmm"), shardKeys.First());
             }
 
             source.LastOffsetPoint = newLastOffset.ToString("O");
