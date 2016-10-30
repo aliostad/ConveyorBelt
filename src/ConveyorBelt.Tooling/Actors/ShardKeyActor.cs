@@ -60,6 +60,7 @@ namespace ConveyorBelt.Tooling.Actors
                 var minDateTime = DateTimeOffset.MaxValue;
                 var hasAnything = false;
                 int n = 0;
+                var shardKeyTime = shardKeyArrived.GetDateTimeOffset().ToString("yyyyMMddHHmm");
 
                 foreach (var entity in entities)
                 {
@@ -67,7 +68,8 @@ namespace ConveyorBelt.Tooling.Actors
                     var delayInSeconds = entity.Timestamp.Subtract(eventDateTimeOffset).TotalSeconds;
                     if (delayInSeconds >= _shardKeyDelayWarning)
                     {
-                        TheTrace.TraceWarning("SHARD_KEY_ACTOR_DELAY_DETECTED => Delay of {0} seconds for {1}", delayInSeconds, shardKeyArrived.Source.TypeName);
+                        TheTrace.TraceWarning("SHARD_KEY_ACTOR_DELAY_DETECTED => Delay of {0} seconds for {1} in shardKey {2} and time {3}", 
+                            delayInSeconds, shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
                     }
 
                     entity.Timestamp = eventDateTimeOffset;
@@ -77,7 +79,8 @@ namespace ConveyorBelt.Tooling.Actors
                     n++;
                 }
 
-                TheTrace.TraceInformation("Gathered {0} records for {1} and ShardKey {2} => {1}_{2}", n, shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey);
+                TheTrace.TraceInformation("Gathered {0} records for {1} and ShardKey {2} => {1}_{2} {1}_{3}", n, 
+                    shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
 
                 if (hasAnything)
                 {
