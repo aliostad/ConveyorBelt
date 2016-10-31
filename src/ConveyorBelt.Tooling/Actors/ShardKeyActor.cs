@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BeeHive;
+using BeeHive.Configuration;
 using ConveyorBelt.Tooling.Events;
 using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Querying;
@@ -18,13 +19,21 @@ namespace ConveyorBelt.Tooling.Actors
         private readonly IElasticsearchBatchPusher _pusher;
         private readonly ITelemetryProvider _telemetryProvider;
         private readonly SimpleInstrumentor _durationInstrumentor;
+        private readonly int _shardKeyDelayWarning = 120;
 
         public ShardKeyActor(IElasticsearchBatchPusher pusher,
-                             ITelemetryProvider telemetryProvider)
+                             ITelemetryProvider telemetryProvider,
+                             IConfigurationValueProvider configurationValueProvider)
         {
             _pusher = pusher;
             _telemetryProvider = telemetryProvider;
             _durationInstrumentor = telemetryProvider.GetInstrumentor<ShardKeyActor>();
+            if (!int.TryParse(
+                configurationValueProvider.GetValue(ConfigurationKeys.ShadKeyArrivalDelayWarningInSeconds),
+                out _shardKeyDelayWarning))
+            {
+                _shardKeyDelayWarning = 120;
+            }
         }
 
         public void Dispose()
@@ -50,12 +59,25 @@ namespace ConveyorBelt.Tooling.Actors
 
                 var minDateTime = DateTimeOffset.MaxValue;
                 var hasAnything = false;
+                int n = 0;
+
                 foreach (var entity in entities)
                 {
+                    var eventDateTimeOffset = entity.GetEventDateTimeOffset();
+                    var delayInSeconds = entity.Timestamp.Subtract(eventDateTimeOffset).TotalSeconds;
+                    if (delayInSeconds >= _shardKeyDelayWarning)
+                    {
+                        TheTrace.TraceWarning("SHARD_KEY_ACTOR_DELAY_DETECTED => Delay of {0} seconds for {1}", delayInSeconds, shardKeyArrived.Source.TypeName);
+                    }
+
+                    entity.Timestamp = eventDateTimeOffset;
                     await _pusher.PushAsync(entity, shardKeyArrived.Source);
                     hasAnything = true;
                     minDateTime = minDateTime > entity.Timestamp ? entity.Timestamp : minDateTime;
+                    n++;
                 }
+
+                TheTrace.TraceInformation("Gathered {0} records for {1} and ShardKey {2} => {1}_{2}", n, shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey);
 
                 if (hasAnything)
                 {

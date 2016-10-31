@@ -24,6 +24,7 @@
       <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" />
       <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" />
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" />
+      <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" />
     </ConfigurationSettings>
     <LocalResources>
       <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />
