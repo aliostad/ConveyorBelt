@@ -141,6 +141,7 @@
     <Compile Include="Internal\ConveyorBeltConstants.cs" />
     <Compile Include="Internal\DateTimeOffsetExtensions.cs" />
     <Compile Include="Internal\FactoryHelper.cs" />
+    <Compile Include="Internal\ServicePointHelper.cs" />
     <Compile Include="Internal\SitecoreLogEntry.cs" />
     <Compile Include="Internal\ParserHelper.cs" />
     <Compile Include="Internal\SimpleFilter.cs" />

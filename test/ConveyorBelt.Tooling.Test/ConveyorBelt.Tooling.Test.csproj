@@ -118,6 +118,7 @@
     <Compile Include="Parsing\SitecoreLogParserShould.cs" />
     <Compile Include="MinuteTableShardSchedulerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServicePointHelperTest.cs" />
     <Compile Include="TableEntityExtensionsTest.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,7 @@ using Castle.Windsor;
 using ConveyorBelt.Tooling;
 using ConveyorBelt.Tooling.Actors;
 using ConveyorBelt.Tooling.Configuration;
+using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
 using ConveyorBelt.Tooling.Telemetry;
@@ -153,6 +154,8 @@ namespace ConveyorBelt.ConsoleWorker
 
             _orchestrator = container.Resolve<Orchestrator>();
             _scheduler = container.Resolve<MasterScheduler>();
+
+            ServicePointHelper.ApplyStandardSettings(_configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl));
         }
 
         public static void Run()

@@ -21,6 +21,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Castle.MicroKernel.Registration;
 using ConveyorBelt.Tooling.Configuration;
+using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
 using ConveyorBelt.Tooling.Telemetry;
@@ -160,6 +161,7 @@ namespace ConveyorBelt.Worker
             _orchestrator = container.Resolve<Orchestrator>();
             _scheduler = container.Resolve<MasterScheduler>();
             _keyValueStore = container.Resolve<IKeyValueStore>();
+            ServicePointHelper.ApplyStandardSettings(_configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl));
         }
 
         private async Task CheckStopRequestAsync()
