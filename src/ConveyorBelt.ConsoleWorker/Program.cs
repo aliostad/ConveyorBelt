@@ -142,6 +142,8 @@ namespace ConveyorBelt.ConsoleWorker
                         ContainerName = "locks",
                         Path = "conveyor_belt/locks/master_Keys/"
                     })),
+                Component.For<IKeyValueStore>()
+                    .Instance(new AzureKeyValueStore(storageConnectionString, "locks")),
                 Component.For<IEventQueueOperator>()
                     .Instance(new ServiceBusOperator(servicebusConnectionString)),
                 Component.For<ITelemetryProvider>()

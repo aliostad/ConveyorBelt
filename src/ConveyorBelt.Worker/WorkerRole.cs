@@ -34,6 +34,8 @@ namespace ConveyorBelt.Worker
         private IConfigurationValueProvider _configurationValueProvider;
         private Orchestrator _orchestrator;
         private MasterScheduler _scheduler;
+        private IKeyValueStore _keyValueStore;
+        private bool _stopped = false;
 
         public WorkerRole()
         {
@@ -146,6 +148,8 @@ namespace ConveyorBelt.Worker
                         ContainerName = clusterLockContainer,
                         Path = clusterLockRootPath
                     })),
+                Component.For<IKeyValueStore>()
+                    .Instance(new AzureKeyValueStore(storageConnectionString, clusterLockContainer)),
                 Component.For<IEventQueueOperator>()
                     .Instance(new ServiceBusOperator(servicebusConnectionString)),
                 Component.For<ITelemetryProvider>()
@@ -155,7 +159,25 @@ namespace ConveyorBelt.Worker
 
             _orchestrator = container.Resolve<Orchestrator>();
             _scheduler = container.Resolve<MasterScheduler>();
+            _keyValueStore = container.Resolve<IKeyValueStore>();
         }
+
+        private async Task CheckStopRequestAsync()
+        {
+            bool shouldStop = await _keyValueStore.ExistsAsync("stop_indexing");
+
+            if (_stopped && !shouldStop)
+            {
+                _orchestrator.Start();
+                _stopped = false;
+            }
+
+            if (!_stopped && shouldStop)
+            {
+                _orchestrator.Stop();
+                _stopped = true;
+            }
+        } 
 
         public override void Run()
         {
@@ -212,8 +234,12 @@ namespace ConveyorBelt.Worker
                 var seconds = DateTimeOffset.UtcNow.Subtract(then).TotalSeconds;
                 if (seconds < 30)
                     await Task.Delay(TimeSpan.FromSeconds(30 - seconds), cancellationToken);
+
+                await CheckStopRequestAsync();
             }
         }
+
+
     }
 
     public class AzureTempDownloadLocationProvider : ITempDownloadLocationProvider

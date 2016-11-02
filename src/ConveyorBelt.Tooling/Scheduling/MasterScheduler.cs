@@ -27,6 +27,7 @@ namespace ConveyorBelt.Tooling.Scheduling
         private string _createIndexJsonCommand = null;
         private readonly object _padLock = new object();
         private readonly IIndexNamer _indexNamer;
+        private IKeyValueStore _keyValueStore;
 
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
@@ -36,8 +37,10 @@ namespace ConveyorBelt.Tooling.Scheduling
             IServiceLocator locator,
             ILockStore lockStore,
             ITelemetryProvider telemetryProvider,
-            IIndexNamer indexNamer)
+            IIndexNamer indexNamer,
+            IKeyValueStore keyValueStore)
         {
+            _keyValueStore = keyValueStore;
             _indexNamer = indexNamer;
             _lockStore = lockStore;
             _telemetryProvider = telemetryProvider;
@@ -49,11 +52,21 @@ namespace ConveyorBelt.Tooling.Scheduling
             _scheduleDurationInstrumentor  = telemetryProvider.GetInstrumentor<MasterScheduler>();
          }
 
+        private async Task<bool> ShouldScheduleAsync()
+        {
+            return await _keyValueStore.ExistsAsync("stop_scheduling");
+        } 
+
         public async Task ScheduleSourcesAsync()
         {
+
+            if (!await ShouldScheduleAsync())
+                return;
+
             var seconds =
                 Convert.ToInt32(_configurationValueProvider.GetValue(ConfigurationKeys.ClusterLockDurationSeconds));
             var sources = _sourceConfiguration.GetSources();
+
             foreach (var source in sources)
             {
                 try

@@ -23,6 +23,7 @@
       <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" value="" />
       <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" value="false" />
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="true" />
+      <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" value="120" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
