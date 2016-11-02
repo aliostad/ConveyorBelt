@@ -131,6 +131,8 @@ namespace ConveyorBelt.Tooling
             doc.Add("@timestamp", entity.Timestamp);
             doc.Add("PartitionKey", entity.PartitionKey);
             doc.Add("RowKey", entity.RowKey);
+            doc.Add("cb_type", source.TypeName);
+
             foreach (var property in entity.Properties)
             {
                 if (property.Key != DiagnosticsSource.CustomAttributesFieldName)
