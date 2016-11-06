@@ -24,10 +24,8 @@ namespace ConveyorBelt.Tooling.Scheduling
         private readonly ILockStore _lockStore;
         private readonly ITelemetryProvider _telemetryProvider;
         private readonly SimpleInstrumentor _scheduleDurationInstrumentor;
-        private string _createIndexJsonCommand = null;
-        private readonly object _padLock = new object();
         private readonly IIndexNamer _indexNamer;
-        private IKeyValueStore _keyValueStore;
+        private readonly IKeyValueStore _keyValueStore;
 
 
         public MasterScheduler(IEventQueueOperator eventQueueOperator, 
@@ -54,7 +52,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
         private async Task<bool> ShouldScheduleAsync()
         {
-            return await _keyValueStore.ExistsAsync("stop_scheduling");
+            return !await _keyValueStore.ExistsAsync("stop_scheduling");
         } 
 
         public async Task ScheduleSourcesAsync()
