@@ -71,12 +71,12 @@ namespace ConveyorBelt.Tooling
                     var items = (JArray) j.items;
                     statuses = items.Children<JObject>().Select(x => x.Properties().First().Value["status"].Value<int>()).ToList();
 
-                    if (statuses.Any(y => y < 200 && y > 299))
+                    if (statuses.Any(y => y < 200 || (y > 299 && y != 429)))
                     {
                        TheTrace.TraceWarning("LOOK!! We had some errors from ES bulk at retry {1}: {0}", content, retry);
                     }
 
-                    if (statuses.Any(x => x == 429))
+                    if (statuses.Any(y => y == 429))
                     {
                         var timeSpan = _interval.Next();
                         TheTrace.TraceWarning("LOOK!! Got 429 -> backing off for {0} seconds", timeSpan.TotalSeconds);
