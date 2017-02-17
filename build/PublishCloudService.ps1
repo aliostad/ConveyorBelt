@@ -11,16 +11,18 @@ Param(  $serviceName = "",
         $subscriptionDataFile = "",
         $slot = "Production",
         $affinityGroupName = "",
-        $tokensFile = "tokens.json"
+        $tokensFile = "tokens.json",
+		$vsVersion= "14.0"
      )
 
+	 
 
 function Package()
 {
 
    . $env:windir\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe 
         /target:Publish `
-        /p:VisualStudioVersion=12.0;Configuration=Release;TargetProfile=Cloud `
+        /p:VisualStudioVersion=$vsVersion;Configuration=Release;TargetProfile=Cloud `
 
 
 }
@@ -194,7 +196,7 @@ function Package([ref] $packagePath)
 
    . $env:windir\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe ..\src\ConveyorBelt\ConveyorBelt.ccproj `
             /target:Publish `
-            /p:VisualStudioVersion=12.0`;Configuration=Release`;TargetProfile=Cloud
+            /p:VisualStudioVersion=$vsVersion`;Configuration=Release`;TargetProfile=Cloud
      $packagePath.Value = ((GetSolutionRootFolder) + "\src\ConveyorBelt\bin\Release\app.publish\ConveyorBelt.cspkg")
      $val = ($packagePath).Value
      Write-Host "Package created at $val" -foregroundcolor "green"
