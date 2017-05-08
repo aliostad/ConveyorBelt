@@ -117,12 +117,16 @@ namespace ConveyorBelt.Tooling
             if (!_filters[source.Filter].Satisfies(entity))
                 return;
 
+            var indexNameAndTypeName = _indexNamer.GetIndexNameAndTypeName(entity, source);
+            string indexName = indexNameAndTypeName.Item1;
+            string indexTypeName = indexNameAndTypeName.Item2;
+
             var op = new
             {
                 index = new
                 {
-                    _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.TypeName),
-                    _type = source.TypeName,
+                    _index = indexName,
+                    _type = indexTypeName,
                     _id = entity.PartitionKey + entity.RowKey
                 }
             };
@@ -156,6 +160,7 @@ namespace ConveyorBelt.Tooling
                     source.RowKey);
             }
         }
+        
 
         private static IEnumerable<KeyValuePair<string, string>> GetNameValues(string customAttribs)
         {
