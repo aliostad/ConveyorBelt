@@ -248,8 +248,10 @@ namespace ConveyorBelt.Tooling.Scheduling
             if (days <= 0)
                 return Enumerable.Empty<string>();
 
+            var indexTypeName = _indexNamer.GetIndexName(dateTimeOffset.TimeOffset, source);
+            
             return Enumerable.Range(0, days).Select(x => DateTimeOffset.UtcNow.AddDays(1).AddDays(-x))
-                .Select(z => _indexNamer.BuildName(dateTimeOffset.TimeOffset, source.ToTypeKey()));
+                .Select(z => indexTypeName);
         }
 
     }
