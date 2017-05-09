@@ -249,7 +249,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 return Enumerable.Empty<string>();
 
             return Enumerable.Range(0, days).Select(x => DateTimeOffset.UtcNow.AddDays(1).AddDays(-x))
-                .Select(z => _indexNamer.BuildName(dateTimeOffset.TimeOffset, source.ToTypeKey()));
+                .Select(z => _indexNamer.BuildName(dateTimeOffset.TimeOffset, source.GetMappingName().ToLowerInvariant()));
         }
 
     }
