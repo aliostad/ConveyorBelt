@@ -62,7 +62,7 @@ namespace ConveyorBelt.Tooling
                         (await responseMessage.Content.ReadAsStringAsync());
 
                     if(!responseMessage.IsSuccessStatusCode)
-                        throw new ApplicationException(string.Format("Unsuccessful ES bulk: {0} - {1}", responseMessage.StatusCode, content));
+                            throw new ApplicationException(string.Format("Unsuccessful ES bulk: {0} - {1}", responseMessage.StatusCode, content));
 
                     dynamic j = JObject.Parse(content);
                     if (j == null || j.items == null)
@@ -121,8 +121,8 @@ namespace ConveyorBelt.Tooling
             {
                 index = new
                 {
-                    _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.TypeName),
-                    _type = source.TypeName,
+                    _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
+                    _type = source.DynamicProperties["MappingName"].ToString(),
                     _id = entity.PartitionKey + entity.RowKey
                 }
             };
