@@ -26,7 +26,7 @@ namespace ConveyorBelt.Tooling.Configuration
 
         public void UpdateSource(DiagnosticsSource source)
         {
-            _table.Execute(TableOperation.InsertOrReplace(source.ToEntity()));
+            _table.Execute(TableOperation.Merge(source.ToEntity()));
         }
 
         public DiagnosticsSource RefreshSource(DiagnosticsSource source)
