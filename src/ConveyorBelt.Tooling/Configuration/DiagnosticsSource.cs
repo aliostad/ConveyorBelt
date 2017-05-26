@@ -112,7 +112,15 @@ namespace ConveyorBelt.Tooling.Configuration
 
         public DynamicTableEntity ToEntity()
         {
-            return _entity;
+            return new DynamicTableEntity(PartitionKey, RowKey)
+            {
+                Properties =
+                {
+                    ["ErrorMessage"] = _entity.Properties["ErrorMessage"],
+                    ["LastScheduled"] = _entity.Properties["LastScheduled"],
+                    ["LastOffsetPoint"] = _entity.Properties["LastOffsetPoint"]
+                }
+            };
         }
 
         public T GetProperty<T>(string name)
