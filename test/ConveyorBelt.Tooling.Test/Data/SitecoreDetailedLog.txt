@@ -4,17 +4,13 @@
 21008 10:49:23 INFO  Sitecore started
 21008 10:49:23 INFO  Sitecore.NET 8.1 (rev. 151207)
 21008 10:49:23 INFO  
-21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\antlr3.runtime.dll (Antlr3.Runtime)
-21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\sitecore.logging.client.dll (Sitecore CMS, Lets you insert loggers in your JavaScript, and automatically sends the log messages to a server side component that stores them in your existing server side logs. Interfaces with Sitecore.Logging.
 
 Ideal for logging JavaScript exceptions to the server, including a stack trace. Documentation and examples are at jsnlog.com)
-21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\sitecore.logging.dll (Sitecore CMS, Sitecore Logging Framework, 8.0 rev. 141020)
 ManagedPoolThread #11 11:09:29 INFO  Job ended: Master_Database_Agent (units processed: 5)
 18076 11:09:44 WARN  The "Security.ShareAuthenticationTicket" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "False"
 10644 11:09:44 INFO  HttpModule is being initialized
 17180 11:09:44 INFO  HttpModule is being initialized
 17436 11:10:02 WARN  The "Sitecore.Web.IsAuthorizationBypassAllowed" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "False"
-21008 10:49:23 INFO  c:\asos\websites\asos.content.sitecore\bin\yahoo.yui.compressor.dll (YUI Compressor, A .NET port of the Yahoo! YUI Compressor project)
 21008 10:49:23 INFO  
 21008 10:49:23 INFO  Operating system Microsoft Windows NT 6.1.7601 Service Pack 1
 21008 10:49:23 INFO  
@@ -22,15 +18,12 @@ ManagedPoolThread #11 11:09:29 INFO  Job ended: Master_Database_Agent (units pro
 21008 10:49:23 INFO  
 21008 10:49:23 INFO  UTC offset: 01:00:00
 21008 10:49:23 INFO  Machine name: asglh-wl-11148
-21008 10:49:23 INFO  App pool ID: Asos.Content.Sitecore
 21008 10:49:23 INFO  
 21008 10:49:23 INFO  Process ID: 20984
-21008 10:49:23 INFO  Windows identity used by the process: IIS APPPOOL\Asos.Content.Sitecore. Impersonation: False
 21008 10:49:23 INFO  Managed pipeline mode: Integrated
 21008 10:49:23 INFO  
 21008 10:49:23 WARN  The "EventQueue.Enabled" setting contains an invalid value. The default value is used instead. Invalid value: "". Default value: "True"
 21008 10:49:23 INFO  EventQueues enabled: True
-21008 10:49:23 INFO  Instance Name:ASGLH-WL-11148-Asos.Content.Sitecore
 21008 10:49:23 INFO  
 21008 10:49:23 INFO  Threshold settings
 21008 10:49:23 INFO    Show threshold warnings: False
@@ -91,8 +84,6 @@ DefaultQuartzScheduler_Worker-1 11:00:00 WARN  The "Publishing.Recovery.Publishe
 17436 11:10:02 ERROR Test Error with exception
 Exception: System.Exception
 Message: Test message
-Source: Asos.Content.Sitecore.EntityService
-   at Asos.Content.Sitecore.EntityService.Repositories.ContentItemRepository.Exists(String database, String path) in c:\Dev\AsosContent\Dev\Solutions\Asos.Content.Sitecore.Base\EntityService\Repositories\ContentItemRepository.cs:line 113
 
 Nested Exception
 

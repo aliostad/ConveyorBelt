@@ -38,7 +38,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             using (var stream = new MemoryStream(File.ReadAllBytes(@"data\SitecoreLog2.txt")))
             {
                 var sitecoreLogParser = new SitecoreLogParser();
-                var uri = new Uri("http://localhost/data/asosbaselogfile.20160613.180755.txt");
+                var uri = new Uri("http://localhost/data/baselogfile.20160613.180755.txt");
 
                 var result = sitecoreLogParser.Parse(stream, uri);
                 Assert.NotNull(result);
@@ -54,7 +54,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             using (var stream = new MemoryStream(File.ReadAllBytes(@"data\SitecoreLog3.txt")))
             {
                 var sitecoreLogParser = new SitecoreLogParser();
-                var uri = new Uri("http://localhost/data/sitecoredev228CA/xyz/asosbaselogfile.20160101.180755.txt");
+                var uri = new Uri("http://localhost/data/sitecoredev228CA/xyz/baselogfile.20160101.180755.txt");
 
                 var result = sitecoreLogParser.Parse(stream, uri).ToList();
                 Assert.NotNull(result);
