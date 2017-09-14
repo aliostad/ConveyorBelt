@@ -10,6 +10,7 @@ using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Scheduling;
 using ConveyorBelt.Tooling.Telemetry;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
 using PerfIt;
 
@@ -46,7 +47,19 @@ namespace ConveyorBelt.Tooling.Actors
             {
                 TheTrace.TraceInformation("Got {0} from {1}", blobFileArrived.BlobId,
                  blobFileArrived.Source.TypeName);
-                var account = CloudStorageAccount.Parse(blobFileArrived.Source.ConnectionString);
+                //var account = CloudStorageAccount.Parse(blobFileArrived.Source.ConnectionString);
+                CloudStorageAccount account;
+                if (!String.IsNullOrWhiteSpace(blobFileArrived.Source.AccountSasKey))
+                {
+                    // Create new storage credentials using the SAS token.
+                    var accountSas = new StorageCredentials(blobFileArrived.Source.AccountSasKey);
+                    // Use these credentials and the account name to create a Blob service client.
+                    account = new CloudStorageAccount(accountSas, blobFileArrived.Source.AccountName, "", useHttps: true);
+                }
+                else
+                {
+                    account = CloudStorageAccount.Parse(blobFileArrived.Source.ConnectionString);
+                }
                 var client = account.CreateCloudBlobClient();
                 var container = client.GetContainerReference(blobFileArrived.Source.DynamicProperties["ContainerName"].ToString());
                 var uri = new Uri(blobFileArrived.BlobId);

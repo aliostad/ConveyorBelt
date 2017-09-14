@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BeeHive.Configuration;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling.Configuration
@@ -26,6 +27,7 @@ namespace ConveyorBelt.Tooling.Configuration
 
         public void UpdateSource(DiagnosticsSource source)
         {
+           // _table.Execute(TableOperation.InsertOrReplace(source.ToEntity()));
             _table.Execute(TableOperation.Merge(source.ToEntity()));
         }
 
@@ -47,7 +49,25 @@ namespace ConveyorBelt.Tooling.Configuration
                 {
                     if (_table == null)
                     {
-                        var account = CloudStorageAccount.Parse(configurationValueProvider.GetValue(ConfigurationKeys.StorageConnectionString));
+                        //var account = CloudStorageAccount.Parse(configurationValueProvider.GetValue(ConfigurationKeys.StorageConnectionString));
+                        CloudStorageAccount account;
+                        if (!String.IsNullOrWhiteSpace(
+                            configurationValueProvider.GetValue(ConfigurationKeys.StorageAccountSasKey)))
+                        {
+                            // Create new storage credentials using the SAS token.
+                            var accountSas =
+                                new StorageCredentials(
+                                    configurationValueProvider.GetValue(ConfigurationKeys.StorageAccountSasKey));
+                            // Use these credentials and the account name to create a Blob service client.
+                            account = new CloudStorageAccount(accountSas, ConfigurationKeys.StorageAccountName, "",
+                                useHttps: true);
+                        }
+                        else
+                        {
+                            account =
+                                CloudStorageAccount.Parse(
+                                    configurationValueProvider.GetValue(ConfigurationKeys.StorageConnectionString));
+                        }
                         var client = account.CreateCloudTableClient();
                         _table = client.GetTableReference(configurationValueProvider.GetValue(ConfigurationKeys.TableName));
                         _table.CreateIfNotExists();

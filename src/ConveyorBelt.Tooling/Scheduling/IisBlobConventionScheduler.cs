@@ -10,6 +10,7 @@ using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Events;
 using ConveyorBelt.Tooling.Internal;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace ConveyorBelt.Tooling.Scheduling
@@ -21,7 +22,19 @@ namespace ConveyorBelt.Tooling.Scheduling
             const string DefaultIisLogFileFormatConvention = "u_exyyMMddHH";
 
             TheTrace.TraceInformation("IisBlobConventionScheduler - Starting scheduling");
-            var account = CloudStorageAccount.Parse(source.ConnectionString);
+            //var account = CloudStorageAccount.Parse(source.ConnectionString);
+            CloudStorageAccount account;
+            if (!String.IsNullOrWhiteSpace(source.AccountSasKey))
+            {
+                // Create new storage credentials using the SAS token.
+                var accountSas = new StorageCredentials(source.AccountSasKey);
+                // Use these credentials and the account name to create a Blob service client.
+                account = new CloudStorageAccount(accountSas, source.AccountName, endpointSuffix: "", useHttps: true);
+            }
+            else
+            {
+                account = CloudStorageAccount.Parse(source.ConnectionString);
+            }
             var client = account.CreateCloudBlobClient();
             var pathFormat = source.GetProperty<string>("BlobPathFormat");
             TheTrace.TraceInformation("IisBlobConventionScheduler - pathformat: {0}", pathFormat);

@@ -8,9 +8,10 @@ using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Telemetry;
 using ConveyorBelt.Tooling.Scheduling;
-using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using PerfIt;
+using Microsoft.WindowsAzure.Storage;
 
 namespace ConveyorBelt.Tooling.Actors
 {
@@ -48,7 +49,19 @@ namespace ConveyorBelt.Tooling.Actors
 
             await _durationInstrumentor.InstrumentAsync(async () =>
             {
-                var account = CloudStorageAccount.Parse(blobFileScheduled.Source.ConnectionString);
+                //var account = CloudStorageAccount.Parse(blobFileScheduled.Source.ConnectionString);
+                CloudStorageAccount account;
+                if (!String.IsNullOrWhiteSpace(blobFileScheduled.Source.AccountSasKey))
+                {
+                    // Create new storage credentials using the SAS token.
+                    var accountSas = new StorageCredentials(blobFileScheduled.Source.AccountSasKey);
+                    // Use these credentials and the account name to create a Blob service client.
+                    account = new CloudStorageAccount(accountSas, blobFileScheduled.Source.AccountName, "", useHttps: true);
+                }
+                else
+                {
+                    account = CloudStorageAccount.Parse(blobFileScheduled.Source.ConnectionString);
+                }
                 var client = account.CreateCloudBlobClient();
                 var container = client.GetContainerReference("wad-iis-logfiles");
 

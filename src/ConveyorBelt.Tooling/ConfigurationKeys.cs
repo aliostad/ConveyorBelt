@@ -13,6 +13,8 @@ namespace ConveyorBelt.Tooling
         public const string ElasticSearchUrl = "ConveyorBelt.ElasticSearchUrl";
         public const string BulkBatchSize = "ConveyorBelt.BulkBatchSize";        
         public const string StorageConnectionString = "ConveyorBelt.Storage.ConnectionString";
+        public const string StorageAccountSasKey = "ConveyorBelt.Storage.AccountSasKey";
+        public const string StorageAccountName = "ConveyorBelt.Storage.AccountName";
         public const string ShadKeyArrivalDelayWarningInSeconds = "ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds";
         public const string ServiceBusConnectionString = "ConveyorBelt.ServiceBus.ConnectionString";
         public const string MappingsPath = "ConveyorBelt.MappingsPath";
