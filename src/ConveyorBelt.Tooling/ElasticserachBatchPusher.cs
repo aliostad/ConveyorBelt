@@ -148,6 +148,7 @@ namespace ConveyorBelt.Tooling
 
             _batch.AddDoc(JsonConvert.SerializeObject(op).Replace("\r\n", " "), doc.ToString().Replace("\r\n", " "));
 
+            
             if (_batch.Count >= _batchSize)
             {
                 await PushbatchAsync();

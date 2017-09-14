@@ -26,6 +26,21 @@ namespace ConveyorBelt.Tooling.Configuration
             get { return _entity.Properties.GetStringValue("ConnectionString"); }
         }
 
+        public string AccountName
+        {
+            get { return _entity.Properties.GetStringValue("StorageAccountName"); }
+        }
+
+        public string AccountSubscriptionId
+        {
+            get { return _entity.Properties.GetStringValue("AccountSubscriptionId"); }
+        }
+
+        public string AccountSasKey
+        {
+            get { return _entity.Properties.GetStringValue("AccountSasKey"); }
+        }
+        
         public string CustomAttributes
         {
             get { return _entity.Properties.GetStringValue(CustomAttributesFieldName); }
@@ -53,7 +68,7 @@ namespace ConveyorBelt.Tooling.Configuration
         {
             get { return _entity.Properties.GetStringValue("StopOffsetPoint"); }
         }
-
+        
         /// <summary>
         /// Number of minutes after which if no entry exists, it considered done and if there was anything,
         /// would have been copied to TableStorage by now 
@@ -112,15 +127,12 @@ namespace ConveyorBelt.Tooling.Configuration
 
         public DynamicTableEntity ToEntity()
         {
-            return new DynamicTableEntity(PartitionKey, RowKey)
-            {
-                Properties =
-                {
-                    ["ErrorMessage"] = _entity.Properties["ErrorMessage"],
-                    ["LastScheduled"] = _entity.Properties["LastScheduled"],
-                    ["LastOffsetPoint"] = _entity.Properties["LastOffsetPoint"]
-                }
-            };
+            var entity = new DynamicTableEntity(PartitionKey, RowKey);
+            entity.Properties.Add("ErrorMessage", _entity.Properties["ErrorMessage"]);
+            entity.Properties.Add("LastScheduled", _entity.Properties["LastScheduled"]);
+            entity.Properties.Add("LastOffsetPoint", _entity.Properties["LastOffsetPoint"]);
+            entity.ETag = _entity.ETag;
+            return entity;
         }
 
         public T GetProperty<T>(string name)
@@ -163,6 +175,8 @@ namespace ConveyorBelt.Tooling.Configuration
             var dss = new DiagnosticsSourceSummary()
             {
                 ConnectionString = ConnectionString,
+                AccountSasKey = AccountSasKey,
+                AccountName = AccountName,
                 IndexName = IndexName,
                 PartitionKey = PartitionKey,
                 RowKey = RowKey,
