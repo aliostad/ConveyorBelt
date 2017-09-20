@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using ConveyorBelt.Tooling.Events;
+using ConveyorBelt.Tooling.Scheduling;
 
 namespace ConveyorBelt.Tooling.Internal
 {
@@ -31,7 +32,18 @@ namespace ConveyorBelt.Tooling.Internal
 
         public static DateTimeOffset GetDateTimeOffset(this ShardKeyArrived shardKeyArrived)
         {
-            return new DateTimeOffset(new DateTime(Convert.ToInt64(shardKeyArrived.ShardKey)), TimeSpan.Zero);
+            long shardKey;
+            var shardKeyArr = shardKeyArrived.ShardKey.Split('_');
+            if (shardKeyArr.Length == 4)
+            {
+               long.TryParse(shardKeyArr[3], out shardKey);              
+            }
+            else
+            {
+               long.TryParse(shardKeyArrived.ShardKey, out shardKey);
+            }
+            
+            return new DateTimeOffset(new DateTime(shardKey), TimeSpan.Zero);
         }
     }
 }

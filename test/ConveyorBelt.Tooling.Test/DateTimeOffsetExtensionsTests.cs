@@ -27,13 +27,23 @@ namespace ConveyorBelt.Tooling.Test
         [Fact]
         public void DateTimeOffset_GetsReturnedCorrectly()
         {
-            
             var shardKeyArrived = new ShardKeyArrived()
             {
                 ShardKey = "0635901169200000000"
             };
 
             Assert.Equal("201602031722", shardKeyArrived.GetDateTimeOffset().ToString("yyyyMMddHHmm"));
+        }
+
+        [Fact]
+        public void DateTimeOffsetForModulo10MinuteShard()
+        {
+            var shardKeyArrived = new ShardKeyArrived()
+            {
+                ShardKey = "0000000000000000006___0636403734870000000"
+            };
+
+            Assert.Equal("201709070931", shardKeyArrived.GetDateTimeOffset().ToString("yyyyMMddHHmm"));
         }
     }
 }

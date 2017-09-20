@@ -217,7 +217,7 @@ namespace ConveyorBelt.Tooling
                 for (var i = _list.Count-1; i >= 0; i--) // start from the end
                 {
                     var si = statuses[i];
-                    if(si >= 200 || si <= 299) // if success
+                    if(si >= 200 && si <= 299) // if success
                         _list.RemoveAt(i);
                 }
 
