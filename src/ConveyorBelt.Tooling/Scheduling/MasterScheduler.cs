@@ -107,7 +107,9 @@ namespace ConveyorBelt.Tooling.Scheduling
                     return null;                        
                 }
 
-                await SetupMappingsAsync(source);
+                var createMappings = _configurationValueProvider.GetValue(ConfigurationKeys.EsCreateMappings);
+                if (Convert.ToBoolean(createMappings))
+                    await SetupMappingsAsync(source);
 
                 if (!source.LastScheduled.HasValue)
                     source.LastScheduled = DateTimeOffset.UtcNow.AddDays(-1);
@@ -207,9 +209,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                 var esUrl = _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl);
                 await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, await GetIndexSettings());
 
-                var createMappings = _configurationValueProvider.GetValue(ConfigurationKeys.EsCreateMappings);
 
-                if (Convert.ToBoolean(createMappings) && (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey())))
+                if (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey()))
                 {
                     var jsonPath = string.Format("{0}{1}.json",
                         _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath),
