@@ -28,7 +28,7 @@
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" />
     </ConfigurationSettings>
     <LocalResources>
-      <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />
+      <LocalStorage name="DownloadFolder" sizeInMB="10120" cleanOnRoleRecycle="true" />
     </LocalResources>
   </WorkerRole>
 </ServiceDefinition>
