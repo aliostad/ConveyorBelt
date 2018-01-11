@@ -22,6 +22,7 @@
       <Setting name="Beehive.ActorParallelism.ShardKeyActor" />
       <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" />
+      <Setting name="ConveyorBelt.ElasticSearch.PipelineEnabled" />
       <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" />
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" />
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" />

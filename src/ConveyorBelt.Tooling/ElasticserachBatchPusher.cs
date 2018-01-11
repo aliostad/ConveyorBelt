@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -21,6 +20,7 @@ namespace ConveyorBelt.Tooling
     {
         private string _esUrl;
         private int _batchSize;
+        private bool _setPipeline;
         private IHttpClient _httpClient;
         private Batch _batch = new Batch();
 
@@ -35,6 +35,10 @@ namespace ConveyorBelt.Tooling
             _httpClient = httpClient;
             _batchSize = batchSize;
             _esUrl = esUrl;
+
+            if(!bool.TryParse(configurationValueProvider.GetValue(ConfigurationKeys.EsPipelineEnabled), out _setPipeline))
+                _setPipeline = false;
+
             var esBackOffMinSecondsString = configurationValueProvider.GetValue(ConfigurationKeys.EsBackOffMinSeconds);
             var esBackOffMaxSecondsString = configurationValueProvider.GetValue(ConfigurationKeys.EsBackOffMaxSeconds);
             var esBackOffMinSeconds = string.IsNullOrWhiteSpace(esBackOffMinSecondsString) ? 5 : int.Parse(esBackOffMinSecondsString);
@@ -117,15 +121,26 @@ namespace ConveyorBelt.Tooling
             if (!_filters[source.Filter].Satisfies(entity))
                 return;
 
-            var op = new
-            {
-                index = new
-                {
-                    _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
-                    _type = source.DynamicProperties["MappingName"].ToString(),
-                    _id = entity.PartitionKey + entity.RowKey
+
+            var op = _setPipeline
+                ? new {
+                    index = new
+                    {
+                        _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
+                        _type = source.DynamicProperties["MappingName"].ToString(),
+                        _id = entity.PartitionKey + entity.RowKey,
+                        pipeline = source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()
+                    }
                 }
-            };
+                : (object) new
+                {
+                    index = new
+                    {
+                        _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
+                        _type = source.DynamicProperties["MappingName"].ToString(),
+                        _id = entity.PartitionKey + entity.RowKey,
+                    }
+                };
 
             var doc = new JObject();
             doc.Add("@timestamp", entity.Timestamp);

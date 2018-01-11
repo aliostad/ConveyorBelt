@@ -63,7 +63,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
                 Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("Test Error with exception\r\n"));
                 Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.EndsWith("Parameter name: database"));
-                Assert.True(result.Count() == 2);
+                Assert.True(result.Count == 2);
             }
         }
 
@@ -77,7 +77,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
 
                 var result = sitecoreLogParser.Parse(stream, uri).ToList();
                 Assert.NotNull(result);
-                Assert.Equal(result.Count, 57);
+                Assert.Equal(50, result.Count);
                 var parsedLog = result.Last();
                 Assert.NotNull(parsedLog);
                 Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "WARN");
