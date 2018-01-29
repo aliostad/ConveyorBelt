@@ -89,20 +89,33 @@ namespace ConveyorBelt.Tooling.EventHub
 
             public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
             {
-                foreach (var ev in messages)
+                try
                 {
-                    foreach (var e in _parser.Parse(ev.GetBodyStream(), null))
+                    foreach (var ev in messages)
                     {
-                        await _elasticsearchBatchPusher.PushAsync(e, _source);
+                        foreach (var e in _parser.Parse(ev.GetBodyStream(), null))
+                        {
+                            await _elasticsearchBatchPusher.PushAsync(e, _source);
+                        }
                     }
                 }
-
-                if(_timer.Elapsed > _checkpointInterval)
+                catch (Exception e)
                 {
-                    _timer.Restart();
-                    await context.CheckpointAsync();
+                    TheTrace.TraceError(e.ToString());
                 }
 
+                try
+                {
+                    if (_timer.Elapsed > _checkpointInterval)
+                    {
+                        _timer.Restart();
+                        await context.CheckpointAsync();
+                    }
+                }
+                catch (Exception e)
+                {
+                    TheTrace.TraceError(e.ToString());
+                }
             }
         }
     }

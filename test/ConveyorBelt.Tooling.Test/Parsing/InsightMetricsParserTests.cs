@@ -12,10 +12,12 @@ namespace ConveyorBelt.Tooling.Test.Parsing
 {
     public class InsightMetricsParserTests
     {
+        private const string FileName = @"data\InsightMetrics.json";
+
         [Fact]
         public void CanReadMetrics()
         {          
-            var stream = File.OpenRead(@"data\InsightMetrics.json");
+            var stream = File.OpenRead(FileName);
             /*
              * 
  			"count": 4,
@@ -49,6 +51,26 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             {
                 stream.Close();
             }
+        }
+
+        [Fact]
+        public void KeysCreatedQueEsUnico()
+        {
+            var stream = File.OpenRead(FileName);
+            
+            try
+            {
+                var parser = new InsightMetricsParser();
+                var records = parser.Parse(stream, null).ToList();
+
+                var dic = records.ToDictionary(x => x.PartitionKey + x.RowKey);
+                Assert.Equal(96, dic.Count);
+            }
+            finally
+            {
+                stream.Close();
+            }
+
         }
     }
 }
