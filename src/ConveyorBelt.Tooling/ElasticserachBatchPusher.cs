@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -32,7 +31,7 @@ namespace ConveyorBelt.Tooling
         private object _lock = new object();
         private Func<IInterval> _intervalGen;
 
-        public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, IIndexNamer indexNamer, int batchSize = 100)
+        public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, IIndexNamer indexNamer, int batchSize = 500)
         {
             _indexNamer = indexNamer;
             _httpClient = httpClient;
@@ -111,16 +110,12 @@ namespace ConveyorBelt.Tooling
 
         public async Task PushAsync(DynamicTableEntity entity, DiagnosticsSourceSummary source)
         {
-            if(source.Filter == null)
-                source.Filter = string.Empty;
-
-            if (string.IsNullOrEmpty(source.Filter))
+            if (!string.IsNullOrEmpty(source.Filter))
             {
                 _filters.AddOrUpdate(source.Filter, new SimpleFilter(source.Filter), ((s, filter) => filter));
+                if (!_filters[source.Filter].Satisfies(entity))
+                    return;
             }
-            
-            if (!_filters[source.Filter].Satisfies(entity))
-                return;
 
             var op = new
             {
@@ -155,32 +150,22 @@ namespace ConveyorBelt.Tooling
 
             if (_batch.Count >= _batchSize)
             {
+                Batch batch = null;
                 lock (_lock)
                 {
                     if (_batch.Count >= _batchSize)
                     {
-                        var batch = _batch.CloneAndClear();
-
-                        // runs async
-                        PushbatchAsync(batch, _httpClient, _esUrl, _intervalGen()).ContinueWith(x =>
-                        {
-                            try
-                            {
-                                var ex = x.Exception;
-                                if (ex != null)
-                                    TheTrace.TraceWarning(ex.ToString());
-                            }
-                            catch (Exception ee)
-                            {
-                                TheTrace.TraceWarning(ee.ToString());
-                            }
-                        });
+                        batch = _batch.CloneAndClear();
                     }
-                }          
+                }
 
-                TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed records to ElasticSearch for {0}-{1}",
-                    source.PartitionKey,
-                    source.RowKey);                     
+                if( batch != null)
+                {
+                    await PushbatchAsync(batch, _httpClient, _esUrl, _intervalGen());
+                    TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed records to ElasticSearch for {0}-{1}",
+                        source.PartitionKey,
+                        source.RowKey);
+                }
             }
         }
 
@@ -218,6 +203,7 @@ namespace ConveyorBelt.Tooling
             {
                 if(op == null || doc == null)
                     throw new ArgumentNullException("Watchout ! op+doc");
+
                 lock (_lock)
                 {
                     _list.Add(new Tuple<string, string>(op, doc));

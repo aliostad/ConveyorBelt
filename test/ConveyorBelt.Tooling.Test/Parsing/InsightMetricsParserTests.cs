@@ -41,7 +41,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
 
                 Assert.Equal("/SUBSCRIPTIONS/9614FC94-9519-46FA-B7EC-DD1B0411DB13/RESOURCEGROUPS/WHASHA/PROVIDERS/MICROSOFT.CACHE/REDIS/FILLAPDWHASHAPRODUCTSEYHOOACHE", r.Properties["resourceId"].StringValue);
                 Assert.Equal("connectedclients", r.Properties["metricName"].StringValue);
-                Assert.Equal("FILLAPDWHASHAPRODUCTSEYHOOACHE_REDIS_MICROSOFT.CACHE_connectedclients", r.PartitionKey);
+                Assert.Equal("9614FC94_FILLAPDWHASHAPRODUCTSEYHOOACHE_REDIS_MICROSOFT.CACHE_connectedclients", r.PartitionKey);
                 Assert.Equal("20180118125500", r.RowKey);
                 Assert.Equal(TimeSpan.Zero, r.Timestamp.Offset);
                 Assert.Equal(1, r.Timestamp.Month);

@@ -39,7 +39,8 @@ namespace ConveyorBelt.Tooling.Parsing
    
             foreach (var r in col.Records)
             {
-                var pk = string.Join("_", r.ResourceId.Split('/').Reverse().Take(3).Concat(new[] { r.MetricName }));
+                var subscriptionGuidFirstPart = r.ResourceId.Split('/')[2].Split('-')[0];
+                var pk = string.Format($"{subscriptionGuidFirstPart}_{string.Join("_", r.ResourceId.Split('/').Reverse().Take(3))}_{r.MetricName}");
                 var rk = r.Time.ToString("yyyyMMddHHmmss");
                 var entity = new DynamicTableEntity(pk, rk);
                 entity.Timestamp = r.Time;

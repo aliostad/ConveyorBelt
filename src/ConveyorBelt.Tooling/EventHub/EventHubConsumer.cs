@@ -98,14 +98,7 @@ namespace ConveyorBelt.Tooling.EventHub
                             await _elasticsearchBatchPusher.PushAsync(e, _source);
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    TheTrace.TraceError(e.ToString());
-                }
 
-                try
-                {
                     if (_timer.Elapsed > _checkpointInterval)
                     {
                         _timer.Restart();
@@ -115,7 +108,7 @@ namespace ConveyorBelt.Tooling.EventHub
                 catch (Exception e)
                 {
                     TheTrace.TraceError(e.ToString());
-                }
+                }                
             }
         }
     }
