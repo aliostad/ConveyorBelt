@@ -29,5 +29,23 @@ namespace ConveyorBelt.Tooling.Internal
             // OK timestamp is the only thing we can look for then
             return entity.Timestamp;
         }
+
+        public static DateTimeOffset GetTimestamp(this DynamicTableEntity entity, DiagnosticsSourceSummary source)
+        {
+
+            if (source.DynamicProperties.ContainsKey(ConveyorBeltConstants.TimestampFieldName) &&
+                source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName]!=null &&
+                source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName] is string &&
+                entity.Properties.ContainsKey((string) source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName]))
+            {
+                var fieldName = (string)source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName];
+                if (entity.Properties[fieldName].PropertyType == EdmType.DateTime)
+                {
+                    return entity.Properties[fieldName].DateTimeOffsetValue.Value;
+                }
+            }
+
+            return entity.Timestamp;
+        }
     }
 }

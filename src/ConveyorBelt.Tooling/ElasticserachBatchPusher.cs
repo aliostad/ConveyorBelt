@@ -128,7 +128,7 @@ namespace ConveyorBelt.Tooling
             };
 
             var doc = new JObject();
-            doc.Add("@timestamp", entity.Timestamp);
+            doc.Add("@timestamp", entity.GetTimestamp(source));
             doc.Add("PartitionKey", entity.PartitionKey);
             doc.Add("RowKey", entity.RowKey);
             doc.Add("cb_type", source.TypeName);

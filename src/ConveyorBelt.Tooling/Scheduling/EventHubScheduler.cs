@@ -36,7 +36,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 }
             }
 
-            return Task.FromResult(new Tuple<IEnumerable<Event>, bool>(new Event[0], true));
+            return Task.FromResult(new Tuple<IEnumerable<Event>, bool>(new Event[0], false));
         }
     }
 }
