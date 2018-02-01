@@ -19,7 +19,7 @@ namespace ConveyorBelt.Tooling.EventHub
             new ConcurrentDictionary<string, Lazy<EventHubConsumer>>();
 
         private readonly IElasticsearchBatchPusher _pusher;
-        private readonly DiagnosticsSourceSummary _source;
+        public DiagnosticsSourceSummary Source { get; }
         private readonly IParser _parser;
         private readonly EventProcessorHost _eventProcessorHost;
 
@@ -34,7 +34,7 @@ namespace ConveyorBelt.Tooling.EventHub
         public EventHubConsumer(IElasticsearchBatchPusher pusher, DiagnosticsSourceSummary source)
         {
             this._pusher = pusher;
-            this._source = source;
+            this.Source = source;
             _parser = FactoryHelper.Create<IParser>(source.DynamicProperties["Parser"].ToString());
 
             _eventProcessorHost = new EventProcessorHost(
@@ -51,7 +51,7 @@ namespace ConveyorBelt.Tooling.EventHub
 
         public IEventProcessor CreateEventProcessor(PartitionContext context)
         {
-            return new EventProcessor(_pusher, _parser, _source);
+            return new EventProcessor(_pusher, _parser, Source);
         }
 
         public void Dispose()

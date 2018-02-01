@@ -32,7 +32,8 @@ namespace ConveyorBelt.Tooling.Scheduling
                     }),
                     (kk, vv) => vv);
 
-                var heh = consume.Value; // to make sure it gets accessed and created if new
+                // to make sure it gets accessed and created if new otherwise system is 'lazy'
+                TheTrace.TraceInformation("This is the EventHub thing I was talking about: {0}", consume.Value.Source.TypeName);
             }
             else
             {
