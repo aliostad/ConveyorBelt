@@ -155,7 +155,7 @@ namespace ConveyorBelt.Tooling
                 Batch batch = null;
                 lock (_lock)
                 {
-                    if (_batch.Count >= _batchSize)
+                    if (_batch.Count >= _batchSize || DateTimeOffset.Now.Subtract(_lastPush) > _maxWait)
                     {
                         batch = _batch.CloneAndClear();
                         _lastPush = DateTimeOffset.Now;                        
