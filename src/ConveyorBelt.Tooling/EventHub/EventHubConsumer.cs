@@ -15,8 +15,8 @@ namespace ConveyorBelt.Tooling.EventHub
 {
     public class EventHubConsumer : IEventProcessorFactory, IDisposable
     {
-        public static readonly ConcurrentDictionary<string, EventHubConsumer> Consumers =
-            new ConcurrentDictionary<string, EventHubConsumer>();
+        public static readonly ConcurrentDictionary<string, Lazy<EventHubConsumer>> Consumers =
+            new ConcurrentDictionary<string, Lazy<EventHubConsumer>>();
 
         private readonly IElasticsearchBatchPusher _pusher;
         private readonly DiagnosticsSourceSummary _source;

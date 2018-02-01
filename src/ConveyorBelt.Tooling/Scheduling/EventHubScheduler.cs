@@ -21,18 +21,27 @@ namespace ConveyorBelt.Tooling.Scheduling
         public Task<Tuple<IEnumerable<Event>, bool>> TryScheduleAsync(DiagnosticsSource source)
         {
             var key = source.ToTypeKey();
-            if(source.IsActive.GetValueOrDefault(true))
+
+            if (source.IsActive.GetValueOrDefault(true))
             {
-                EventHubConsumer.Consumers.AddOrUpdate(key,
-                    (k) => new EventHubConsumer(_pusher, source.ToSummary()),
+                var consume = EventHubConsumer.Consumers.AddOrUpdate(key,
+                    new Lazy<EventHubConsumer>(() =>
+                    {
+                        TheTrace.TraceInformation("Just added this eventHub consumer {0}", key);
+                        return new EventHubConsumer(_pusher, source.ToSummary());
+                    }),
                     (kk, vv) => vv);
+
+                var heh = consume.Value; // to make sure it gets accessed and created if new
             }
             else
             {
-                EventHubConsumer consumer = null;
-                if(EventHubConsumer.Consumers.TryRemove(key, out consumer))
+                Lazy<EventHubConsumer> consumer = null;
+
+                if (EventHubConsumer.Consumers.TryRemove(key, out consumer))
                 {
-                    consumer.Dispose();
+                    consumer.Value.Dispose();
+                    TheTrace.TraceInformation("Just removed this eventHub consumer {0}", key);
                 }
             }
 
