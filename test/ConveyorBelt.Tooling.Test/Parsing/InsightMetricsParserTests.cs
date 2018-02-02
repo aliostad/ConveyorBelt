@@ -37,7 +37,6 @@ namespace ConveyorBelt.Tooling.Test.Parsing
 
                 Assert.Equal(96, records.Count);
                 var r = records[0];
-                var ts = r.Timestamp;
 
                 Assert.Equal("/SUBSCRIPTIONS/9614FC94-9519-46FA-B7EC-DD1B0411DB13/RESOURCEGROUPS/WHASHA/PROVIDERS/MICROSOFT.CACHE/REDIS/FILLAPDWHASHAPRODUCTSEYHOOACHE", r.Properties["resourceId"].StringValue);
                 Assert.Equal("connectedclients", r.Properties["metricName"].StringValue);

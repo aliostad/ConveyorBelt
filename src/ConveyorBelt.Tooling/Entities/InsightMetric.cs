@@ -28,7 +28,7 @@ namespace ConveyorBelt.Tooling.Entities
 
         public string TimeGrain { get; set; }
 
-        public Double Average { get; set; }
+        public double Average { get; set; }
 
         public double Minimum { get; set; }
 

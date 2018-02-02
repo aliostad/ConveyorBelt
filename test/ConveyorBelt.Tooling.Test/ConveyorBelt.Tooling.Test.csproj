@@ -125,7 +125,6 @@
     <Compile Include="IndexNamerTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="Parsing\InsightMetricsParserTests.cs" />
-    <Compile Include="Parsing\JsonCovert.cs" />
     <Compile Include="Parsing\SitecoreLogLineParserShould.cs" />
     <Compile Include="Parsing\SitecoreLogParserShould.cs" />
     <Compile Include="MinuteTableShardSchedulerTests.cs" />
