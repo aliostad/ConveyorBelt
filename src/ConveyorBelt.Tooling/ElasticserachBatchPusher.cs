@@ -30,8 +30,6 @@ namespace ConveyorBelt.Tooling
         private IIndexNamer _indexNamer;
         private object _lock = new object();
         private Func<IInterval> _intervalGen;
-        private DateTimeOffset _lastPush = DateTimeOffset.Now;
-        private readonly TimeSpan _maxWait = TimeSpan.FromSeconds(30);
 
         public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, IIndexNamer indexNamer, int batchSize = 500)
         {
@@ -150,15 +148,14 @@ namespace ConveyorBelt.Tooling
 
             _batch.AddDoc(JsonConvert.SerializeObject(op).Replace("\r\n", " "), doc.ToString().Replace("\r\n", " "));
 
-            if (_batch.Count >= _batchSize ||  DateTimeOffset.Now.Subtract(_lastPush) > _maxWait)
+            if (_batch.Count >= _batchSize)
             {
                 Batch batch = null;
                 lock (_lock)
                 {
-                    if (_batch.Count >= _batchSize || DateTimeOffset.Now.Subtract(_lastPush) > _maxWait)
+                    if (_batch.Count >= _batchSize)
                     {
                         batch = _batch.CloneAndClear();
-                        _lastPush = DateTimeOffset.Now;                        
                     }
                 }
 

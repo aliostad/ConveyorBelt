@@ -99,6 +99,8 @@ namespace ConveyorBelt.Tooling.EventHub
                         }
                     }
 
+                    await _elasticsearchBatchPusher.FlushAsync(); // we cannot wait really
+
                     if (_timer.Elapsed > _checkpointInterval)
                     {
                         _timer.Restart();
