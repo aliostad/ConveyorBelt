@@ -130,7 +130,9 @@ namespace ConveyorBelt.Tooling.Configuration
             var entity = new DynamicTableEntity(PartitionKey, RowKey);
             entity.Properties.Add("ErrorMessage", _entity.Properties["ErrorMessage"]);
             entity.Properties.Add("LastScheduled", _entity.Properties["LastScheduled"]);
-            entity.Properties.Add("LastOffsetPoint", _entity.Properties["LastOffsetPoint"]);
+            entity.Properties.Add("LastOffsetPoint", _entity.Properties.ContainsKey("LastOffsetPoint") ? 
+                _entity.Properties["LastOffsetPoint"] : 
+                EntityProperty.GeneratePropertyForDateTimeOffset(DateTimeOffset.Now.Subtract(TimeSpan.FromDays(365))));
             entity.ETag = _entity.ETag;
             return entity;
         }

@@ -79,7 +79,9 @@
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\WindowsAzure.ServiceBus.3.4.1\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
-      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ServiceBus.Messaging.EventProcessorHost, Version=0.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Azure.ServiceBus.EventProcessorHost.2.2.7\lib\net45-full\Microsoft.ServiceBus.Messaging.EventProcessorHost.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.0.0\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
@@ -129,6 +131,8 @@
     <Compile Include="DefaultHttpClient.cs" />
     <Compile Include="DiagnosticsSourceSummary.cs" />
     <Compile Include="ElasticsearchClient.cs" />
+    <Compile Include="Entities\InsightMetric.cs" />
+    <Compile Include="EventHub\EventHubConsumer.cs" />
     <Compile Include="Events\BlobFileArrived.cs" />
     <Compile Include="Events\BlobFileScheduled.cs" />
     <Compile Include="Events\ShardKeyArrived.cs" />
@@ -153,6 +157,7 @@
     <Compile Include="ITempDownloadLocationProvider.cs" />
     <Compile Include="Parsing\AkamaiLogParser.cs" />
     <Compile Include="Parsing\IisLogParser.cs" />
+    <Compile Include="Parsing\InsightMetricsParser.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Internal\SitecoreLogLineParser.cs" />
     <Compile Include="Parsing\SitecoreLogParser.cs" />
@@ -162,6 +167,7 @@
     <Compile Include="Querying\TableStorageShardKeyQuery.cs" />
     <Compile Include="Scheduling\BaseScheduler.cs" />
     <Compile Include="Scheduling\D18MinuteTableShardScheduler.cs" />
+    <Compile Include="Scheduling\EventHubScheduler.cs" />
     <Compile Include="Scheduling\IisBlobConventionScheduler.cs" />
     <Compile Include="Scheduling\IisBlobScheduler.cs" />
     <Compile Include="Scheduling\ISourceScheduler.cs" />
