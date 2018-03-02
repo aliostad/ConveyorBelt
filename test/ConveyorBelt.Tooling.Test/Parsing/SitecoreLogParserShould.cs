@@ -67,7 +67,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             }
         }
 
-        [Fact]
+        [Fact(Skip ="Not used anymore")]
         public void ParseMultipleLogs()
         {
             using (var stream = new MemoryStream(File.ReadAllBytes(@"data\SitecoreDetailedLog.txt")))

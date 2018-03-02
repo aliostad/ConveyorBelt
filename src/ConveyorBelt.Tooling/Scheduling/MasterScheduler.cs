@@ -204,11 +204,15 @@ namespace ConveyorBelt.Tooling.Scheduling
 
         private async Task SetupMappingsAsync(DiagnosticsSource source)
         {
+            var createMappingString = _configurationValueProvider.GetValue(ConfigurationKeys.EsCreateMappings);
+            var createMappings = Convert.ToBoolean(createMappingString);
+            if (!createMappings)
+                return;
+
             foreach (var indexName in GetIndexNames(source))
             {
                 var esUrl = _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl);
                 await _elasticsearchClient.CreateIndexIfNotExistsAsync(esUrl, indexName, await GetIndexSettings());
-
 
                 if (!await _elasticsearchClient.MappingExistsAsync(esUrl, indexName, source.ToTypeKey()))
                 {

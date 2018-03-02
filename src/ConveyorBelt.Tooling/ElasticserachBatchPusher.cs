@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -25,11 +26,13 @@ namespace ConveyorBelt.Tooling
         private Batch _batch = new Batch();
 
         // no reason for thread sync/concurrent since this will be called only by a single thread
-        private Dictionary<string, SimpleFilter> _filters = new Dictionary<string, SimpleFilter>();
+        private ConcurrentDictionary<string, SimpleFilter> _filters = new ConcurrentDictionary<string, SimpleFilter>();
         private IInterval _interval;
         private IIndexNamer _indexNamer;
+        private object _lock = new object();
+        private Func<IInterval> _intervalGen;
 
-        public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, IIndexNamer indexNamer, int batchSize = 100)
+        public ElasticsearchBatchPusher(IHttpClient httpClient, IConfigurationValueProvider configurationValueProvider, string esUrl, IIndexNamer indexNamer, int batchSize = 500)
         {
             _indexNamer = indexNamer;
             _httpClient = httpClient;
@@ -43,26 +46,28 @@ namespace ConveyorBelt.Tooling
             var esBackOffMaxSecondsString = configurationValueProvider.GetValue(ConfigurationKeys.EsBackOffMaxSeconds);
             var esBackOffMinSeconds = string.IsNullOrWhiteSpace(esBackOffMinSecondsString) ? 5 : int.Parse(esBackOffMinSecondsString);
             var esBackOffMaxSeconds = string.IsNullOrWhiteSpace(esBackOffMaxSecondsString) ? 100 : int.Parse(esBackOffMaxSecondsString);
-
-            _interval = new DoublyIncreasingInterval(TimeSpan.FromSeconds(esBackOffMinSeconds), TimeSpan.FromSeconds(esBackOffMaxSeconds), 5);
+            _intervalGen = () => new DoublyIncreasingInterval(TimeSpan.FromSeconds(esBackOffMinSeconds),
+                TimeSpan.FromSeconds(esBackOffMaxSeconds), 5);
         }
 
-        private async Task PushbatchAsync()
+        private static async Task PushbatchAsync(Batch batch, IHttpClient client, string esUrl, IInterval interval)
         {
 
-            if (_batch.Count == 0)
+            if (batch.Count == 0)
                 return;
 
             try
             {
                 int retry = 0;
                 List<int> statuses = null;
+                string content = string.Empty;
+                string reqContent = string.Empty;
                 do
                 {
-                    var responseMessage = await  _httpClient.PostAsync(_esUrl + "_bulk",
-                    new StringContent(_batch.ToString(),
-                        Encoding.UTF8, "application/json"));
-                    var content = responseMessage.Content == null ? "" :
+                    reqContent = batch.ToString();
+                    var responseMessage = await client.PostAsync(esUrl + "_bulk",
+                        new StringContent(reqContent, Encoding.UTF8, "application/json"));
+                    content = responseMessage.Content == null ? "" :
                         (await responseMessage.Content.ReadAsStringAsync());
 
                     if(!responseMessage.IsSuccessStatusCode)
@@ -82,23 +87,23 @@ namespace ConveyorBelt.Tooling
 
                     if (statuses.Any(y => y == 429))
                     {
-                        var timeSpan = _interval.Next();
+                        var timeSpan = interval.Next();
                         TheTrace.TraceWarning("LOOK!! Got 429 -> backing off for {0} seconds", timeSpan.TotalSeconds);
                         Thread.Sleep(timeSpan);
                     }
                     else
                     {
-                        _interval.Reset();
+                        interval.Reset();
                     }
 
-                    TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing {1} records to {0} [retry: {2}]", _esUrl, _batch.Count, retry);
+                    TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushing {1} records to {0} [retry: {2}]", esUrl, batch.Count, retry);
 
-                } while (_batch.Prune(statuses) > 0 && retry++ < 3);
+                } while ((batch = Batch.Prune(batch, statuses, content, reqContent)) != null && batch.Count > 0 && retry++ < 3);
 
-                if (_batch.Count > 0)
+                if (batch.Count > 0)
                 {
-                    TheTrace.TraceWarning("WARNING!!! Some residual documents could not be inserted even after retries: {0}", _batch.Count);
-                    _batch.Clear();
+                    TheTrace.TraceWarning("WARNING!!! Some residual documents could not be inserted even after retries: {0}", batch.Count);
+                    batch.Clear();
                 }
             }
             catch (Exception e)
@@ -110,16 +115,12 @@ namespace ConveyorBelt.Tooling
 
         public async Task PushAsync(DynamicTableEntity entity, DiagnosticsSourceSummary source)
         {
-            if(source.Filter == null)
-                source.Filter = string.Empty;
-
-            if (!_filters.ContainsKey(source.Filter))
+            if (!string.IsNullOrEmpty(source.Filter))
             {
-                _filters.Add(source.Filter, new SimpleFilter(source.Filter));
+                _filters.AddOrUpdate(source.Filter, new SimpleFilter(source.Filter), ((s, filter) => filter));
+                if (!_filters[source.Filter].Satisfies(entity))
+                    return;
             }
-
-            if (!_filters[source.Filter].Satisfies(entity))
-                return;
 
 
             var op = _setPipeline
@@ -143,7 +144,7 @@ namespace ConveyorBelt.Tooling
                 };
 
             var doc = new JObject();
-            doc.Add("@timestamp", entity.Timestamp);
+            doc.Add("@timestamp", entity.GetTimestamp(source));
             doc.Add("PartitionKey", entity.PartitionKey);
             doc.Add("RowKey", entity.RowKey);
             doc.Add("cb_type", source.TypeName);
@@ -163,13 +164,24 @@ namespace ConveyorBelt.Tooling
 
             _batch.AddDoc(JsonConvert.SerializeObject(op).Replace("\r\n", " "), doc.ToString().Replace("\r\n", " "));
 
-            
             if (_batch.Count >= _batchSize)
             {
-                await PushbatchAsync();
-                TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed records to ElasticSearch for {0}-{1}",
-                    source.PartitionKey,
-                    source.RowKey);
+                Batch batch = null;
+                lock (_lock)
+                {
+                    if (_batch.Count >= _batchSize)
+                    {
+                        batch = _batch.CloneAndClear();
+                    }
+                }
+
+                if( batch != null)
+                {
+                    await PushbatchAsync(batch, _httpClient, _esUrl, _intervalGen());
+                    TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed records to ElasticSearch for {0}-{1}",
+                        source.PartitionKey,
+                        source.RowKey);
+                }
             }
         }
 
@@ -185,18 +197,33 @@ namespace ConveyorBelt.Tooling
 
         public Task FlushAsync()
         {
-            return PushbatchAsync();
+            return PushbatchAsync(_batch.CloneAndClear(), _httpClient, _esUrl, _intervalGen());
         }
-
-        
 
         internal class Batch
         {
-             private List<Tuple<string, string>> _list = new List<Tuple<string, string>>();
+            private ConcurrentBag<Tuple<string, string>> _list = new ConcurrentBag<Tuple<string, string>>();
+            private object _lock = new object();
+
+            public Batch()
+            {
+                
+            }
+
+            private Batch(ConcurrentBag<Tuple<string, string>> list)
+            {
+                _list = list;
+            }
 
             public void AddDoc(string op, string doc)
             {
-                _list.Add(new Tuple<string, string>(op, doc));
+                if(op == null || doc == null)
+                    throw new ArgumentNullException("Watchout ! op+doc");
+
+                lock (_lock)
+                {
+                    _list.Add(new Tuple<string, string>(op, doc));
+                }
             }
 
             public int Count
@@ -206,13 +233,14 @@ namespace ConveyorBelt.Tooling
 
             public void Clear()
             {
-                _list.Clear();
+                _list = new ConcurrentBag<Tuple<string, string>>();
             }
 
             public override string ToString()
             {
                 var sb = new StringBuilder();
-                foreach (var item in _list)
+                var copy = _list.ToArray();
+                foreach (var item in copy)
                 {
                     sb.Append(item.Item1);
                     sb.Append('\n');
@@ -223,20 +251,37 @@ namespace ConveyorBelt.Tooling
                 return sb.ToString();
             }
 
-            public int Prune(IList<int> statuses)
+            public static Batch Prune(Batch batch, IList<int> statuses, string contentInfo = null, string reqContentInfo = null)
             {
-                if(statuses.Count != _list.Count)
+                if(statuses.Count != batch._list.Count)
                     throw new InvalidOperationException(string.Format(
-                        "Statuses should have exactly the same number of items. {0} vs. statuses {1}", _list.Count, statuses.Count));
+                        "Statuses should have exactly the same number of items. {0} vs. statuses {1}\r\n{2}", batch._list.Count, statuses.Count, contentInfo ?? string.Empty));
 
-                for (var i = _list.Count-1; i >= 0; i--) // start from the end
+                var list = new ConcurrentBag<Tuple<string, string>>();
+
+                int i = 0;
+                foreach (var item in batch._list)
                 {
                     var si = statuses[i];
-                    if(si >= 200 && si <= 299) // if success
-                        _list.RemoveAt(i);
+                    if (si >= 300) // if success
+                        list.Add(item);
+                    i++;
                 }
+              
+                
+                return new Batch(list);
+            }
 
-                return _list.Count;
+            public Batch CloneAndClear()
+            {
+                Tuple<string, string>[] copy;
+                lock (_lock)
+                {
+                    copy = _list.ToArray();
+                    this._list = new ConcurrentBag<Tuple<string, string>>();
+                }
+                
+                return new Batch(new ConcurrentBag<Tuple<string, string>>(copy));
             }
         }
     }
