@@ -33,7 +33,7 @@ namespace ConveyorBelt.Tooling.Querying
             var fieldIndices = new Dictionary<string,int>();
             using (connection)
             {
-                var sql = string.Format("SELECT * FROM {0} WHERE {1} = '{2}'", tableName, shardFieldName, thatMinute);
+                var sql = $"SELECT * FROM {tableName} WHERE {shardFieldName} = '{thatMinute}'";
                 TheTrace.TraceInformation("SQL is {0}", sql);
 
                 var reader = await connection.ExecuteReaderAsync(sql);

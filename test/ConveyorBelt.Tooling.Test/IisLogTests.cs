@@ -19,12 +19,10 @@ namespace ConveyorBelt.Tooling.Test
         {
             var stream = new MemoryStream(File.ReadAllBytes("IisLog.txt"));
             var parser = new IisLogParser();
-            var entities = parser.Parse(stream,
-                new Uri(
-                    "http://shipish/e277461e28dd4309af674f083094c568/Test.Presentation.Web.Api/Test.Presentation.Web.Api_IN_0/Web/W3SVC1273337584/u_ex15020701.log", UriKind.Absolute)).ToArray();
-            Assert.Equal(entities[0].Properties["s-computername"].StringValue, "RD00155D4A0E2E");
-            Assert.Equal(entities[0].Properties["cs-method"].StringValue, "GET");
-            Assert.Equal(entities[1].Properties["cs-uri-stem"].StringValue, "/product/catalogue/v2/productgroups/ctl/4650127");
+            var entities = parser.Parse(stream, new Uri("http://shipish/e277461e28dd4309af674f083094c568/Test.Presentation.Web.Api/Test.Presentation.Web.Api_IN_0/Web/W3SVC1273337584/u_ex15020701.log", UriKind.Absolute), new DiagnosticsSourceSummary()).ToArray();
+            Assert.Equal(entities[0]["s-computername"], "RD00155D4A0E2E");
+            Assert.Equal(entities[0]["cs-method"], "GET");
+            Assert.Equal(entities[1]["cs-uri-stem"], "/product/catalogue/v2/productgroups/ctl/4650127");
         }
     }
 }

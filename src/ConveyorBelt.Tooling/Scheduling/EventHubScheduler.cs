@@ -11,9 +11,9 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class EventHubScheduler : ISourceScheduler
     {
-        private readonly IElasticsearchBatchPusher _pusher;
+        private readonly NestBatchPusher _pusher;
 
-        public EventHubScheduler(IElasticsearchBatchPusher pusher)
+        public EventHubScheduler(NestBatchPusher pusher)
         {
             this._pusher = pusher;
         }

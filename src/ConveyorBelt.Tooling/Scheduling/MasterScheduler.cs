@@ -175,7 +175,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             }
 
             var mappingsPath = _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath);
-            var jsonPath = string.Format("{0}{1}.json", mappingsPath, settingsJson);
+            var jsonPath = $"{mappingsPath}{settingsJson}.json";
 
             if (string.IsNullOrEmpty(mappingsPath)) // not defined return default
                 return string.Empty;

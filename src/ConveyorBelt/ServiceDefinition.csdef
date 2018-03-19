@@ -27,8 +27,5 @@
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" />
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" />
     </ConfigurationSettings>
-    <LocalResources>
-      <LocalStorage name="DownloadFolder" sizeInMB="10120" cleanOnRoleRecycle="true" />
-    </LocalResources>
   </WorkerRole>
 </ServiceDefinition>

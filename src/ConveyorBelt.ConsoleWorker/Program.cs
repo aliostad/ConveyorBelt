@@ -60,6 +60,10 @@ namespace ConveyorBelt.ConsoleWorker
                 }
             }
 
+            int bulkBatchSize = 100;
+            var bulkBatchSizeString = _configurationValueProvider.GetValue(ConfigurationKeys.BulkBatchSize);
+            int.TryParse(bulkBatchSizeString, out bulkBatchSize);
+
             container.Register(
                  Component.For<IElasticsearchClient>()
                     .ImplementedBy<ElasticsearchClient>()
@@ -99,9 +103,6 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<BlobFileConventionActor>()
                     .ImplementedBy<BlobFileConventionActor>()
                     .LifestyleTransient(),
-                Component.For<ITempDownloadLocationProvider>()
-                    .ImplementedBy<TempDownloadLocationProvider>()
-                    .LifestyleSingleton(),                    
                 Component.For<IisBlobScheduler>()
                     .ImplementedBy<IisBlobScheduler>()
                     .LifestyleTransient(),
@@ -138,10 +139,11 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<AkamaiLogParser>()
                     .ImplementedBy<AkamaiLogParser>()
                     .LifestyleTransient(),
-                Component.For<IElasticsearchBatchPusher>()
-                    .ImplementedBy<ElasticsearchBatchPusher>()
+                Component.For<NestBatchPusher>()
+                    .ImplementedBy<NestBatchPusher>()
                     .LifestyleTransient()
-                    .DependsOn(Dependency.OnValue("esUrl", _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl))),
+                    .DependsOn(Dependency.OnValue("esUrl", _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl)))
+                    .DependsOn(Dependency.OnValue("batchSize", bulkBatchSize)),
                 Component.For<ILockStore>()
                     .Instance(new AzureLockStore(new BlobSource()
                     {
@@ -232,17 +234,9 @@ namespace ConveyorBelt.ConsoleWorker
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     await Task.Delay(TimeSpan.FromSeconds(30 - seconds), cancellationToken);
-                    Console.WriteLine("Waiting ...");                    
+                    Console.WriteLine("Waiting ...");
                 }
             }
-        }
-    }
-
-    public class TempDownloadLocationProvider : ITempDownloadLocationProvider
-    {
-        public string GetDownloadFolder()
-        {
-            return Path.GetTempPath();
         }
     }
 }

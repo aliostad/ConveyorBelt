@@ -21,14 +21,14 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160613.172129.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri);
+                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary());
                 Assert.NotNull(result);
                 var parsedLog = result.FirstOrDefault();
                 Assert.NotNull(parsedLog);
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.ProcessId].StringValue, "ManagedPoolThread #0");
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "INFO");
-                Assert.Equal(parsedLog.Timestamp, DateTimeOffset.Parse("2016-06-13 17:12:32"));
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, "Trying to load XML configuration /App_Config/Security/GlobalRoles.config");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.ProcessId], "ManagedPoolThread #0");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Level], "INFO");
+                Assert.Equal(parsedLog["@timestamp"], "2016-06-13T17:12:32");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Message], "Trying to load XML configuration /App_Config/Security/GlobalRoles.config");
             }
         }
 
@@ -40,11 +40,11 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/baselogfile.20160613.180755.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri);
+                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary());
                 Assert.NotNull(result);
                 var parsedLog = result.FirstOrDefault();
                 Assert.NotNull(parsedLog);
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "DEBUG");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Level], "DEBUG");
             }
         }
 
@@ -56,13 +56,13 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/sitecoredev228CA/xyz/baselogfile.20160101.180755.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri).ToList();
+                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 var parsedLog = result.FirstOrDefault();
                 Assert.NotNull(parsedLog);
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("Test Error with exception\r\n"));
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.EndsWith("Parameter name: database"));
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Level], "ERROR");
+                Assert.True(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].StartsWith("Test Error with exception\r\n"));
+                Assert.True(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].EndsWith("Parameter name: database"));
                 Assert.True(result.Count == 2);
             }
         }
@@ -75,19 +75,19 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172133.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri).ToList();
+                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 Assert.Equal(50, result.Count);
                 var parsedLog = result.Last();
                 Assert.NotNull(parsedLog);
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "WARN");
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, "Shutdown message: HostingEnvironment initiated shutdown");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Level], "WARN");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Message], "Shutdown message: HostingEnvironment initiated shutdown");
 
                 foreach (var log in result)
                 {
                     Assert.NotNull(log);
-                    Assert.NotEqual(log.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, string.Empty);
-                    Assert.False(log.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("****"));
+                    Assert.NotEqual(log[SitecoreLogParser.SitecoreLogFields.Message], string.Empty);
+                    Assert.False(log[SitecoreLogParser.SitecoreLogFields.Message].Contains("****"));
                 }
             }
         }
@@ -100,31 +100,31 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172133.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri).ToList();
+                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 Assert.Equal(result.Count, 2);
 
                 var parsedLog = result.First();
                 Assert.NotNull(parsedLog);
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("Test Message1:\r\n"));
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("The password failed.  Password=**PASSWORD**REDACTED**\r\n"));
-                Assert.False(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("TESTPassword"));
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Level], "ERROR");
+                Assert.True(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].StartsWith("Test Message1:\r\n"));
+                Assert.True(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].Contains("The password failed.  Password=**PASSWORD**REDACTED**\r\n"));
+                Assert.False(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].Contains("TESTPassword"));
 
 
                 parsedLog = result.Last();
                 Assert.NotNull(parsedLog);
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "ERROR");
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.StartsWith("SINGLE MSG: Sitecore heartbeat:\r\n"));
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains(";Password=**PASSWORD**REDACTED**;"));
-                Assert.True(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("User ID=**USER**REDACTED**;"));
-                Assert.False(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("Not!actuallyApa$$word"));
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Level], "ERROR");
+                Assert.True(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].StartsWith("SINGLE MSG: Sitecore heartbeat:\r\n"));
+                Assert.True(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].Contains(";Password=**PASSWORD**REDACTED**;"));
+                Assert.True(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].Contains("User ID=**USER**REDACTED**;"));
+                Assert.False(parsedLog[SitecoreLogParser.SitecoreLogFields.Message].Contains("Not!actuallyApa$$word"));
 
                 foreach (var log in result)
                 {
                     Assert.NotNull(log);
-                    Assert.NotEqual(log.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, string.Empty);
-                    Assert.False(log.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue.Contains("****"));
+                    Assert.NotEqual(log[SitecoreLogParser.SitecoreLogFields.Message], string.Empty);
+                    Assert.False(log[SitecoreLogParser.SitecoreLogFields.Message].Contains("****"));
                 }
             }
         }
@@ -137,13 +137,13 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172133.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri).ToList();
+                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 Assert.Equal(result.Count, 1);
                 var parsedLog = result.Last();
                 Assert.NotNull(parsedLog);
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Level].StringValue, "INFO");
-                Assert.Equal(parsedLog.Properties[SitecoreLogParser.SitecoreLogFields.Message].StringValue, "Sitecore started");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Level], "INFO");
+                Assert.Equal(parsedLog[SitecoreLogParser.SitecoreLogFields.Message], "Sitecore started");
             }
         }
     }

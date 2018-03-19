@@ -19,11 +19,11 @@ namespace ConveyorBelt.Tooling.Actors
     [ActorDescription("BlobFileArrived-Process", 6)]
     public class BlobFileActor : IProcessorActor
     {
-        private readonly IElasticsearchBatchPusher _pusher;
         private readonly ITelemetryProvider _telemetryProvider;
         private readonly SimpleInstrumentor _durationInstrumentor;
+        private readonly NestBatchPusher _pusher;
 
-        public BlobFileActor(IElasticsearchBatchPusher pusher, ITelemetryProvider telemetryProvider)
+        public BlobFileActor(NestBatchPusher pusher, ITelemetryProvider telemetryProvider)
         {
             _pusher = pusher;
             _telemetryProvider = telemetryProvider;
@@ -71,17 +71,13 @@ namespace ConveyorBelt.Tooling.Actors
                 await blob.DownloadToStreamAsync(stream);
                 var parser = FactoryHelper.Create<IParser>(blobFileArrived.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
                 var hasAnything = false;
-                var minDateTime = DateTimeOffset.MaxValue;
-                foreach (var entity in parser.Parse(stream, blob.Uri, blobFileArrived.Position ?? 0, blobFileArrived.EndPosition ?? 0))
-                {
-                    await _pusher.PushAsync(entity, blobFileArrived.Source);
-                    hasAnything = true;
-                    minDateTime = minDateTime > entity.Timestamp ? entity.Timestamp : minDateTime;
-                }
+                var minDateTime = DateTimeOffset.UtcNow;
+
+                var seenPages = await _pusher.PushAll(parser.Parse(stream, blob.Uri, blobFileArrived.Source, blobFileArrived.Position ?? 0, blobFileArrived.EndPosition ?? 0), blobFileArrived.Source).ConfigureAwait(false);
+                hasAnything = seenPages > 0;
 
                 if (hasAnything)
                 {
-                    await _pusher.FlushAsync();
                     _telemetryProvider.WriteTelemetry(
                         "BlobFileActor log delay duration",
                         (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 

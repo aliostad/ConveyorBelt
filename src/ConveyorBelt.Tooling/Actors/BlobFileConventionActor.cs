@@ -18,16 +18,13 @@ namespace ConveyorBelt.Tooling.Actors
     [ActorDescription("BlobFileScheduled-Process", 6)]
     public class BlobFileConventionActor : IProcessorActor
     {
-        private readonly IElasticsearchBatchPusher _pusher;
-        private readonly ITempDownloadLocationProvider _tempDownloadLocationProvider;
+        private readonly NestBatchPusher _pusher;
         private readonly ITelemetryProvider _telemetryProvider;
         private readonly SimpleInstrumentor _durationInstrumentor;
 
-        public BlobFileConventionActor(IElasticsearchBatchPusher pusher, 
-                                       ITempDownloadLocationProvider tempDownloadLocationProvider,
+        public BlobFileConventionActor(NestBatchPusher pusher, 
                                        ITelemetryProvider telemetryProvider)
         {
-            _tempDownloadLocationProvider = tempDownloadLocationProvider;
             _telemetryProvider = telemetryProvider;
             _pusher = pusher;
             _durationInstrumentor = telemetryProvider.GetInstrumentor<BlobFileConventionActor>();
@@ -83,7 +80,7 @@ namespace ConveyorBelt.Tooling.Actors
                 if (mainBlobExists)
                 {
                     currentLength = mainBlob.Properties.Length;
-                    if (currentLength == blobFileScheduled.LastPosition)
+                    if (currentLength <= blobFileScheduled.LastPosition)
                     {
                         if (nextBlobExists)
                         {
@@ -99,36 +96,25 @@ namespace ConveyorBelt.Tooling.Actors
                     }
                     else
                     {
-                        var stream = await DownloadToFileAsync(mainBlob);
-                        try
+                        using (var stream = await mainBlob.OpenReadAsync().ConfigureAwait(false))
                         {
-                            currentLength = stream.Length;
-                        var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisBlobConventionScheduler));
-                            var hasAnything = false;
-                            var minDateTime = DateTimeOffset.MaxValue;
-                            foreach (var entity in parser.Parse(stream, mainBlob.Uri, blobFileScheduled.LastPosition))
-                            {
-                                await _pusher.PushAsync(entity, blobFileScheduled.Source);
-                                hasAnything = true;
-                                minDateTime = minDateTime > entity.Timestamp ? entity.Timestamp : minDateTime;
-                            }
+                            var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
+                            var minDateTime = DateTimeOffset.UtcNow;
 
-                            if (hasAnything)
+                            var parsedRecords = parser.Parse(stream, mainBlob.Uri, blobFileScheduled.Source, blobFileScheduled.LastPosition);
+                            var pages = await _pusher.PushAll(parsedRecords, blobFileScheduled.Source).ConfigureAwait(false);
+                            
+                            if (pages > 0)
                             {
-                                await _pusher.FlushAsync();
                                 TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
                                 _telemetryProvider.WriteTelemetry(
                                     "BlobFileConventionActor log delay duration",
                                     (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
                                     blobFileScheduled.Source.TypeName);
                             }
-                        }
-                        finally
-                        {
-                            stream.Close();
-                            File.Delete(stream.Name);
-                        }
 
+                            currentLength += stream.Position;
+                        }
                     }
                 }
                 else
@@ -138,7 +124,6 @@ namespace ConveyorBelt.Tooling.Actors
                         TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
                         return; // Stop chasing it.
                     }
-
                 }
 
                 blobFileScheduled.LastPosition = currentLength;
@@ -153,16 +138,6 @@ namespace ConveyorBelt.Tooling.Actors
             });
 
             return events;
-        }
-
-        private async Task<FileStream> DownloadToFileAsync(CloudBlockBlob blob)
-        {
-            var downloadFolder = _tempDownloadLocationProvider.GetDownloadFolder();
-            string fileName = Path.Combine(downloadFolder, Guid.NewGuid().ToString("N"));
-            var fileStream = new FileStream(fileName, FileMode.Create);
-            await blob.DownloadToStreamAsync(fileStream);
-            fileStream.Position = 0;
-            return fileStream;
         }
     }
 }

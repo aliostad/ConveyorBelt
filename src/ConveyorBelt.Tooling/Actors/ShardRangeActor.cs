@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
 using ConveyorBelt.Tooling.Events;
@@ -14,17 +13,14 @@ namespace ConveyorBelt.Tooling.Actors
     [ActorDescription("ShardRangeArrived-Process", 3)]
     public class ShardRangeActor : IProcessorActor
     {
-        private IElasticsearchBatchPusher _pusher;
+        private readonly NestBatchPusher _pusher;
 
-        public ShardRangeActor(IElasticsearchBatchPusher pusher)
+        public ShardRangeActor(NestBatchPusher pusher)
         {
             _pusher = pusher;
         }
 
-        public void Dispose()
-        {
-            
-        }
+        public void Dispose() { }
 
         public async Task<IEnumerable<Event>> ProcessAsync(Event evnt)
         {
@@ -55,18 +51,8 @@ namespace ConveyorBelt.Tooling.Actors
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("PartitionKey", "le", shardKeyArrived.InclusiveEndKey))));
 
-            bool hasAnything = false;
-            foreach (var entity in entities)
-            {
-                await _pusher.PushAsync(entity, shardKeyArrived.Source);
-                hasAnything = true;
-            }
 
-            if (hasAnything)
-            {
-                await _pusher.FlushAsync();
-            }
-
+            await _pusher.PushAll(entities, shardKeyArrived.Source);
             return Enumerable.Empty<Event>();
         }
     }

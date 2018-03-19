@@ -8,6 +8,7 @@ using ConveyorBelt.Tooling.Events;
 using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Querying;
 using ConveyorBelt.Tooling.Telemetry;
+using Microsoft.WindowsAzure.Storage.Table;
 using PerfIt;
 
 namespace ConveyorBelt.Tooling.Actors
@@ -16,14 +17,14 @@ namespace ConveyorBelt.Tooling.Actors
     [ActorDescription("ShardKeyArrived-Process", 5)]
     public class ShardKeyActor : IProcessorActor
     {
-        private readonly IElasticsearchBatchPusher _pusher;
         private readonly ITelemetryProvider _telemetryProvider;
         private readonly SimpleInstrumentor _durationInstrumentor;
         private readonly int _shardKeyDelayWarning = 120;
+        private readonly NestBatchPusher _pusher;
 
-        public ShardKeyActor(IElasticsearchBatchPusher pusher,
-                             ITelemetryProvider telemetryProvider,
-                             IConfigurationValueProvider configurationValueProvider)
+        public ShardKeyActor(ITelemetryProvider telemetryProvider,
+                             IConfigurationValueProvider configurationValueProvider,
+							 NestBatchPusher pusher)
         {
             _pusher = pusher;
             _telemetryProvider = telemetryProvider;
@@ -57,43 +58,47 @@ namespace ConveyorBelt.Tooling.Actors
                 var query = FactoryHelper.Create<IShardKeyQuery>(shardKeyQuerier, typeof(TableStorageShardKeyQuery));
                 var entities = await query.QueryAsync(shardKeyArrived);
 
-                var minDateTime = DateTimeOffset.MaxValue;
-                var hasAnything = false;
-                int n = 0;
                 var shardKeyTime = shardKeyArrived.GetDateTimeOffset().ToString("yyyyMMddHHmm");
 
-                foreach (var entity in entities)
-                {
-                    var eventDateTimeOffset = entity.GetEventDateTimeOffset();
-                    var delayInSeconds = entity.Timestamp.Subtract(eventDateTimeOffset).TotalSeconds;
-                    if (delayInSeconds >= _shardKeyDelayWarning)
-                    {
-                        TheTrace.TraceWarning("SHARD_KEY_ACTOR_DELAY_DETECTED => Delay of {0} seconds for {1} in shardKey {2} and time {3}", 
-                            delayInSeconds, shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
-                    }
-
-                    entity.Timestamp = eventDateTimeOffset;
-                    await _pusher.PushAsync(entity, shardKeyArrived.Source);
-                    hasAnything = true;
-                    minDateTime = minDateTime > entity.Timestamp ? entity.Timestamp : minDateTime;
-                    n++;
-                }
-
-                TheTrace.TraceInformation("Gathered {0} records for {1} and ShardKey {2} => {1}_{2} {1}_{3}", n, 
-                    shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
-
-                if (hasAnything)
-                {
-                    await _pusher.FlushAsync();
-
-                    _telemetryProvider.WriteTelemetry(
-                        "ShardKeyArrivedActor log delay duration",
-                        (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
-                        shardKeyArrived.Source.TypeName);
-                }
-            });
+                await _pusher.PushAll(PreprocessEntities(entities, shardKeyArrived, shardKeyTime), shardKeyArrived.Source).ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
             return Enumerable.Empty<Event>();
+        }
+
+        private IEnumerable<DynamicTableEntity> PreprocessEntities(IEnumerable<DynamicTableEntity> entities, ShardKeyArrived shardKeyArrived, string shardKeyTime)
+        {
+            var minDateTime = DateTimeOffset.MaxValue;
+            var n = 0;
+
+            foreach (var entity in entities)
+            {
+                var eventDateTimeOffset = entity.GetEventDateTimeOffset();
+                var delayInSeconds = entity.Timestamp.Subtract(eventDateTimeOffset).TotalSeconds;
+                if (delayInSeconds >= _shardKeyDelayWarning)
+                {
+                    TheTrace.TraceWarning(
+                        "SHARD_KEY_ACTOR_DELAY_DETECTED => Delay of {0} seconds for {1} in shardKey {2} and time {3}",
+                        delayInSeconds, shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
+                }
+
+                entity.Timestamp = eventDateTimeOffset;
+                yield return entity;
+
+                minDateTime = minDateTime > entity.Timestamp ? entity.Timestamp : minDateTime;
+                n++;
+            }
+
+            TheTrace.TraceInformation("Gathered {0} records for {1} and ShardKey {2} => {1}_{2} {1}_{3}", n,
+                shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
+
+            if (n > 0)
+            {
+                _telemetryProvider.WriteTelemetry(
+                    "ShardKeyArrivedActor log delay duration",
+                    (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds,
+                    shardKeyArrived.Source.TypeName);
+            }
         }
     }
 }
