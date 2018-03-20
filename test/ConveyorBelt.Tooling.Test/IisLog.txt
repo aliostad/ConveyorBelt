@@ -1,9 +1,9 @@
 ﻿#Software: Microsoft Internet Information Services 8.5
 #Version: 1.0
 #Date: 2016-09-16 05:59:59
-#Fields: date time s-sitename s-computername s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs-version cs(User-Agent) cs(Cookie) cs(Referer) cs-host sc-status sc-substatus sc-win32-status sc-bytes cs-bytes time-taken
-2016-09-16 05:59:59 W3SVC1273337584 RD00155D4A0E2E 10.209.7.6 GET /product/catalogue/v2/productgroups/ctl/6281677 store=AU 80 - 23.67.71.62 HTTP/1.1 - - - api.foofoo.nik.com 200 0 0 10294 756 80
-2016-09-16 05:59:59 W3SVC1273337584 RD00155D4A0E2E 10.209.7.6 GET /product/catalogue/v2/productgroups/ctl/4650127 store=US 80 - 92.123.66.148 HTTP/1.1 - - - api.foofoo.nik.com 200 0 0 7446 760 95
+#Fields: date time s-sitename s-computername s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs-version cs(User-Agent) cs(Cookie) cs(Referer) cs-host sc-status sc-substatus sc-win32-status sc-bytes
+2016-09-16 05:59:59 W3SVC1273337584 RD00155D4A0E2E 10.209.7.6 GET /product/catalogue/v2/productgroups/ctl/6281677 store=AU 80 - 23.67.71.62 HTTP/1.1 - - - api.foofoo.nik.com 200 0 0 10294
+2016-09-16 05:59:59 W3SVC1273337584 RD00155D4A0E2E 10.209.7.6 GET /product/catalogue/v2/productgroups/ctl/4650127 store=US 80 - 92.123.66.148 HTTP/1.1 - - - api.foofoo.nik.com 200 0 0 7446
 #Software: Microsoft Internet Information Services 8.5
 #Version: 1.0
 #Date: 2016-09-16 05:00:00
