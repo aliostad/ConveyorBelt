@@ -73,7 +73,7 @@ namespace ConveyorBelt.Tooling.Internal
                         result.Add(property.Key, property.Value.BooleanValue?.ToString().ToLower());
                         break;
                     default:
-                        result.Add(property.Key, property.Value.ToString());
+                        result.Add(property.Key, property.Value.PropertyAsObject.ToString());
                         break;
                 }
             }

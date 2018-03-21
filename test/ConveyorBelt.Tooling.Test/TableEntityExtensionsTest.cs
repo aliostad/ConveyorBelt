@@ -81,7 +81,38 @@ namespace ConveyorBelt.Tooling.Test
             jest.Timestamp = ahora.Subtract(TimeSpan.FromDays(42));
             var source = new DiagnosticsSourceSummary();
             source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName] = "Non-existing";
+
             Assert.Equal(ahora.Subtract(TimeSpan.FromDays(42)), jest.GetTimestamp(source));
+        }
+
+        [Fact]
+        public void ConvertTableEntityToDictionary()
+        {
+            var ahora = DateTimeOffset.FromFileTime(129000000000000000).UtcDateTime;
+            var entity = new DynamicTableEntity("ali", "ostad", "eTag", new Dictionary<string, EntityProperty> {
+                {"whah??", EntityProperty.GeneratePropertyForDateTimeOffset(ahora)},
+                {"inty", EntityProperty.GeneratePropertyForInt(123)},
+                {"doubly", EntityProperty.GeneratePropertyForDouble(123.23)},
+                {"booly", EntityProperty.GeneratePropertyForBool(false)},
+                {"stringy", EntityProperty.GeneratePropertyForString("magical unicorns")}
+            }) {
+                Timestamp = ahora.Subtract(TimeSpan.FromDays(42))
+            };
+
+            var source = new DiagnosticsSourceSummary{ TypeName = "typename" };
+            source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName] = "whah??";
+            
+            var dict = entity.ToDictionary(source);
+            
+            Assert.Equal("typename", dict["cb_type"]);
+            Assert.Equal("ali", dict["PartitionKey"]);
+            Assert.Equal("ostad", dict["RowKey"]);
+            Assert.Equal(ahora.ToString("s"), dict["whah??"]);
+            Assert.Equal("123", dict["inty"]);
+            Assert.Equal("123.23", dict["doubly"]);
+            Assert.Equal("false", dict["booly"]);
+            Assert.Equal("magical unicorns", dict["stringy"]);
+            Assert.Equal(ahora.ToString("s"), dict["@timestamp"]);
         }
     }
 }

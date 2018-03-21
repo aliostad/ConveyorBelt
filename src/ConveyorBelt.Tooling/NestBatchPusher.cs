@@ -37,7 +37,7 @@ namespace ConveyorBelt.Tooling
                 .ServerCertificateValidationCallback(delegate { return true; })
                 .BasicAuthentication(credentials[0], credentials[1])
                 .RequestTimeout(TimeSpan.FromMinutes(2))
-//                .EnableDebugMode(_ => { if(!_.Success) Console.WriteLine(); })
+                .EnableDebugMode(_ => { if(!_.Success) Console.WriteLine(); })
                 .DefaultIndex("DafaultIndex");
 
             _client = new ElasticClient(connectionConfiguration);
@@ -48,8 +48,7 @@ namespace ConveyorBelt.Tooling
 
         private string GetIndexName(DiagnosticsSourceSummary source, DateTimeOffset? timestamp)
         {
-            return source.IndexName ?? _indexNamer.BuildName(timestamp.Value,
-                       source.DynamicProperties["MappingName"].ToString().ToLowerInvariant());
+            return source.IndexName ?? _indexNamer.BuildName(timestamp, source.DynamicProperties["MappingName"].ToString().ToLowerInvariant());
         }
 
         public async Task<int> PushAll(IEnumerable<IDictionary<string, string>> lazyEnumerable, DiagnosticsSourceSummary source)
