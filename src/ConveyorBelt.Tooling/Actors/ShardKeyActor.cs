@@ -50,8 +50,8 @@ namespace ConveyorBelt.Tooling.Actors
 
             await _durationInstrumentor.InstrumentAsync(async () =>
             {
-                //TheTrace.TraceInformation("Got {0} from {1}", shardKeyArrived.ShardKey,
-                //shardKeyArrived.Source.TypeName);
+                TheTrace.TraceInformation("Got {0} from {1}", shardKeyArrived.ShardKey,
+                shardKeyArrived.Source.TypeName);
 
                 var shardKeyQuerier = (string)shardKeyArrived.Source.GetDynamicProperty(ConveyorBeltConstants.ShardKeyQuery);
                 var query = FactoryHelper.Create<IShardKeyQuery>(shardKeyQuerier, typeof(TableStorageShardKeyQuery));
@@ -64,13 +64,12 @@ namespace ConveyorBelt.Tooling.Actors
 
                 foreach (var entity in entities)
                 {
-                    TheTrace.TraceError("Fetched rows for {0}",entity.PartitionKey);
                     var eventDateTimeOffset = entity.GetEventDateTimeOffset();
                     var delayInSeconds = entity.Timestamp.Subtract(eventDateTimeOffset).TotalSeconds;
                     if (delayInSeconds >= _shardKeyDelayWarning)
                     {
-                        //TheTrace.TraceWarning("SHARD_KEY_ACTOR_DELAY_DETECTED => Delay of {0} seconds for {1} in shardKey {2} and time {3}", 
-                        //    delayInSeconds, shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
+                        TheTrace.TraceWarning("SHARD_KEY_ACTOR_DELAY_DETECTED => Delay of {0} seconds for {1} in shardKey {2} and time {3}", 
+                            delayInSeconds, shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
                     }
 
                     entity.Timestamp = eventDateTimeOffset;
@@ -80,8 +79,8 @@ namespace ConveyorBelt.Tooling.Actors
                     n++;
                 }
 
-                //TheTrace.TraceInformation("Gathered {0} records for {1} and ShardKey {2} => {1}_{2} {1}_{3}", n, 
-                //    shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
+                TheTrace.TraceInformation("Gathered {0} records for {1} and ShardKey {2} => {1}_{2} {1}_{3}", n, 
+                    shardKeyArrived.Source.TypeName, shardKeyArrived.ShardKey, shardKeyTime);
 
                 if (hasAnything)
                 {

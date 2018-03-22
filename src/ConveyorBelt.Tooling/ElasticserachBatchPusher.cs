@@ -64,7 +64,6 @@ namespace ConveyorBelt.Tooling
                 string reqContent = string.Empty;
                 do
                 {
-                    TheTrace.TraceError("Pushing to Elastic");
                     reqContent = batch.ToString();
                     var responseMessage = await client.PostAsync(esUrl + "_bulk",
                         new StringContent(reqContent, Encoding.UTF8, "application/json"));
@@ -116,99 +115,73 @@ namespace ConveyorBelt.Tooling
 
         public async Task PushAsync(DynamicTableEntity entity, DiagnosticsSourceSummary source)
         {
-            try
+            if (!string.IsNullOrEmpty(source.Filter))
             {
-
-                if (!string.IsNullOrEmpty(source.Filter))
-                {
-                    _filters.AddOrUpdate(source.Filter, new SimpleFilter(source.Filter), ((s, filter) => filter));
-                    if (!_filters[source.Filter].Satisfies(entity))
-                        return;
-                }
-
-                TheTrace.TraceError("Before Pipeline");
-                var op = _setPipeline
-                    ? new
-                    {
-                        index = new
-                        {
-                            _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp,
-                                         source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
-                            _type = source.DynamicProperties["MappingName"].ToString(),
-                            _id = entity.PartitionKey + entity.RowKey,
-                            pipeline = source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()
-                        }
-                    }
-                    : (object) new
-                    {
-                        index = new
-                        {
-                            _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp,
-                                         source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
-                            _type = source.DynamicProperties["MappingName"].ToString(),
-                            _id = entity.PartitionKey + entity.RowKey,
-                        }
-                    };
-                TheTrace.TraceError("After Pipeline - looks OK");
-                var doc = new JObject();
-                doc.Add("@timestamp", entity.GetTimestamp(source));
-                doc.Add("PartitionKey", entity.PartitionKey);
-                doc.Add("RowKey", entity.RowKey);
-                doc.Add("cb_type", source.TypeName);
-
-                foreach (var property in entity.Properties)
-                {
-                    if (property.Key != DiagnosticsSource.CustomAttributesFieldName)
-                        doc[property.Key] = JToken.FromObject(property.Value.PropertyAsObject);
-                }
-
-                TheTrace.TraceError("Property foreach also looks OK");
-                if (entity.Properties.ContainsKey(DiagnosticsSource.CustomAttributesFieldName))
-                {
-                    foreach (var keyValue in GetNameValues(entity
-                        .Properties[DiagnosticsSource.CustomAttributesFieldName].StringValue))
-                    {
-                        doc[keyValue.Key] = keyValue.Value;
-                    }
-                }
-
-                TheTrace.TraceError("Property if also looks OK");
-
-                _batch.AddDoc(JsonConvert.SerializeObject(op).Replace("\r\n", " "),
-                    doc.ToString().Replace("\r\n", " "));
-
-                TheTrace.TraceError("Batch Count {0}", _batch.Count);
-
-                if (_batch.Count >= _batchSize)
-                {
-                    Batch batch = null;
-                    lock (_lock)
-                    {
-                        if (_batch.Count >= _batchSize)
-                        {
-                            batch = _batch.CloneAndClear();
-                        }
-                    }
-
-                    if (batch != null)
-                    {
-                        TheTrace.TraceError("Before PushbatchAsync");
-                        await PushbatchAsync(batch, _httpClient, _esUrl, _intervalGen());
-                        TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed records to ElasticSearch for {0}-{1}",
-                            source.PartitionKey,
-                            source.RowKey);
-                    }
-                }
-                else
-                {
-                    TheTrace.TraceError("Else Batch Count {0}", _batch.Count);
-                }
-
+                _filters.AddOrUpdate(source.Filter, new SimpleFilter(source.Filter), ((s, filter) => filter));
+                if (!_filters[source.Filter].Satisfies(entity))
+                    return;
             }
-            catch (Exception e)
+
+
+            var op = _setPipeline
+                ? new {
+                    index = new
+                    {
+                        _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
+                        _type = source.DynamicProperties["MappingName"].ToString(),
+                        _id = entity.PartitionKey + entity.RowKey,
+                        pipeline = source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()
+                    }
+                }
+                : (object) new
+                {
+                    index = new
+                    {
+                        _index = source.IndexName ?? _indexNamer.BuildName(entity.Timestamp, source.DynamicProperties["MappingName"].ToString().ToLowerInvariant()),
+                        _type = source.DynamicProperties["MappingName"].ToString(),
+                        _id = entity.PartitionKey + entity.RowKey,
+                    }
+                };
+
+            var doc = new JObject();
+            doc.Add("@timestamp", entity.GetTimestamp(source));
+            doc.Add("PartitionKey", entity.PartitionKey);
+            doc.Add("RowKey", entity.RowKey);
+            doc.Add("cb_type", source.TypeName);
+
+            foreach (var property in entity.Properties)
             {
-                TheTrace.TraceError(e.ToString());
-                throw;
+                if (property.Key != DiagnosticsSource.CustomAttributesFieldName)
+                    doc[property.Key] = JToken.FromObject(property.Value.PropertyAsObject);
+            }
+            if (entity.Properties.ContainsKey(DiagnosticsSource.CustomAttributesFieldName))
+            {
+                foreach (var keyValue in GetNameValues(entity.Properties[DiagnosticsSource.CustomAttributesFieldName].StringValue))
+                {
+                    doc[keyValue.Key] = keyValue.Value;
+                }
+            }
+
+            _batch.AddDoc(JsonConvert.SerializeObject(op).Replace("\r\n", " "), doc.ToString().Replace("\r\n", " "));
+
+            if (_batch.Count >= _batchSize)
+            {
+                Batch batch = null;
+                lock (_lock)
+                {
+                    if (_batch.Count >= _batchSize)
+                    {
+                        batch = _batch.CloneAndClear();
+                    }
+                }
+
+                if( batch != null)
+                {
+                    await PushbatchAsync(batch, _httpClient, _esUrl, _intervalGen());
+                    TheTrace.TraceInformation("ConveyorBelt_Pusher: Pushed records to ElasticSearch for {0}-{1}",
+                        source.PartitionKey,
+                        source.RowKey);
+                }
             }
         }
 
