@@ -126,6 +126,12 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<ReverseTimestampMinuteTableShardScheduler>()
                     .ImplementedBy<ReverseTimestampMinuteTableShardScheduler>()
                     .LifestyleTransient(),
+                Component.For<EventHubScheduler>()
+                    .ImplementedBy<EventHubScheduler>()
+                    .LifestyleTransient(),
+                Component.For<InsightMetricsParser>()
+                    .ImplementedBy<InsightMetricsParser>()
+                    .LifestyleTransient(),
                 Component.For<IisLogParser>()
                     .ImplementedBy<IisLogParser>()
                     .LifestyleTransient(),

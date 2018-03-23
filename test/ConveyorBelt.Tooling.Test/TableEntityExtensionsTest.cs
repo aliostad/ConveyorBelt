@@ -52,5 +52,36 @@ namespace ConveyorBelt.Tooling.Test
             Assert.Equal(itsYesterday, entity.GetEventDateTimeOffset());
         }
 
+        [Fact]
+        public void IfTimestampFieldSpecifiedOverridesTimestamp()
+        {
+            var ahora = DateTimeOffset.Now;
+
+            var jest = new DynamicTableEntity("ali", "ostad", "eTag", new Dictionary<string, EntityProperty>
+            {
+                {"whah??", EntityProperty.GeneratePropertyForDateTimeOffset(ahora)} 
+            });
+
+            jest.Timestamp = ahora.Subtract(TimeSpan.FromDays(42));
+            var source = new DiagnosticsSourceSummary();
+            source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName] = "whah??";
+            Assert.Equal(ahora, jest.GetTimestamp(source));
+        }
+
+        [Fact]
+        public void NoErroesIfTimestampFieldSpecifiedNotExistsAndGetsBackTimestamp()
+        {
+            var ahora = DateTimeOffset.Now;
+
+            var jest = new DynamicTableEntity("ali", "ostad", "eTag", new Dictionary<string, EntityProperty>
+            {
+                {"whah??", EntityProperty.GeneratePropertyForDateTimeOffset(ahora)}
+            });
+
+            jest.Timestamp = ahora.Subtract(TimeSpan.FromDays(42));
+            var source = new DiagnosticsSourceSummary();
+            source.DynamicProperties[ConveyorBeltConstants.TimestampFieldName] = "Non-existing";
+            Assert.Equal(ahora.Subtract(TimeSpan.FromDays(42)), jest.GetTimestamp(source));
+        }
     }
 }

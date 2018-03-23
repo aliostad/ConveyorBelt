@@ -27,7 +27,9 @@ namespace ConveyorBelt.Tooling.Test
                 PartitionKey = "pk",
                 RowKey = "rk"
             };
-            
+
+            summary.DynamicProperties["MappingName"] = "woo_on_my_rug";
+
             pusher.PushAsync(new DynamicTableEntity("pk", "rk"), summary).Wait();
             pusher.PushAsync(new DynamicTableEntity("pk", "rk"), summary).Wait();
             pusher.PushAsync(new DynamicTableEntity("pk", "rk"), summary).Wait();
@@ -54,6 +56,7 @@ namespace ConveyorBelt.Tooling.Test
                 PartitionKey = "pk",
                 RowKey = "rk"
             };
+            summary.DynamicProperties["MappingName"] = "woo_on_my_rug";
 
             pusher.PushAsync(new DynamicTableEntity("pk", "rk"), summary).Wait();
             pusher.PushAsync(new DynamicTableEntity("pk", "rk"), summary).Wait();
