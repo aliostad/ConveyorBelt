@@ -64,18 +64,24 @@ namespace ConveyorBelt.Tooling.Internal
 
             foreach (var property in entity.Properties)
             {
+                string val;
                 switch (property.Value.PropertyType)
                 {
                     case EdmType.DateTime:
-                        result.Add(property.Key, property.Value.DateTimeOffsetValue?.ToString("s"));
+                        val = property.Value.DateTimeOffsetValue?.ToString("s");
                         break;
                     case EdmType.Boolean:
-                        result.Add(property.Key, property.Value.BooleanValue?.ToString().ToLower());
+                        val = property.Value.BooleanValue?.ToString().ToLower();
                         break;
                     default:
-                        result.Add(property.Key, property.Value.PropertyAsObject.ToString());
+                        val = property.Value.PropertyAsObject.ToString();
                         break;
                 }
+
+                if (string.IsNullOrWhiteSpace(val) || val == ",")
+                    continue;
+
+                result.Add(property.Key, val);
             }
 
             return result;
