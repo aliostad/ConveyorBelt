@@ -96,7 +96,7 @@ namespace ConveyorBelt.Tooling.Actors
                     }
                     else
                     {
-                        using (var stream = await mainBlob.OpenReadAsync().ConfigureAwait(false))
+                        using (var stream = mainBlob.OpenRead())
                         {
                             var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
                             var minDateTime = DateTimeOffset.UtcNow;

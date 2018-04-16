@@ -11,10 +11,14 @@ namespace ConveyorBelt.Tooling.Parsing
     {
         public IEnumerable<IDictionary<string, string>> Parse(Stream body, Uri id, DiagnosticsSourceSummary source, long startPosition = 0, long endPosition = 0)
         {
-            return ParseInternal(body, id, source, startPosition, startPosition, endPosition);
+            using (var reader = new StreamReader(body, Encoding.ASCII, false))
+            {
+                foreach(var doc in ParseInternal(reader, id, source, startPosition, startPosition + 1, endPosition))
+                    yield return doc;
+            }
         }
 
-        private IEnumerable<IDictionary<string, string>> ParseInternal(Stream body, Uri id, DiagnosticsSourceSummary source, long startReadPosition, long startParsePosition, long endPosition)
+        private IEnumerable<IDictionary<string, string>> ParseInternal(StreamReader reader, Uri id, DiagnosticsSourceSummary source, long startReadPosition, long startParsePosition, long endPosition)
         {
             if (endPosition == 0)
                 endPosition = long.MaxValue;
@@ -23,55 +27,67 @@ namespace ConveyorBelt.Tooling.Parsing
             var partitionKey = string.Join("_", idSegments.Take(idSegments.Length - 1));
             var rowKeyPrefix = Path.GetFileNameWithoutExtension(idSegments.Last());
 
-            var fields = startReadPosition > 0 ? ReadFirstHeaders(body) : null;
-            body.Seek(startReadPosition, SeekOrigin.Begin);
+            var fields = startReadPosition > 0 ? ReadFirstHeaders(reader) : null;
+
+            reader.DiscardBufferedData();
+            reader.BaseStream.Seek(startReadPosition, SeekOrigin.Begin);
 
             var headersHaveChanged = false;
-            using (var reader = new StreamReader(body, Encoding.ASCII, true, 1024 * 1024 * 5, true))
+            string line;
+            var offset = startReadPosition;
+            var lineCount = 0;
+
+            //In case starting offset was set to a line break
+            var lineBreakIndex = Environment.NewLine.IndexOf((char) reader.Peek());
+            if (lineBreakIndex >= 0)
             {
-                string line;
-                var offset = startReadPosition;
-                var lineCount = 0;
-                while (offset < endPosition && (line = reader.ReadLine()) != null)
+                reader.ReadLine();
+                offset += Environment.NewLine.Length - lineBreakIndex;
+            }
+
+            while (offset < endPosition && (line = reader.ReadLine()) != null)
+            {
+                lineCount++;
+                offset += line.Length + Environment.NewLine.Length;
+
+                if (line.StartsWith("#Fields: "))
                 {
-                    lineCount++;
-                    offset += line.Length + Environment.NewLine.Length;
-                    if (line.StartsWith("#Fields: "))
-                    {
-                        fields = BuildFields(line);
-                        continue;
-                    }
-
-                    if (line.StartsWith("#"))
-                        continue;
-
-                    //skip until start offset in case of re-read
-                    if (offset < startParsePosition)
-                        continue;
-
-                    var entries = GetEntries(line);
-                    if (fields?.Length + 2 != entries.Length)
-                    {
-                        if (startReadPosition == 0)
-                            throw new InvalidOperationException("fields column mismatch");
-
-                        //e.g. in case startReadPosition was pointing to the middle of the line
-                        //have to skip to next line
-                        if (lineCount == 1)
-                            continue;
-
-                        headersHaveChanged = true;
-                        break;
-                    }
-
-                    yield return ParseEntity(fields, entries, source.TypeName, partitionKey, $"{rowKeyPrefix}_{offset}");
+                    fields = BuildFields(line);
+                    continue;
                 }
+
+                if (line.StartsWith("#") || fields == null)//make sure that fields are set before parsing them
+                    continue;
+
+                //skip until start offset in case of re-read
+                if (offset < startParsePosition)
+                    continue;
+
+                var entries = GetEntries(line);
+                if (fields?.Length + 2 != entries.Length)
+                {
+                    if (startReadPosition == 0)
+                        throw new InvalidOperationException("fields column mismatch");
+
+                    //e.g. in case startReadPosition was pointing to the middle of the line
+                    //have to skip to next line
+                    if (lineCount == 1)
+                        continue;
+
+                    headersHaveChanged = true;
+                    break;
+                }
+
+                var doc = ParseEntity(fields, entries, source.TypeName, partitionKey, $"{rowKeyPrefix}_{offset}");
+
+                if(doc != null)
+                    yield return doc;
             }
 
             if (!headersHaveChanged) yield break;
 
             //headers have changed since the beginning of the file - have to read whole file
-            foreach (var doc in ParseInternal(body, id, source, 0, startParsePosition, endPosition))
+            foreach (var doc in ParseInternal(reader, id, source, 0, startParsePosition, endPosition))
             {
                 yield return doc;
             }
@@ -81,6 +97,8 @@ namespace ConveyorBelt.Tooling.Parsing
         {
             const int stampEntryCount = 2;
             var datetime = string.Join("T", entries.Take(stampEntryCount));
+            if (datetime.Length != 19 /*"2016-09-16T05:00:00".Length*/)
+                return null;
 
             var doc = new Dictionary<string, string>(fields.Length + 3)
             {
@@ -119,19 +137,18 @@ namespace ConveyorBelt.Tooling.Parsing
             return doc;
         }
 
-        private string[] ReadFirstHeaders(Stream body)
+        private string[] ReadFirstHeaders(StreamReader reader)
         {
             // this is just to make sure we read the fields. If we start in the middle, we will miss the fields
-            body.Seek(0, SeekOrigin.Begin);
-            using (var headerReader = new StreamReader(body, Encoding.ASCII, true, 1024 * 5, true))
+            reader.DiscardBufferedData();
+            reader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                string line;
-                while ((line = headerReader.ReadLine()) != null)
+                if (line.StartsWith("#Fields: "))
                 {
-                    if (line.StartsWith("#Fields: "))
-                    {
-                        return BuildFields(line);
-                    }
+                    return BuildFields(line);
                 }
             }
 
