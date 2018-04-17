@@ -37,7 +37,7 @@ namespace ConveyorBelt.Tooling
                 .ServerCertificateValidationCallback(delegate { return true; })
                 .BasicAuthentication(credentials[0], credentials[1])
                 .RequestTimeout(TimeSpan.FromMinutes(2))
-                .EnableDebugMode(_ => { if(!_.Success) Console.WriteLine(); })
+                //.EnableDebugMode(_ => { if(!_.Success) Console.WriteLine(); })
                 .DefaultIndex("DafaultIndex");
 
             _client = new ElasticClient(connectionConfiguration);

@@ -94,7 +94,9 @@ namespace ConveyorBelt.Tooling.Test
                 {"inty", EntityProperty.GeneratePropertyForInt(123)},
                 {"doubly", EntityProperty.GeneratePropertyForDouble(123.23)},
                 {"booly", EntityProperty.GeneratePropertyForBool(false)},
-                {"stringy", EntityProperty.GeneratePropertyForString("magical unicorns")}
+                {"stringy", EntityProperty.GeneratePropertyForString("magical unicorns")},
+                {"ignored1", EntityProperty.GeneratePropertyForString(",")},
+                {"ignored2", EntityProperty.GeneratePropertyForString("")}
             }) {
                 Timestamp = ahora.Subtract(TimeSpan.FromDays(42))
             };
@@ -113,6 +115,9 @@ namespace ConveyorBelt.Tooling.Test
             Assert.Equal("false", dict["booly"]);
             Assert.Equal("magical unicorns", dict["stringy"]);
             Assert.Equal(ahora.ToString("s"), dict["@timestamp"]);
+            Assert.False(dict.ContainsKey("ignored1"));
+            Assert.False(dict.ContainsKey("ignored2"));
+            Assert.Equal(9, dict.Count);
         }
     }
 }

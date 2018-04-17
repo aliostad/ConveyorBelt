@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ConveyorBelt.Tooling.Configuration;
+using Newtonsoft.Json.Converters;
 
 namespace ConveyorBelt.Tooling.Parsing
 {
@@ -93,11 +94,38 @@ namespace ConveyorBelt.Tooling.Parsing
             }
         }
 
+        private static bool IsSortableDateTime(string datetime)
+        {
+            if (datetime.Length != 19 /*"2016-09-16T05:00:00".Length*/)
+                return false;
+
+            var i = 0;
+            return char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i++])
+                &&              datetime[i++] == '-'
+                && char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i++])
+                &&              datetime[i++] == '-'
+                && char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i++])
+                &&              datetime[i++] == 'T'
+                && char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i++])
+                &&              datetime[i++] == ':'
+                && char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i++])
+                &&              datetime[i++] == ':'
+                && char.IsDigit(datetime[i++])
+                && char.IsDigit(datetime[i]);
+        }
+
         private static Dictionary<string, string> ParseEntity(string[] fields, string[] entries, string cbType, string partitionKey, string rowKey)
         {
             const int stampEntryCount = 2;
             var datetime = string.Join("T", entries.Take(stampEntryCount));
-            if (datetime.Length != 19 /*"2016-09-16T05:00:00".Length*/)
+            if (!IsSortableDateTime(datetime))
                 return null;
 
             var doc = new Dictionary<string, string>(fields.Length + 3)
