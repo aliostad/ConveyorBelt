@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mappings", "Mappings", "{40
 		mappings\WADWindowsEventLogsTable.json = mappings\WADWindowsEventLogsTable.json
 	EndProjectSection
 EndProject
-Project("{BB40F520-413E-3EBA-ABD4-2177801094F0}") = "ConveyorBelt", "src\ConveyorBelt\ConveyorBelt.ccproj", "{F3342E9C-4479-4676-81AA-3297BEE00DF7}"
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "ConveyorBelt", "src\ConveyorBelt\ConveyorBelt.ccproj", "{F3342E9C-4479-4676-81AA-3297BEE00DF7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConveyorBelt.Worker", "src\ConveyorBelt.Worker\ConveyorBelt.Worker.csproj", "{A7E7FF33-4C19-4E7F-BCEC-76EEBA4A0504}"
 EndProject

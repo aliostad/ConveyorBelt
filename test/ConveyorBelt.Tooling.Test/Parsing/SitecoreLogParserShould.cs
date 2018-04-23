@@ -21,7 +21,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160613.172129.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary());
+                var result = sitecoreLogParser.Parse(() => stream, uri, new DiagnosticsSourceSummary());
                 Assert.NotNull(result);
                 var parsedLog = result.FirstOrDefault();
                 Assert.NotNull(parsedLog);
@@ -40,7 +40,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/baselogfile.20160613.180755.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary());
+                var result = sitecoreLogParser.Parse(() => stream, uri, new DiagnosticsSourceSummary());
                 Assert.NotNull(result);
                 var parsedLog = result.FirstOrDefault();
                 Assert.NotNull(parsedLog);
@@ -56,7 +56,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/sitecoredev228CA/xyz/baselogfile.20160101.180755.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
+                var result = sitecoreLogParser.Parse(() => stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 var parsedLog = result.FirstOrDefault();
                 Assert.NotNull(parsedLog);
@@ -75,7 +75,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172133.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
+                var result = sitecoreLogParser.Parse(() => stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 Assert.Equal(50, result.Count);
                 var parsedLog = result.Last();
@@ -100,7 +100,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172133.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
+                var result = sitecoreLogParser.Parse(() => stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 Assert.Equal(result.Count, 2);
 
@@ -137,7 +137,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
                 var sitecoreLogParser = new SitecoreLogParser();
                 var uri = new Uri("http://localhost/data/SitecoreLog1.log.20160606.172133.txt");
 
-                var result = sitecoreLogParser.Parse(stream, uri, new DiagnosticsSourceSummary()).ToList();
+                var result = sitecoreLogParser.Parse(() => stream, uri, new DiagnosticsSourceSummary()).ToList();
                 Assert.NotNull(result);
                 Assert.Equal(result.Count, 1);
                 var parsedLog = result.Last();

@@ -34,6 +34,11 @@ namespace ConveyorBelt.Tooling.Actors
         {
         }
 
+        private Stream StreamFactory(CloudBlockBlob blob)
+        {
+            return blob.OpenRead();
+        }
+
         public async Task<IEnumerable<Event>> ProcessAsync(Event evnt)
         {
             var events = new List<Event>();
@@ -96,25 +101,23 @@ namespace ConveyorBelt.Tooling.Actors
                     }
                     else
                     {
-                        using (var stream = mainBlob.OpenRead())
+                        var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
+                        var minDateTime = DateTimeOffset.UtcNow;
+
+                        var cursor = new ParseCursor(blobFileScheduled.LastPosition);
+                        var parsedRecords = parser.Parse(() => StreamFactory(mainBlob), mainBlob.Uri, blobFileScheduled.Source, cursor);
+                        var pages = await _pusher.PushAll(parsedRecords, blobFileScheduled.Source).ConfigureAwait(false);
+                        
+                        if (pages > 0)
                         {
-                            var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
-                            var minDateTime = DateTimeOffset.UtcNow;
-
-                            var parsedRecords = parser.Parse(stream, mainBlob.Uri, blobFileScheduled.Source, blobFileScheduled.LastPosition);
-                            var pages = await _pusher.PushAll(parsedRecords, blobFileScheduled.Source).ConfigureAwait(false);
-                            
-                            if (pages > 0)
-                            {
-                                TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
-                                _telemetryProvider.WriteTelemetry(
-                                    "BlobFileConventionActor log delay duration",
-                                    (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
-                                    blobFileScheduled.Source.TypeName);
-                            }
-
-                            currentLength += stream.Position;
+                            TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
+                            _telemetryProvider.WriteTelemetry(
+                                "BlobFileConventionActor log delay duration",
+                                (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
+                                blobFileScheduled.Source.TypeName);
                         }
+
+                        currentLength = cursor.EndPosition;
                     }
                 }
                 else

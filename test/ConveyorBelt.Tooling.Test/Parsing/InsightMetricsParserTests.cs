@@ -33,7 +33,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             try
             {
                 var parser = new InsightMetricsParser();
-                var records = parser.Parse(stream, null, new DiagnosticsSourceSummary()).ToList();
+                var records = parser.Parse(() => stream, null, new DiagnosticsSourceSummary()).ToList();
 
                 Assert.Equal(96, records.Count);
                 var r = records[0];
@@ -61,7 +61,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
             try
             {
                 var parser = new InsightMetricsParser();
-                var records = parser.Parse(stream, null, new DiagnosticsSourceSummary()).ToList();
+                var records = parser.Parse(() => stream, null, new DiagnosticsSourceSummary()).ToList();
 
                 var dic = records.ToDictionary(x => x["PartitionKey"] + x["RowKey"]);
                 Assert.Equal(96, dic.Count);

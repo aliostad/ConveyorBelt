@@ -161,6 +161,7 @@
     <Compile Include="Parsing\InsightMetricsParser.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Internal\SitecoreLogLineParser.cs" />
+    <Compile Include="Parsing\ParseCursor.cs" />
     <Compile Include="Parsing\SitecoreLogParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Querying\IShardKeyQuery.cs" />

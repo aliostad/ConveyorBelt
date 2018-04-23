@@ -21,13 +21,15 @@ namespace ConveyorBelt.Tooling.Parsing
             public static readonly string CbType = "cb_type";
         }
 
-        public IEnumerable<IDictionary<string, string>> Parse(Stream body, Uri id, DiagnosticsSourceSummary source, long startPosition = 0, long endPosition = 0)
+        public IEnumerable<IDictionary<string, string>> Parse(Func<Stream> streamFactory, Uri id, DiagnosticsSourceSummary source, ParseCursor cursor = null)
         {
+            cursor = cursor ?? new ParseCursor(0);
+            var body = streamFactory();
             if (body.Position != 0)
                 body.Position = 0;
 
-            if (endPosition == 0)
-                endPosition = long.MaxValue;
+            if (cursor.EndPosition == 0)
+                cursor.EndPosition = long.MaxValue;
 
             string line;
             var lineNumber = 0;
@@ -41,11 +43,11 @@ namespace ConveyorBelt.Tooling.Parsing
 
             SitecoreLogEntry currentEntry = null;
             var reader = new StreamReader(body);
-            while (body.Position < endPosition && (line = reader.ReadLine()) != null)
+            while (body.Position < cursor.EndPosition && (line = reader.ReadLine()) != null)
             {
                 lineNumber++;
 
-                if (body.Position < startPosition)
+                if (body.Position < cursor.StartReadPosition)
                     continue;
 
                 if (string.IsNullOrWhiteSpace(line))

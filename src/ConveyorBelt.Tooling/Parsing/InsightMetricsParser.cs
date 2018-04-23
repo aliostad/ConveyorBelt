@@ -11,11 +11,10 @@ namespace ConveyorBelt.Tooling.Parsing
 {
     public class InsightMetricsParser : IParser
     {
-        public IEnumerable<IDictionary<string, string>> Parse(Stream body,
+        public IEnumerable<IDictionary<string, string>> Parse(Func<Stream> streamFactory,
             Uri id,
             DiagnosticsSourceSummary source,
-            long startPosition = 0, 
-            long endPosition = 0)
+            ParseCursor cursor = null)
         {
             /*
              * 
@@ -31,6 +30,7 @@ namespace ConveyorBelt.Tooling.Parsing
              */
 
             var ms = new MemoryStream();
+            var body = streamFactory();
             body.CopyTo(ms);
             ms.Position = 0;
             var text = new StreamReader(ms).ReadToEnd();

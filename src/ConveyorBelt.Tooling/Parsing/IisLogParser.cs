@@ -4,38 +4,72 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ConveyorBelt.Tooling.Configuration;
-using Newtonsoft.Json.Converters;
+using Microsoft.WindowsAzure.Storage;
 
 namespace ConveyorBelt.Tooling.Parsing
 {
     public class IisLogParser : IParser
     {
-        public IEnumerable<IDictionary<string, string>> Parse(Stream body, Uri id, DiagnosticsSourceSummary source, long startPosition = 0, long endPosition = 0)
+        public IEnumerable<IDictionary<string, string>> Parse(Func<Stream> streamFactory, Uri id, DiagnosticsSourceSummary source, ParseCursor cursor = null)
         {
-            using (var reader = new StreamReader(body, Encoding.ASCII, false))
+            cursor = cursor ?? new ParseCursor(0);
+            StorageException lastException = null;
+
+            var resumeAttemptCount = 0;
+            while (resumeAttemptCount < 3)
             {
-                foreach(var doc in ParseInternal(reader, id, source, startPosition, startPosition + 1, endPosition))
-                    yield return doc;
+                using(var stream = streamFactory())
+                using (var reader = new StreamReader(stream, Encoding.ASCII, false))
+                using (var enumerator = ParseInternal(reader, id, source, cursor).GetEnumerator())
+                {
+                    var wasInterrupted = false;
+                    bool hasMoved;
+                    do
+                    {
+                        if (enumerator.Current != null)
+                            yield return enumerator.Current;
+
+                        try
+                        {
+                            hasMoved = enumerator.MoveNext();
+                        }
+                        catch (StorageException ex)
+                        {
+                            lastException = ex;
+                            wasInterrupted = true;
+                            resumeAttemptCount++;
+                            break;
+                        }
+                    } while (hasMoved);
+
+                    if (!wasInterrupted)
+                    {
+                        cursor.EndPosition = cursor.StartReadPosition;
+                        yield break;
+                    }
+                }
             }
+
+            throw new Exception("Failed to complete parsing", lastException);
         }
 
-        private IEnumerable<IDictionary<string, string>> ParseInternal(StreamReader reader, Uri id, DiagnosticsSourceSummary source, long startReadPosition, long startParsePosition, long endPosition)
+        private IEnumerable<IDictionary<string, string>> ParseInternal(StreamReader reader, Uri id, DiagnosticsSourceSummary source, ParseCursor cursor)
         {
-            if (endPosition == 0)
-                endPosition = long.MaxValue;
+            if (cursor.EndPosition == 0)
+                cursor.EndPosition = long.MaxValue;
 
             var idSegments = id.Segments.Skip(2).Select(x => x.Replace("/", "")).ToArray();
             var partitionKey = string.Join("_", idSegments.Take(idSegments.Length - 1));
             var rowKeyPrefix = Path.GetFileNameWithoutExtension(idSegments.Last());
 
-            var fields = startReadPosition > 0 ? ReadFirstHeaders(reader) : null;
+            var fields = cursor.StartReadPosition > 0 ? ReadFirstHeaders(reader) : null;
 
             reader.DiscardBufferedData();
-            reader.BaseStream.Seek(startReadPosition, SeekOrigin.Begin);
+            reader.BaseStream.Position = cursor.StartReadPosition;
 
             var headersHaveChanged = false;
             string line;
-            var offset = startReadPosition;
+            var offset = cursor.StartReadPosition;
             var lineCount = 0;
 
             //In case starting offset was set to a line break
@@ -46,7 +80,7 @@ namespace ConveyorBelt.Tooling.Parsing
                 offset += Environment.NewLine.Length - lineBreakIndex;
             }
 
-            while (offset < endPosition && (line = reader.ReadLine()) != null)
+            while (offset < cursor.EndPosition && (line = reader.ReadLine()) != null)
             {
                 lineCount++;
                 offset += line.Length + Environment.NewLine.Length;
@@ -61,13 +95,13 @@ namespace ConveyorBelt.Tooling.Parsing
                     continue;
 
                 //skip until start offset in case of re-read
-                if (offset < startParsePosition)
+                if (offset <= cursor.StartParsePosition)
                     continue;
 
                 var entries = GetEntries(line);
-                if (fields?.Length + 2 != entries.Length)
+                if (fields.Length + 2 != entries.Length)//first 2 entries - date and time are collapsed into @timestamp
                 {
-                    if (startReadPosition == 0)
+                    if (cursor.StartReadPosition == 0)
                         throw new InvalidOperationException("fields column mismatch");
 
                     //e.g. in case startReadPosition was pointing to the middle of the line
@@ -80,15 +114,17 @@ namespace ConveyorBelt.Tooling.Parsing
                 }
 
                 var doc = ParseEntity(fields, entries, source.TypeName, partitionKey, $"{rowKeyPrefix}_{offset}");
-
                 if(doc != null)
                     yield return doc;
+
+                cursor.StartReadPosition = offset;
             }
 
             if (!headersHaveChanged) yield break;
 
             //headers have changed since the beginning of the file - have to read whole file
-            foreach (var doc in ParseInternal(reader, id, source, 0, startParsePosition, endPosition))
+            cursor.StartReadPosition = 0;
+            foreach (var doc in ParseInternal(reader, id, source, cursor))
             {
                 yield return doc;
             }
@@ -169,7 +205,7 @@ namespace ConveyorBelt.Tooling.Parsing
         {
             // this is just to make sure we read the fields. If we start in the middle, we will miss the fields
             reader.DiscardBufferedData();
-            reader.BaseStream.Seek(0, SeekOrigin.Begin);
+            reader.BaseStream.Position = 0;
 
             string line;
             while ((line = reader.ReadLine()) != null)

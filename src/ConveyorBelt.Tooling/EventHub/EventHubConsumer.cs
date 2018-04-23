@@ -90,7 +90,7 @@ namespace ConveyorBelt.Tooling.EventHub
             {
                 try
                 {
-                    var lazyEnumerable = messages.SelectMany(ev => _parser.Parse(ev.GetBodyStream(), null, _source));
+                    var lazyEnumerable = messages.SelectMany(ev => _parser.Parse(ev.GetBodyStream, null, _source));
                     await _elasticsearchBatchPusher.PushAll(lazyEnumerable, _source);
 
                     if (_timer.Elapsed > _checkpointInterval)

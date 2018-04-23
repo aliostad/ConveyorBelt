@@ -73,7 +73,8 @@ namespace ConveyorBelt.Tooling.Actors
                 var hasAnything = false;
                 var minDateTime = DateTimeOffset.UtcNow;
 
-                var seenPages = await _pusher.PushAll(parser.Parse(stream, blob.Uri, blobFileArrived.Source, blobFileArrived.Position ?? 0, blobFileArrived.EndPosition ?? 0), blobFileArrived.Source).ConfigureAwait(false);
+                var records = parser.Parse(() => stream, blob.Uri, blobFileArrived.Source, new ParseCursor(blobFileArrived.Position ?? 0) {EndPosition = blobFileArrived.EndPosition ?? 0});
+                var seenPages = await _pusher.PushAll(records, blobFileArrived.Source).ConfigureAwait(false);
                 hasAnything = seenPages > 0;
 
                 if (hasAnything)
