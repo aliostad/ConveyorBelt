@@ -84,9 +84,10 @@ namespace ConveyorBelt.Tooling
                     bulkDescriptor.Pipeline(mappingName.ToLower());
 
                 return bulkDescriptor
-                    .MaxDegreeOfParallelism(10)
-                    .Size(_batchSize)
-                    .BackOffTime(_backOffTime);
+//                    .MaxDegreeOfParallelism(10)
+                    .Size(_batchSize);
+//                    .BackOffTime(_backOffTime)
+//                    .BackOffRetries();
             });
 
             var observer = new BulkAllObserver(

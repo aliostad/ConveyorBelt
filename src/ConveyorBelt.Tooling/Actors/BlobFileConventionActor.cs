@@ -78,28 +78,14 @@ namespace ConveyorBelt.Tooling.Actors
                 if (!previousBlobExists && !mainBlobExists)
                 {
                     TheTrace.TraceInformation("BlobFileConventionActor - previous blob does not exist. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
-                    return; // will never be here. Stop chasing it.                
+                    return; // will never be here. Stop chasing it.
                 }
 
                 long currentLength = 0;
                 if (mainBlobExists)
                 {
                     currentLength = mainBlob.Properties.Length;
-                    if (currentLength <= blobFileScheduled.LastPosition)
-                    {
-                        if (nextBlobExists)
-                        {
-                            TheTrace.TraceInformation("BlobFileConventionActor - Next blob exists. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
-                            return; // done and dusted. Stop chasing it.
-                        }
-
-                        if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
-                        {
-                            TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
-                            return; // Stop chasing it.
-                        }
-                    }
-                    else
+                    if (currentLength > blobFileScheduled.LastPosition)
                     {
                         var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
                         var minDateTime = DateTimeOffset.UtcNow;
@@ -107,26 +93,26 @@ namespace ConveyorBelt.Tooling.Actors
                         var cursor = new ParseCursor(blobFileScheduled.LastPosition);
                         var parsedRecords = parser.Parse(() => StreamFactory(mainBlob), mainBlob.Uri, blobFileScheduled.Source, cursor);
                         var pages = await _pusher.PushAll(parsedRecords, blobFileScheduled.Source).ConfigureAwait(false);
-                        
+
                         if (pages > 0)
                         {
                             TheTrace.TraceInformation("BlobFileConventionActor - pushed records for {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
-                            _telemetryProvider.WriteTelemetry(
-                                "BlobFileConventionActor log delay duration",
-                                (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
-                                blobFileScheduled.Source.TypeName);
+                            _telemetryProvider.WriteTelemetry("BlobFileConventionActor log delay duration", (long) (DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, blobFileScheduled.Source.TypeName);
                         }
+                    }
 
-                        currentLength = cursor.EndPosition;
+                    currentLength = mainBlob.Properties.Length;
+                    if (nextBlobExists)
+                    {
+                        TheTrace.TraceInformation("BlobFileConventionActor - Next blob exists. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
+                        return; // done and dusted. Stop chasing it.
                     }
                 }
-                else
+
+                if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
                 {
-                    if (blobFileScheduled.StopChasingAfter < DateTimeOffset.Now)
-                    {
-                        TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
-                        return; // Stop chasing it.
-                    }
+                    TheTrace.TraceInformation("BlobFileConventionActor - Chase time past. Stopped chasing {0} at {1}", blobFileScheduled.FileToConsume, DateTimeOffset.Now);
+                    return; // Stop chasing it.
                 }
 
                 blobFileScheduled.LastPosition = currentLength;
