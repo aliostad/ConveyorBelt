@@ -16,14 +16,14 @@ namespace ConveyorBelt.Tooling
     {
         private readonly IIndexNamer _indexNamer;
         private readonly IElasticClient _client;
-        private readonly TimeSpan _backOffTime;
         private readonly int _batchSize;
         private readonly bool _setPipeline;
 
-        public NestBatchPusher(string esUrl, IIndexNamer indexNamer, IConfigurationValueProvider configurationValueProvider, int batchSize = 100)
+        public NestBatchPusher(string esUrl, IIndexNamer indexNamer, IConfigurationValueProvider configurationValueProvider)
         {
             _indexNamer = indexNamer;
-            _batchSize = batchSize;
+            if (!int.TryParse(configurationValueProvider.GetValue(ConfigurationKeys.BulkBatchSize), out _batchSize))
+                _batchSize = 500;
 
             var endodedCreds = configurationValueProvider.GetValue(ConfigurationKeys.TabSeparatedCustomEsHttpHeaders)
                 .Replace("Authorization: Basic", "").Trim();
@@ -41,9 +41,6 @@ namespace ConveyorBelt.Tooling
                 .DefaultIndex("DafaultIndex");
 
             _client = new ElasticClient(connectionConfiguration);
-
-            var backoffSeconds = configurationValueProvider.GetValue(ConfigurationKeys.EsBackOffMinSeconds);
-            _backOffTime = TimeSpan.FromSeconds(string.IsNullOrWhiteSpace(backoffSeconds) ? 5 : int.Parse(backoffSeconds));
         }
 
         private string GetIndexName(DiagnosticsSourceSummary source, DateTimeOffset? timestamp)

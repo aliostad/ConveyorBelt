@@ -60,10 +60,6 @@ namespace ConveyorBelt.ConsoleWorker
                 }
             }
 
-            int bulkBatchSize = 100;
-            var bulkBatchSizeString = _configurationValueProvider.GetValue(ConfigurationKeys.BulkBatchSize);
-            int.TryParse(bulkBatchSizeString, out bulkBatchSize);
-
             container.Register(
                  Component.For<IElasticsearchClient>()
                     .ImplementedBy<ElasticsearchClient>()
@@ -145,8 +141,7 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<NestBatchPusher>()
                     .ImplementedBy<NestBatchPusher>()
                     .LifestyleTransient()
-                    .DependsOn(Dependency.OnValue("esUrl", _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl)))
-                    .DependsOn(Dependency.OnValue("batchSize", bulkBatchSize)),
+                    .DependsOn(Dependency.OnValue("esUrl", _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl))),
                 Component.For<ILockStore>()
                     .Instance(new AzureLockStore(new BlobSource()
                     {

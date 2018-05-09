@@ -28,8 +28,6 @@ namespace ConveyorBelt.Tooling
         /// </summary>
         public const string TabSeparatedCustomEsHttpHeaders = "ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders";
 
-        public const string EsBackOffMinSeconds = "ConveyorBelt.ElasticSearch.BackOffMinSeconds";
-        public const string EsBackOffMaxSeconds = "ConveyorBelt.ElasticSearch.BackOffMaxSeconds";
         public const string EsIndexCreationJsonFileName = "ConveyorBelt.ElasticSearch.IndexCreationJsonFileName";
         public const string EsOneIndexPerType = "ConveyorBelt.ElasticSearch.OneIndexPerType";
         public const string EsPipelineEnabled = "ConveyorBelt.ElasticSearch.PipelineEnabled";

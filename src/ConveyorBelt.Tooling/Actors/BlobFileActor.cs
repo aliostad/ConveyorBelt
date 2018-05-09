@@ -80,7 +80,7 @@ namespace ConveyorBelt.Tooling.Actors
                 if (hasAnything)
                 {
                     _telemetryProvider.WriteTelemetry(
-                        "BlobFileActor log delay duration",
+                        "BlobFileActor message processing duration",
                         (long)(DateTimeOffset.UtcNow - minDateTime).TotalMilliseconds, 
                         blobFileArrived.Source.TypeName);
                 }
