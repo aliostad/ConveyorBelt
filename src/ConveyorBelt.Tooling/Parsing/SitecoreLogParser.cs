@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using ConveyorBelt.Tooling.Internal;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling.Parsing
 {
@@ -16,15 +14,22 @@ namespace ConveyorBelt.Tooling.Parsing
             public static readonly string Level = "SitecoreLevel";
             public static readonly string Message = "Payload";
             public static readonly string ProcessId = "SitecoreProcessId";
+            
+            public static readonly string Timestamp = "@timestamp";
+            public static readonly string PartitionKey = "PartitionKey";
+            public static readonly string RowKey = "RowKey";
+            public static readonly string CbType = "cb_type";
         }
 
-        public IEnumerable<DynamicTableEntity> Parse(Stream body, Uri id, long position = 0, long endPosition = 0)
+        public IEnumerable<IDictionary<string, string>> Parse(Func<Stream> streamFactory, Uri id, DiagnosticsSourceSummary source, ParseCursor cursor = null)
         {
+            cursor = cursor ?? new ParseCursor(0);
+            var body = streamFactory();
             if (body.Position != 0)
                 body.Position = 0;
 
-            if (endPosition == 0)
-                endPosition = long.MaxValue;
+            if (cursor.EndPosition == 0)
+                cursor.EndPosition = long.MaxValue;
 
             string line;
             var lineNumber = 0;
@@ -38,11 +43,11 @@ namespace ConveyorBelt.Tooling.Parsing
 
             SitecoreLogEntry currentEntry = null;
             var reader = new StreamReader(body);
-            while (body.Position < endPosition && (line = reader.ReadLine()) != null)
+            while (body.Position < cursor.EndPosition && (line = reader.ReadLine()) != null)
             {
                 lineNumber++;
 
-                if (body.Position < position)
+                if (body.Position < cursor.StartReadPosition)
                     continue;
 
                 if (string.IsNullOrWhiteSpace(line))
@@ -76,13 +81,13 @@ namespace ConveyorBelt.Tooling.Parsing
                 else if (currentEntry != null)
                 {
                     //new entry found, current one is completed.
-                    yield return MapLogItemToTableEntity(currentEntry, partionKey, fileName);
+                    yield return MapLogItemToTableEntity(currentEntry, source, partionKey, fileName);
                     currentEntry = logItem;
                 }
             }
 
             if (currentEntry != null)
-                yield return MapLogItemToTableEntity(currentEntry, partionKey, fileName);
+                yield return MapLogItemToTableEntity(currentEntry, source, partionKey, fileName);
         }
 
         /// <summary>
@@ -110,19 +115,17 @@ namespace ConveyorBelt.Tooling.Parsing
             return line;
         }
 
-        private static DynamicTableEntity MapLogItemToTableEntity(SitecoreLogEntry logItem, string partitionKey,
-            string fileName)
+        private static IDictionary<string, string> MapLogItemToTableEntity(SitecoreLogEntry logItem, DiagnosticsSourceSummary source, string partitionKey, string fileName)
         {
-            var entity = new DynamicTableEntity
-            {
-                Timestamp = new DateTimeOffset(logItem.LogDateTime),
-                PartitionKey = partitionKey,
-                RowKey = string.Format("{0}_{1}", fileName, logItem.LogLineNumber)
+            return new Dictionary<string, string> {
+                {SitecoreLogFields.Timestamp, logItem.LogDateTime.ToString("s")},
+                {SitecoreLogFields.PartitionKey, partitionKey},
+                {SitecoreLogFields.RowKey, $"{fileName}_{logItem.LogLineNumber}"},
+                {SitecoreLogFields.CbType, source.TypeName},
+                {SitecoreLogFields.Level, logItem.Level},
+                {SitecoreLogFields.ProcessId, logItem.EventSource},
+                {SitecoreLogFields.Message, logItem.Message}
             };
-            entity.Properties.Add(SitecoreLogFields.Level, new EntityProperty(logItem.Level));
-            entity.Properties.Add(SitecoreLogFields.ProcessId, new EntityProperty(logItem.EventSource));
-            entity.Properties.Add(SitecoreLogFields.Message, new EntityProperty(logItem.Message));
-            return entity;
         }
 
         private static DateTime GetFileDate(string fileName)

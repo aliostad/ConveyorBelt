@@ -1,5 +1,4 @@
 ﻿using BeeHive;
-using ConveyorBelt.Tooling.Configuration;
 using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Parsing;
 using Microsoft.ServiceBus.Messaging;
@@ -18,7 +17,7 @@ namespace ConveyorBelt.Tooling.EventHub
         public static readonly ConcurrentDictionary<string, Lazy<EventHubConsumer>> Consumers =
             new ConcurrentDictionary<string, Lazy<EventHubConsumer>>();
 
-        private readonly IElasticsearchBatchPusher _pusher;
+        private readonly NestBatchPusher _pusher;
         public DiagnosticsSourceSummary Source { get; }
         private readonly IParser _parser;
         private readonly EventProcessorHost _eventProcessorHost;
@@ -31,7 +30,7 @@ namespace ConveyorBelt.Tooling.EventHub
         /// </summary>
         /// <param name="pusher"></param>
         /// <param name="source"></param>
-        public EventHubConsumer(IElasticsearchBatchPusher pusher, DiagnosticsSourceSummary source)
+        public EventHubConsumer(NestBatchPusher pusher, DiagnosticsSourceSummary source)
         {
             this._pusher = pusher;
             this.Source = source;
@@ -61,14 +60,14 @@ namespace ConveyorBelt.Tooling.EventHub
 
         internal class EventProcessor : IEventProcessor
         {
-            private readonly IElasticsearchBatchPusher _elasticsearchBatchPusher;
+            private readonly NestBatchPusher _elasticsearchBatchPusher;
             private readonly IParser _parser;
             private readonly DiagnosticsSourceSummary _source;
             private readonly Stopwatch _timer = Stopwatch.StartNew();
 
             private readonly TimeSpan _checkpointInterval = TimeSpan.FromMinutes(1);
 
-            public EventProcessor(IElasticsearchBatchPusher elasticsearchBatchPusher,
+            public EventProcessor(NestBatchPusher elasticsearchBatchPusher,
                 IParser parser,
                 DiagnosticsSourceSummary source)
             {
@@ -79,7 +78,7 @@ namespace ConveyorBelt.Tooling.EventHub
 
             public Task CloseAsync(PartitionContext context, CloseReason reason)
             {
-                return _elasticsearchBatchPusher.FlushAsync();
+                return Task.FromResult(false);
             }
 
             public Task OpenAsync(PartitionContext context)
@@ -91,15 +90,8 @@ namespace ConveyorBelt.Tooling.EventHub
             {
                 try
                 {
-                    foreach (var ev in messages)
-                    {
-                        foreach (var e in _parser.Parse(ev.GetBodyStream(), null))
-                        {
-                            await _elasticsearchBatchPusher.PushAsync(e, _source);
-                        }
-                    }
-
-                    await _elasticsearchBatchPusher.FlushAsync(); // we cannot wait really
+                    var lazyEnumerable = messages.SelectMany(ev => _parser.Parse(ev.GetBodyStream, null, _source));
+                    await _elasticsearchBatchPusher.PushAll(lazyEnumerable, _source);
 
                     if (_timer.Elapsed > _checkpointInterval)
                     {

@@ -59,10 +59,6 @@ namespace ConveyorBelt.Worker
                 }
             }
 
-            int bulkBatchSize = 100;
-            var bulkBatchSizeString = _configurationValueProvider.GetValue(ConfigurationKeys.BulkBatchSize);
-            int.TryParse(bulkBatchSizeString, out bulkBatchSize);
-
             var servicebusConnectionString = _configurationValueProvider.GetValue(ConfigurationKeys.ServiceBusConnectionString);
 
             container.Register(
@@ -143,14 +139,10 @@ namespace ConveyorBelt.Worker
                     .ImplementedBy<DefaultHttpClient>()
                     .LifestyleSingleton()
                     .DependsOn(Dependency.OnValue("defaultHeaders", headers)),
-                Component.For<ITempDownloadLocationProvider>()
-                    .ImplementedBy<AzureTempDownloadLocationProvider>()
-                    .LifestyleSingleton(),                    
-                Component.For<IElasticsearchBatchPusher>()
-                    .ImplementedBy<ElasticsearchBatchPusher>()
+                Component.For<NestBatchPusher>()
+                    .ImplementedBy<NestBatchPusher>()
                     .LifestyleTransient()
-                    .DependsOn(Dependency.OnValue("esUrl", _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl)))
-                    .DependsOn(Dependency.OnValue("batchSize", bulkBatchSize)),
+                    .DependsOn(Dependency.OnValue("esUrl", _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl))),
                 Component.For<ILockStore>()
                     .Instance(new AzureLockStore(new BlobSource()
                     {
@@ -248,16 +240,6 @@ namespace ConveyorBelt.Worker
 
                 await CheckStopRequestAsync();
             }
-        }
-
-
-    }
-
-    public class AzureTempDownloadLocationProvider : ITempDownloadLocationProvider
-    {
-        public string GetDownloadFolder()
-        {
-            return RoleEnvironment.GetLocalResource("DownloadFolder").RootPath;
         }
     }
 }

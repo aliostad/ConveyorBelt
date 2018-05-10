@@ -183,6 +183,7 @@ namespace ConveyorBelt.Tooling.Configuration
                 PartitionKey = PartitionKey,
                 RowKey = RowKey,
                 TypeName = ToTypeKey(),
+                LastTimeOffset = FileOffset.Parse(LastOffsetPoint)?.TimeOffset,
                 DynamicProperties = new Dictionary<string, object>()
             };
 

@@ -99,9 +99,6 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<BlobFileConventionActor>()
                     .ImplementedBy<BlobFileConventionActor>()
                     .LifestyleTransient(),
-                Component.For<ITempDownloadLocationProvider>()
-                    .ImplementedBy<TempDownloadLocationProvider>()
-                    .LifestyleSingleton(),                    
                 Component.For<IisBlobScheduler>()
                     .ImplementedBy<IisBlobScheduler>()
                     .LifestyleTransient(),
@@ -126,6 +123,9 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<ReverseTimestampMinuteTableShardScheduler>()
                     .ImplementedBy<ReverseTimestampMinuteTableShardScheduler>()
                     .LifestyleTransient(),
+                Component.For<D18MinuteTableShardScheduler>()
+                    .ImplementedBy<D18MinuteTableShardScheduler>()
+                    .LifestyleTransient(),
                 Component.For<EventHubScheduler>()
                     .ImplementedBy<EventHubScheduler>()
                     .LifestyleTransient(),
@@ -138,8 +138,8 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<AkamaiLogParser>()
                     .ImplementedBy<AkamaiLogParser>()
                     .LifestyleTransient(),
-                Component.For<IElasticsearchBatchPusher>()
-                    .ImplementedBy<ElasticsearchBatchPusher>()
+                Component.For<NestBatchPusher>()
+                    .ImplementedBy<NestBatchPusher>()
                     .LifestyleTransient()
                     .DependsOn(Dependency.OnValue("esUrl", _configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl))),
                 Component.For<ILockStore>()
@@ -232,17 +232,9 @@ namespace ConveyorBelt.ConsoleWorker
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     await Task.Delay(TimeSpan.FromSeconds(30 - seconds), cancellationToken);
-                    Console.WriteLine("Waiting ...");                    
+                    Console.WriteLine("Waiting ...");
                 }
             }
-        }
-    }
-
-    public class TempDownloadLocationProvider : ITempDownloadLocationProvider
-    {
-        public string GetDownloadFolder()
-        {
-            return Path.GetTempPath();
         }
     }
 }

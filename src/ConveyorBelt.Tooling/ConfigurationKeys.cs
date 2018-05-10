@@ -11,7 +11,7 @@ namespace ConveyorBelt.Tooling
         public const string FrequencyInSeconds = "ConveyorBelt.FrequencyInSeconds";
         public const string TableName = "ConveyorBelt.TableName";
         public const string ElasticSearchUrl = "ConveyorBelt.ElasticSearchUrl";
-        public const string BulkBatchSize = "ConveyorBelt.BulkBatchSize";        
+        public const string BulkBatchSize = "ConveyorBelt.BulkBatchSize";
         public const string StorageConnectionString = "ConveyorBelt.Storage.ConnectionString";
         public const string StorageAccountSasKey = "ConveyorBelt.Storage.AccountSasKey";
         public const string StorageAccountName = "ConveyorBelt.Storage.AccountName";
@@ -28,10 +28,9 @@ namespace ConveyorBelt.Tooling
         /// </summary>
         public const string TabSeparatedCustomEsHttpHeaders = "ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders";
 
-        public const string EsBackOffMinSeconds = "ConveyorBelt.ElasticSearch.BackOffMinSeconds";
-        public const string EsBackOffMaxSeconds = "ConveyorBelt.ElasticSearch.BackOffMaxSeconds";
         public const string EsIndexCreationJsonFileName = "ConveyorBelt.ElasticSearch.IndexCreationJsonFileName";
         public const string EsOneIndexPerType = "ConveyorBelt.ElasticSearch.OneIndexPerType";
+        public const string EsPipelineEnabled = "ConveyorBelt.ElasticSearch.PipelineEnabled";
         public const string EsIndexPrefix = "ConveyorBelt.ElasticSearch.IndexPrefix";
         public const string EsCreateMappings = "ConveyorBelt.ElasticSearch.CreateMappings";
     }

@@ -107,7 +107,9 @@ namespace ConveyorBelt.Tooling.Scheduling
                     return null;                        
                 }
 
-                await SetupMappingsAsync(source);
+                var createMappings = _configurationValueProvider.GetValue(ConfigurationKeys.EsCreateMappings);
+                if (Convert.ToBoolean(createMappings))
+                    await SetupMappingsAsync(source);
 
                 if (!source.LastScheduled.HasValue)
                     source.LastScheduled = DateTimeOffset.UtcNow.AddDays(-1);
@@ -173,7 +175,7 @@ namespace ConveyorBelt.Tooling.Scheduling
             }
 
             var mappingsPath = _configurationValueProvider.GetValue(ConfigurationKeys.MappingsPath);
-            var jsonPath = string.Format("{0}{1}.json", mappingsPath, settingsJson);
+            var jsonPath = $"{mappingsPath}{settingsJson}.json";
 
             if (string.IsNullOrEmpty(mappingsPath)) // not defined return default
                 return string.Empty;

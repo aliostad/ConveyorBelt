@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ServiceDefinition name="ConveyorBelt" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2015-04.2.6">
-  <WorkerRole name="ConveyorBelt.Worker" vmsize="Medium">
+  <WorkerRole name="ConveyorBelt.Worker" vmsize="Standard_A2_v2">
     <Imports>
     </Imports>
     <ConfigurationSettings>
@@ -14,20 +14,16 @@
       <Setting name="ConveyorBelt.Storage.ClusterLockRoot" />
       <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" />
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" />
-      <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" />
-      <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" />
       <Setting name="ConveyorBelt.BulkBatchSize" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" />
       <Setting name="Beehive.ActorParallelism.ShardKeyActor" />
       <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" />
+      <Setting name="ConveyorBelt.ElasticSearch.PipelineEnabled" />
       <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" />
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" />
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" />
     </ConfigurationSettings>
-    <LocalResources>
-      <LocalStorage name="DownloadFolder" sizeInMB="20240" cleanOnRoleRecycle="true" />
-    </LocalResources>
   </WorkerRole>
 </ServiceDefinition>

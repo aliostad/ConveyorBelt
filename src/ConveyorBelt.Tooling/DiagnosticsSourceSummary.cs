@@ -38,8 +38,9 @@ namespace ConveyorBelt.Tooling
         /// </summary>
         public string Filter { get; set; }
 
-        public IDictionary<string, object> DynamicProperties { get; set; } 
-        
+        public IDictionary<string, object> DynamicProperties { get; set; }
+        public DateTimeOffset? LastTimeOffset { get; set; }
+
         public object GetDynamicProperty(string name, object defaultValue = null)
         {
             return (DynamicProperties.ContainsKey(name) ? DynamicProperties[name] : null)

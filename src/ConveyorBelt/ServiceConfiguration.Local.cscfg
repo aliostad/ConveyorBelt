@@ -18,15 +18,14 @@
       <Setting name="ConveyorBelt.Storage.ClusterLockRoot" value="conveyor_belt/locks/master_Keys/" />
       <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" value="300" />
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" value="" />
-      <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" value="5" />
-      <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" value="100" />
       <Setting name="ConveyorBelt.BulkBatchSize" value="100" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" value="" />
       <Setting name="Beehive.ActorParallelism.ShardKeyActor" value="5" />
       <Setting name="Beehive.ActorParallelism.BlobFileConventionActor" value="6" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexPrefix" value="" />
-      <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" value="false" />
-      <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="true" />
+      <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" value="true" />
+      <Setting name="ConveyorBelt.ElasticSearch.PipelineEnabled" value="true" />
+      <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="false" />
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" value="120" />
     </ConfigurationSettings>
   </Role>

@@ -41,3 +41,5 @@ build/deploy.ps1
 mappings/NuzLog.json
 .vs/config/applicationhost.config
 .vs/
+*.psess
+*.vsp

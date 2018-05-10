@@ -19,12 +19,17 @@ namespace ConveyorBelt.Tooling
             _oneIndexPerType = Convert.ToBoolean(value);
         }
 
-        public string BuildName(DateTimeOffset time, string typeName)
+        public string BuildName(DateTimeOffset? time, string typeName)
         {
-            var dateString = time.ToString("yyyyMMdd");
+            if (time == null)
+                return _oneIndexPerType ? $"{_indexPrefix}{typeName}" : _indexPrefix;
+
+            var dateString = time.Value.ToString("yyyyMMdd");
+
             var realIndexName = _oneIndexPerType
-                ? string.Format("{0}{1}-{2}", _indexPrefix, typeName, dateString) // [prefix][TypeName]-YYYYMMDD
+                ? $"{_indexPrefix}{typeName}-{dateString}" // [prefix][TypeName]-YYYYMMDD
                 : _indexPrefix + dateString;
+
             return realIndexName;
         }
     }
