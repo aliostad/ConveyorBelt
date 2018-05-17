@@ -47,5 +47,44 @@ namespace ConveyorBelt.Tooling.Internal
 
             return entity.Timestamp;
         }
+
+        public static IDictionary<string, string> ToDictionary(this DynamicTableEntity entity, DiagnosticsSourceSummary source)
+        {
+            const string PartitionKey = "PartitionKey";
+            const string RowKey = "RowKey";
+            const string CbType = "cb_type";
+            const string Timestamp = "@timestamp";
+
+            var result = new Dictionary<string, string> {
+                {PartitionKey, entity.PartitionKey},
+                {RowKey, entity.RowKey},
+                {CbType, source.TypeName},
+                {Timestamp, entity.GetTimestamp(source).ToString("s")}
+            };
+
+            foreach (var property in entity.Properties)
+            {
+                string val;
+                switch (property.Value.PropertyType)
+                {
+                    case EdmType.DateTime:
+                        val = property.Value.DateTimeOffsetValue?.ToString("s");
+                        break;
+                    case EdmType.Boolean:
+                        val = property.Value.BooleanValue?.ToString().ToLower();
+                        break;
+                    default:
+                        val = property.Value.PropertyAsObject.ToString();
+                        break;
+                }
+
+                if (string.IsNullOrWhiteSpace(val) || val == ",")
+                    continue;
+
+                result.Add(property.Key, val);
+            }
+
+            return result;
+        }
     }
 }

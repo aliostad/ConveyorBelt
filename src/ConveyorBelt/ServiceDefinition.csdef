@@ -14,8 +14,6 @@
       <Setting name="ConveyorBelt.Storage.ClusterLockRoot" />
       <Setting name="ConveyorBelt.Storage.ClusterLockDurationSeconds" />
       <Setting name="ConveyorBelt.Storage.TabSeparatedCustomEsHttpHeaders" />
-      <Setting name="ConveyorBelt.ElasticSearch.BackOffMinSeconds" />
-      <Setting name="ConveyorBelt.ElasticSearch.BackOffMaxSeconds" />
       <Setting name="ConveyorBelt.BulkBatchSize" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
       <Setting name="ConveyorBelt.ElasticSearch.IndexCreationJsonFileName" />
@@ -27,8 +25,5 @@
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" />
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" />
     </ConfigurationSettings>
-    <LocalResources>
-      <LocalStorage name="DownloadFolder" sizeInMB="10120" cleanOnRoleRecycle="true" />
-    </LocalResources>
   </WorkerRole>
 </ServiceDefinition>

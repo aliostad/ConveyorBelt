@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ConveyorBelt.Tooling.Entities;
-using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace ConveyorBelt.Tooling.Parsing
 {
     public class InsightMetricsParser : IParser
     {
-        public IEnumerable<DynamicTableEntity> Parse(Stream body,
+        public IEnumerable<IDictionary<string, string>> Parse(Func<Stream> streamFactory,
             Uri id,
-            long position = 0, 
-            long endPosition = 0)
+            DiagnosticsSourceSummary source,
+            ParseCursor cursor = null)
         {
             /*
              * 
@@ -32,6 +30,7 @@ namespace ConveyorBelt.Tooling.Parsing
              */
 
             var ms = new MemoryStream();
+            var body = streamFactory();
             body.CopyTo(ms);
             ms.Position = 0;
             var text = new StreamReader(ms).ReadToEnd();
@@ -42,18 +41,21 @@ namespace ConveyorBelt.Tooling.Parsing
                 var subscriptionGuidFirstPart = r.ResourceId.Split('/')[2].Split('-')[0];
                 var pk = string.Format($"{subscriptionGuidFirstPart}_{string.Join("_", r.ResourceId.Split('/').Reverse().Take(3))}_{r.MetricName}");
                 var rk = r.Time.ToString("yyyyMMddHHmmss");
-                var entity = new DynamicTableEntity(pk, rk);
-                entity.Timestamp = r.Time;
-                entity.Properties.Add("metricName", EntityProperty.GeneratePropertyForString(r.MetricName));
-                entity.Properties.Add("resourceId", EntityProperty.GeneratePropertyForString(r.ResourceId));
-                entity.Properties.Add("timeGrain", EntityProperty.GeneratePropertyForString(r.TimeGrain));
-                entity.Properties.Add("count", EntityProperty.GeneratePropertyForLong(r.Count));
-                entity.Properties.Add("total", EntityProperty.GeneratePropertyForDouble(r.Total));
-                entity.Properties.Add("minimum", EntityProperty.GeneratePropertyForDouble(r.Minimum));
-                entity.Properties.Add("maximum", EntityProperty.GeneratePropertyForDouble(r.Maximum));
-                entity.Properties.Add("average", EntityProperty.GeneratePropertyForDouble(r.Average));
 
-                yield return entity;
+                yield return new Dictionary<string, string>()
+                {
+                    {"@timestamp", r.Time.ToString()},
+                    {"PartitionKey", pk},
+                    {"RowKey", rk},
+                    {"metricName", r.MetricName},
+                    {"resourceId", r.ResourceId},
+                    {"timeGrain", r.TimeGrain},
+                    {"count", r.Count.ToString(CultureInfo.InvariantCulture)},
+                    {"total", r.Total.ToString(CultureInfo.InvariantCulture)},
+                    {"minimum", r.Minimum.ToString(CultureInfo.InvariantCulture)},
+                    {"maximum", r.Maximum.ToString(CultureInfo.InvariantCulture)},
+                    {"average", r.Average.ToString(CultureInfo.InvariantCulture)}
+                };
             }
         }
     }
