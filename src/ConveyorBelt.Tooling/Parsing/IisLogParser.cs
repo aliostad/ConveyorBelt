@@ -19,7 +19,7 @@ namespace ConveyorBelt.Tooling.Parsing
             while (resumeAttemptCount < 3)
             {
                 using(var stream = streamFactory())
-                using (var reader = new StreamReader(stream, Encoding.ASCII, false))
+                using (var reader = new StreamReader(stream, Encoding.ASCII, false, 1024 * 1024 * 6))
                 using (var enumerator = ParseInternal(reader, id, source, cursor).GetEnumerator())
                 {
                     var wasInterrupted = false;
@@ -44,13 +44,11 @@ namespace ConveyorBelt.Tooling.Parsing
 
                     if (!wasInterrupted)
                     {
-                        cursor.EndPosition = cursor.StartReadPosition;
+                        cursor.EndPosition = stream.Length;
                         yield break;
                     }
                 }
             }
-
-            throw new Exception("Failed to complete parsing", lastException);
         }
 
         private IEnumerable<IDictionary<string, string>> ParseInternal(StreamReader reader, Uri id, DiagnosticsSourceSummary source, ParseCursor cursor)
