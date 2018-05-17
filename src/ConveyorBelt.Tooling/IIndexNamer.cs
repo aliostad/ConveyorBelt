@@ -9,5 +9,6 @@ namespace ConveyorBelt.Tooling
     public interface IIndexNamer
     {
         string BuildName(DateTimeOffset? time, string typeName);
+        string BuildName(string timeIso, string typeName);
     }
 }

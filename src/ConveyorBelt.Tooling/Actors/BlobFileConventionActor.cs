@@ -7,7 +7,6 @@ using ConveyorBelt.Tooling.Events;
 using ConveyorBelt.Tooling.Internal;
 using ConveyorBelt.Tooling.Parsing;
 using ConveyorBelt.Tooling.Telemetry;
-using ConveyorBelt.Tooling.Scheduling;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using PerfIt;
@@ -82,9 +81,11 @@ namespace ConveyorBelt.Tooling.Actors
                 }
 
                 long currentLength = 0;
+                long currentOffset = 0;
                 if (mainBlobExists)
                 {
                     currentLength = mainBlob.Properties.Length;
+                    currentOffset = blobFileScheduled.LastPosition;
                     if (currentLength > blobFileScheduled.LastPosition)
                     {
                         var parser = FactoryHelper.Create<IParser>(blobFileScheduled.Source.DynamicProperties["Parser"].ToString(), typeof(IisLogParser));
@@ -93,6 +94,7 @@ namespace ConveyorBelt.Tooling.Actors
                         var cursor = new ParseCursor(blobFileScheduled.LastPosition);
                         var parsedRecords = parser.Parse(() => StreamFactory(mainBlob), mainBlob.Uri, blobFileScheduled.Source, cursor);
                         var pages = await _pusher.PushAll(parsedRecords, blobFileScheduled.Source).ConfigureAwait(false);
+                        currentOffset = cursor.EndPosition;
 
                         if (pages > 0)
                         {
@@ -115,7 +117,10 @@ namespace ConveyorBelt.Tooling.Actors
                     return; // Stop chasing it.
                 }
 
-                blobFileScheduled.LastPosition = currentLength;
+                if (currentOffset == blobFileScheduled.LastPosition && currentOffset < blobFileScheduled.LastPosition)
+                    throw new Exception("Did nothing but did not reach EOF");
+
+                blobFileScheduled.LastPosition = currentOffset;
 
                 // let's defer
                 events.Add(new Event(blobFileScheduled)

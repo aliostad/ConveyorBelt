@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BeeHive.Configuration;
 
 namespace ConveyorBelt.Tooling
@@ -21,16 +20,23 @@ namespace ConveyorBelt.Tooling
 
         public string BuildName(DateTimeOffset? time, string typeName)
         {
-            if (time == null)
+            return BuildName(time?.ToString("s"), typeName);
+        }
+
+        public string BuildName(string timeIso, string typeName)
+        {
+            typeName = typeName.ToLowerInvariant();
                 return _oneIndexPerType ? $"{_indexPrefix}{typeName}" : _indexPrefix;
 
-            var dateString = time.Value.ToString("yyyyMMdd");
+            var dateString = new string(new [] {
+                timeIso[0], timeIso[1], timeIso[2], timeIso[3],
+                timeIso[5], timeIso[6],
+                timeIso[8], timeIso[9]
+            });
 
-            var realIndexName = _oneIndexPerType
-                ? $"{_indexPrefix}{typeName}-{dateString}" // [prefix][TypeName]-YYYYMMDD
+            return _oneIndexPerType
+                ? $"{_indexPrefix}{typeName}-{dateString}"
                 : _indexPrefix + dateString;
-
-            return realIndexName;
         }
     }
 }
