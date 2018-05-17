@@ -26,6 +26,7 @@ namespace ConveyorBelt.Tooling
         public string BuildName(string timeIso, string typeName)
         {
             typeName = typeName.ToLowerInvariant();
+            if (timeIso == null || timeIso.Length < 10)
                 return _oneIndexPerType ? $"{_indexPrefix}{typeName}" : _indexPrefix;
 
             var dateString = new string(new [] {
