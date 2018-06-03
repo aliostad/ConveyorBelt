@@ -25,18 +25,18 @@ namespace ConveyorBelt.Tooling.Parsing
                 foreach(var child in j.Children())
                 {
                     if (child.Type == JTokenType.Object)
-                        result.Add(ToDic(child));
+                        result.Add(ToDic(child, source));
                 }
             }
             else
             {
-                result.Add(ToDic(j));
+                result.Add(ToDic(j, source));
             }
 
             return result;
         }
 
-        private static IDictionary<string, string> ToDic(JToken singleJ)
+        private static IDictionary<string, string> ToDic(JToken singleJ, DiagnosticsSourceSummary source)
         {
             var dic = new Dictionary<string, string>();
             string goodDateTime = null;
@@ -80,6 +80,14 @@ namespace ConveyorBelt.Tooling.Parsing
 
             var datetimeValue = goodDateTime ?? okDateTime ?? anyDateTime ?? DateTimeOffset.UtcNow.ToString("O");
             dic.Add("@timestamp", datetimeValue);
+
+            if(!dic.ContainsKey("PartitionKey") || !dic.ContainsKey("RowKey"))
+            {
+                dic["PartitionKey"] = "nopart_";
+                dic["RowKey"] = Guid.NewGuid().ToString("N");
+            }
+
+            dic["cb_type"] = source.TypeName;
 
             return dic;
         }

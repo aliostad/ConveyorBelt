@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using BeeHive;
 using BeeHive.Configuration;
 using ConveyorBelt.Tooling.Internal;
 using Elasticsearch.Net;
@@ -82,8 +83,15 @@ namespace ConveyorBelt.Tooling
 
             var observer = new BulkAllObserver(
                 onNext: (b) => Interlocked.Increment(ref seenPages),
-                onCompleted: () => tcs.SetResult(seenPages),
-                onError: e => tcs.SetException(e));
+                onCompleted: () =>
+                {
+                    tcs.SetResult(seenPages);
+                },
+                onError: e => {
+                    TheTrace.TraceWarning(e.ToString());
+                    tcs.SetException(e);
+                    }
+                );
 
             observableBulk.Subscribe(observer);
             return await tcs.Task.ConfigureAwait(false);
