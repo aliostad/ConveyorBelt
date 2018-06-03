@@ -126,6 +126,9 @@ namespace ConveyorBelt.Worker
                 Component.For<InsightMetricsParser>()
                     .ImplementedBy<InsightMetricsParser>()
                     .LifestyleTransient(),
+                Component.For<GenericJsonParser>()
+                    .ImplementedBy<GenericJsonParser>()
+                    .LifestyleSingleton(),
                 Component.For<IisLogParser>()
                     .ImplementedBy<IisLogParser>()
                     .LifestyleTransient(),
@@ -162,6 +165,7 @@ namespace ConveyorBelt.Worker
             _orchestrator = container.Resolve<Orchestrator>();
             _scheduler = container.Resolve<MasterScheduler>();
             _keyValueStore = container.Resolve<IKeyValueStore>();
+
             ServicePointHelper.ApplyStandardSettings(_configurationValueProvider.GetValue(ConfigurationKeys.ElasticSearchUrl));
         }
 

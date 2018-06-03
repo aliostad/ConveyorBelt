@@ -132,6 +132,9 @@ namespace ConveyorBelt.ConsoleWorker
                 Component.For<InsightMetricsParser>()
                     .ImplementedBy<InsightMetricsParser>()
                     .LifestyleTransient(),
+                Component.For<GenericJsonParser>()
+                    .ImplementedBy<GenericJsonParser>()
+                    .LifestyleTransient(),
                 Component.For<IisLogParser>()
                     .ImplementedBy<IisLogParser>()
                     .LifestyleTransient(),

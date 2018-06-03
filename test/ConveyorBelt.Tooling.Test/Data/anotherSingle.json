@@ -1,0 +1,7 @@
+﻿{
+    "this": "is string",
+    "thisIsNumber": 1234,
+    "thisIsFloat": 1.234,
+    "thisIsDate": "2018-06-02T13:51:05.4810613+01:00",
+    "timestamp": "2018-06-02T14:51:05.4810613+01:00"
+}

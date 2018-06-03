@@ -34,7 +34,9 @@ namespace ConveyorBelt.Tooling.EventHub
         {
             this._pusher = pusher;
             this.Source = source;
-            _parser = FactoryHelper.Create<IParser>(source.DynamicProperties["Parser"].ToString());
+            _parser = source.DynamicProperties.ContainsKey("Parser") ?
+                FactoryHelper.Create<IParser>(source.DynamicProperties["Parser"].ToString()) :
+                new GenericJsonParser();
 
             _eventProcessorHost = new EventProcessorHost(
                 "ConveyorBelt",

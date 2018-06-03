@@ -59,8 +59,9 @@
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
+	<azureTargetsLoc Condition=" '$(azureTargetsLoc)' == '' ">C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\Windows Azure Tools\2.9</azureTargetsLoc>
 	<VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">12.0</VisualStudioVersion>
-	<CloudExtensionsDir Condition=" '$(CloudExtensionsDir)' == '' ">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Windows Azure Tools\2.9\</CloudExtensionsDir>  
+	<CloudExtensionsDir Condition=" '$(CloudExtensionsDir)' == '' ">$(azureTargetsLoc)\</CloudExtensionsDir>  
   </PropertyGroup>
   <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.targets" />
 </Project>
