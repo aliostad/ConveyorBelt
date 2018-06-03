@@ -43,3 +43,4 @@ mappings/NuzLog.json
 .vs/
 *.psess
 *.vsp
+appSettings.config
