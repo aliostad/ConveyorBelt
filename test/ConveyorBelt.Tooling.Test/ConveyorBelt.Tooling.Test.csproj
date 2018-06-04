@@ -178,7 +178,7 @@
     <None Include="Data\InsightMetrics.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="IisLog.txt">
+    <Content Include="Data\IisLog.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

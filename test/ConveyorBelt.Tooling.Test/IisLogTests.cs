@@ -10,9 +10,11 @@ namespace ConveyorBelt.Tooling.Test
 {
     public class IisLogTests
     {
+        private const string IisFileName = @"data\IisLog.txt";
+
         private static IDictionary<int, int> GetDynamicRowOffsets()
         {
-            var text = Encoding.ASCII.GetString(File.ReadAllBytes("IisLog.txt"));
+            var text = Encoding.ASCII.GetString(File.ReadAllBytes(IisFileName));
             var offset = 0;
             var idx = 1;
 
@@ -36,7 +38,7 @@ namespace ConveyorBelt.Tooling.Test
         public void TestDataFile_ExtractsAllRecords()
         {
             var parser = new IisLogParser();
-            var entities = parser.Parse(() => new MemoryStream(File.ReadAllBytes("IisLog.txt")), new Uri("http://shipish/e277461e28dd4309af674f083094c568/Test.Presentation.Web.Api/Test.Presentation.Web.Api_IN_0/Web/W3SVC1273337584/u_ex15020701.log", UriKind.Absolute), new DiagnosticsSourceSummary()).ToArray();
+            var entities = parser.Parse(() => new MemoryStream(File.ReadAllBytes(IisFileName)), new Uri("http://shipish/e277461e28dd4309af674f083094c568/Test.Presentation.Web.Api/Test.Presentation.Web.Api_IN_0/Web/W3SVC1273337584/u_ex15020701.log", UriKind.Absolute), new DiagnosticsSourceSummary()).ToArray();
             Assert.Equal("5RD00155D4A0E2E", entities[0]["s-computername"]);
             Assert.Equal("GET", entities[0]["cs-method"]);
             Assert.Equal("store=AU", entities[0]["cs-uri-query"]);
@@ -53,7 +55,7 @@ namespace ConveyorBelt.Tooling.Test
         {
             var parser = new IisLogParser();
             var entities = parser.Parse(
-                () => new MemoryStream(File.ReadAllBytes("IisLog.txt")),
+                () => new MemoryStream(File.ReadAllBytes(IisFileName)),
                 new Uri("http://shipish/e277461e28dd4309af674f083094c568/Test.Presentation.Web.Api/Test.Presentation.Web.Api_IN_0/Web/W3SVC1273337584/u_ex15020701.log", UriKind.Absolute),
                 new DiagnosticsSourceSummary(),
                 new ParseCursor(RowOffsets[6]) { EndPosition = RowOffsets[7] }).ToArray();
@@ -71,7 +73,7 @@ namespace ConveyorBelt.Tooling.Test
         {
             var parser = new IisLogParser();
             var entities = parser.Parse(
-                () => new MemoryStream(File.ReadAllBytes("IisLog.txt")),
+                () => new MemoryStream(File.ReadAllBytes(IisFileName)),
                 new Uri("http://shipish/e277461e28dd4309af674f083094c568/Test.Presentation.Web.Api/Test.Presentation.Web.Api_IN_0/Web/W3SVC1273337584/u_ex15020701.log", UriKind.Absolute),
                 new DiagnosticsSourceSummary(),
                 new ParseCursor(RowOffsets[5] + 1) { EndPosition = RowOffsets[7]}).ToArray();
@@ -89,7 +91,7 @@ namespace ConveyorBelt.Tooling.Test
         {
             var parser = new IisLogParser();
             var entities = parser.Parse(
-                () => new MemoryStream(File.ReadAllBytes("IisLog.txt")),
+                () => new MemoryStream(File.ReadAllBytes(IisFileName)),
                 new Uri("http://shipish/e277461e28dd4309af674f083094c568/Test.Presentation.Web.Api/Test.Presentation.Web.Api_IN_0/Web/W3SVC1273337584/u_ex15020701.log", UriKind.Absolute),
                 new DiagnosticsSourceSummary(),
                 new ParseCursor(RowOffsets[30])).ToArray();
