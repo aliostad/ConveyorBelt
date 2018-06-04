@@ -20,7 +20,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
         {
             var stream = new MemoryStream(File.ReadAllBytes(SingleFileName));
             var parser = new GenericJsonParser();
-            var dic = parser.Parse(() => stream, null, null);
+            var dic = parser.Parse(() => stream, null, new DiagnosticsSourceSummary());
             Assert.Equal("is string", dic.First()["this"]);
             Assert.Equal("1234", dic.First()["thisIsNumber"]);
             Assert.Equal("2018-06-02T13:51:05.4810613+01:00", dic.First()["thisIsDate"]);
@@ -32,7 +32,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
         {
             var stream = new MemoryStream(File.ReadAllBytes(AnotherSingleFileName));
             var parser = new GenericJsonParser();
-            var dic = parser.Parse(() => stream, null, null);
+            var dic = parser.Parse(() => stream, null, new DiagnosticsSourceSummary());
             Assert.Equal("2018-06-02T14:51:05.4810613+01:00", dic.First()["@timestamp"]);
         }
 
@@ -41,7 +41,7 @@ namespace ConveyorBelt.Tooling.Test.Parsing
         {
             var stream = new MemoryStream(File.ReadAllBytes(ArrayFileName));
             var parser = new GenericJsonParser();
-            var dic = parser.Parse(() => stream, null, null);
+            var dic = parser.Parse(() => stream, null, new DiagnosticsSourceSummary());
             Assert.Equal("2018-06-02T14:51:05.4810613+01:00", dic.Skip(1).First()["@timestamp"]);
         }
     }
