@@ -23,6 +23,7 @@
       <Setting name="ConveyorBelt.ElasticSearch.PipelineEnabled" value="true" />
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" value="false" />
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" value="120" />
+      <Setting name="ConveyorBelt.LastOffsetPoint" value="" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

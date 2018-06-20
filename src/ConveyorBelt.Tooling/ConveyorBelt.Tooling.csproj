@@ -145,7 +145,6 @@
     <Compile Include="IIndexNamer.cs" />
     <Compile Include="IndexNamer.cs" />
     <Compile Include="Internal\CloudBlobContainerExtensions.cs" />
-    <Compile Include="Internal\CloudTableExtensions.cs" />
     <Compile Include="Internal\ConveyorBeltConstants.cs" />
     <Compile Include="Internal\DateTimeOffsetExtensions.cs" />
     <Compile Include="Internal\FactoryHelper.cs" />

@@ -13,7 +13,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
         protected override IEnumerable<string> GetShardKeys(DateTimeOffset offset)
         {
-            return new [] { string.Format("{0:D19}", (DateTimeOffset.MaxValue.Ticks - offset.Ticks)) };
+            return new [] { $"{(DateTimeOffset.MaxValue.Ticks - offset.Ticks):D19}" };
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ConveyorBelt.Tooling.Events;
+using ConveyorBelt.Tooling.Internal;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ConveyorBelt.Tooling.Querying

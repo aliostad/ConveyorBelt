@@ -86,7 +86,15 @@ namespace ConveyorBelt.Tooling
                 onError: e => tcs.SetException(e));
 
             observableBulk.Subscribe(observer);
-            return await tcs.Task.ConfigureAwait(false);
+            await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromMinutes(2)));
+
+            if (!tcs.Task.IsCompleted)
+            {
+                observableBulk.Dispose();
+                throw new Exception("Failed to complete NEST send operation within timeout period");
+            }
+
+            return await tcs.Task;
         }
     }
 }

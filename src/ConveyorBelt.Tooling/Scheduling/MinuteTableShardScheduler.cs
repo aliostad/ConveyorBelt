@@ -20,13 +20,13 @@ namespace ConveyorBelt.Tooling.Scheduling
         protected override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             if (source.LastOffsetPoint == null)
-                source.LastOffsetPoint = DateTimeOffset.UtcNow.AddDays(-1).DropSecondAndMilliseconds().ToString("O");
+                source.LastOffsetPoint = GetDefaultLastOffset().AddDays(-1).DropSecondAndMilliseconds().ToString("O");
 
             var lastOffset = DateTimeOffset.Parse(source.LastOffsetPoint);
             var events = new List<Event>();
             var graceMinutes = source.GracePeriodMinutes ?? 3;
 
-            var now = DateTimeOffset.UtcNow.DropSecondAndMilliseconds();
+            var now = GetDefaultLastOffset().DropSecondAndMilliseconds();
             var newLastOffset = lastOffset;
             int n = 1; // start from a minute after
             while (now >= lastOffset.Add(TimeSpan.FromMinutes(graceMinutes + n)))
@@ -47,7 +47,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
         protected virtual IEnumerable<string> GetShardKeys(DateTimeOffset offset)
         {
-            return new[] { string.Format("{0:D19}", offset.Ticks) };
+            return new[] { $"{offset.Ticks:D19}" };
         }
     }
 }

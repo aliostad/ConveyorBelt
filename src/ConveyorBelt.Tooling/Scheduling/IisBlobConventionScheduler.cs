@@ -17,6 +17,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 {
     public class IisBlobConventionScheduler : BaseScheduler
     {
+
         protected override Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source)
         {
             const string DefaultIisLogFileFormatConvention = "u_exyyMMddHH";
@@ -48,7 +49,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
             int instanceIndex = 0;
 
-            var nextOffset = DateTimeOffset.UtcNow;
+            var nextOffset = GetDefaultLastOffset();
             var events = new List<Event>();
             var fullNumberOfHoursInBetween = offset.TimeOffset.GetFullNumberOfHoursInBetween(nextOffset);
             if (fullNumberOfHoursInBetween == 0)

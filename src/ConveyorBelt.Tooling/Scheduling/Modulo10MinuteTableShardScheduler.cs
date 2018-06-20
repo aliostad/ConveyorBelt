@@ -14,16 +14,16 @@ namespace ConveyorBelt.Tooling.Scheduling
         {
             return new[]
             {
-                string.Format("0000000000000000000___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000001___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000002___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000003___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000004___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000005___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000006___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000007___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000008___{0:D19}", offset.Ticks),
-                string.Format("0000000000000000009___{0:D19}", offset.Ticks)
+                $"0000000000000000000___{offset.Ticks:D19}",
+                $"0000000000000000001___{offset.Ticks:D19}",
+                $"0000000000000000002___{offset.Ticks:D19}",
+                $"0000000000000000003___{offset.Ticks:D19}",
+                $"0000000000000000004___{offset.Ticks:D19}",
+                $"0000000000000000005___{offset.Ticks:D19}",
+                $"0000000000000000006___{offset.Ticks:D19}",
+                $"0000000000000000007___{offset.Ticks:D19}",
+                $"0000000000000000008___{offset.Ticks:D19}",
+                $"0000000000000000009___{offset.Ticks:D19}"
             };
         }
     }

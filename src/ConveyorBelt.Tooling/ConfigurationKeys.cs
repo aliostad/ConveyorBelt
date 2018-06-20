@@ -21,6 +21,7 @@ namespace ConveyorBelt.Tooling
         public const string ClusterLockContainer = "ConveyorBelt.Storage.ClusterLockContainer";
         public const string ClusterLockRootPath = "ConveyorBelt.Storage.ClusterLockRoot";
         public const string ClusterLockDurationSeconds = "ConveyorBelt.Storage.ClusterLockDurationSeconds";
+        public const string LastOffsetPoint = "ConveyorBelt.LastOffsetPoint";
 
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace ConveyorBelt.Tooling.Scheduling
 
         protected override IEnumerable<string> GetShardKeys(DateTimeOffset offset)
         {
-            return new [] { string.Format("{0:D18}", offset.Ticks) };
+            return new [] { $"{offset.Ticks:D18}" };
         }
     }
 }

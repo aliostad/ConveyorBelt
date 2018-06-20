@@ -53,7 +53,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                 if (blob.Properties.LastModified > offset.TimeOffset)
                 {
                     var filename = blob.Uri.ToString();
-                    newOffset = new FileOffset(filename, blob.Properties.LastModified ?? DateTimeOffset.UtcNow, 0);
+                    newOffset = new FileOffset(filename, blob.Properties.LastModified ?? GetDefaultLastOffset(), 0);
                     TheTrace.TraceInformation("IisBlobScheduler - found {0}", blob.Uri);
 
                     events.Add(new Event(new BlobFileArrived()

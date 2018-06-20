@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BeeHive;
 using ConveyorBelt.Tooling.Events;
-using ConveyorBelt.Tooling.Internal;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -12,11 +11,11 @@ namespace ConveyorBelt.Tooling.Querying
 {
     public class TableStorageShardKeyQuery : IShardKeyQuery
     {
-        public async Task<IEnumerable<DynamicTableEntity>> QueryAsync(ShardKeyArrived shardKeyArrived)
+        public Task<IEnumerable<DynamicTableEntity>> QueryAsync(ShardKeyArrived shardKeyArrived)
         {
             //var account = CloudStorageAccount.Parse(shardKeyArrived.Source.ConnectionString);
             CloudStorageAccount account = null;
-            if (!String.IsNullOrWhiteSpace(shardKeyArrived.Source.AccountSasKey))
+            if (!string.IsNullOrWhiteSpace(shardKeyArrived.Source.AccountSasKey))
             {
                 // Create new storage credentials using the SAS token.
                 var accountSas = new StorageCredentials(shardKeyArrived.Source.AccountSasKey);
@@ -34,11 +33,13 @@ namespace ConveyorBelt.Tooling.Querying
             {
                 account = CloudStorageAccount.Parse(shardKeyArrived.Source.ConnectionString);
             }
+
             var client = account.CreateCloudTableClient();
             var table = client.GetTableReference(shardKeyArrived.Source.DynamicProperties["TableName"].ToString());
-            
 
-            return await table.ExecuteQueryAsync(new TableQuery().Where(TableQuery.GenerateFilterCondition("PartitionKey", "eq", shardKeyArrived.ShardKey))).ConfigureAwait(false);
+            var query = new TableQuery<DynamicTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", "eq", shardKeyArrived.ShardKey));
+
+            return Task.FromResult(table.ExecuteQuery(query));
         }
     }
 }

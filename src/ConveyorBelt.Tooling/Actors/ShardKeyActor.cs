@@ -13,7 +13,6 @@ using PerfIt;
 
 namespace ConveyorBelt.Tooling.Actors
 {
-
     [ActorDescription("ShardKeyArrived-Process", 5)]
     public class ShardKeyActor : IProcessorActor
     {
@@ -24,7 +23,7 @@ namespace ConveyorBelt.Tooling.Actors
 
         public ShardKeyActor(ITelemetryProvider telemetryProvider,
                              IConfigurationValueProvider configurationValueProvider,
-							 NestBatchPusher pusher)
+                             NestBatchPusher pusher)
         {
             _pusher = pusher;
             _telemetryProvider = telemetryProvider;
@@ -56,11 +55,10 @@ namespace ConveyorBelt.Tooling.Actors
 
                 var shardKeyQuerier = (string)shardKeyArrived.Source.GetDynamicProperty(ConveyorBeltConstants.ShardKeyQuery);
                 var query = FactoryHelper.Create<IShardKeyQuery>(shardKeyQuerier, typeof(TableStorageShardKeyQuery));
-                var entities = await query.QueryAsync(shardKeyArrived);
-
+                var lazyEntities = await query.QueryAsync(shardKeyArrived);
                 var shardKeyTime = shardKeyArrived.GetDateTimeOffset().ToString("yyyyMMddHHmm");
+                await _pusher.PushAll(PreprocessEntities(lazyEntities, shardKeyArrived, shardKeyTime), shardKeyArrived.Source).ConfigureAwait(false);
 
-                await _pusher.PushAll(PreprocessEntities(entities, shardKeyArrived, shardKeyTime), shardKeyArrived.Source).ConfigureAwait(false);
             }).ConfigureAwait(false);
 
             return Enumerable.Empty<Event>();

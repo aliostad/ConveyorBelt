@@ -62,8 +62,7 @@ namespace ConveyorBelt.Tooling.Scheduling
                         var filename = blob.Uri.ToString();
                         if (!found) // first time running
                         {
-                            newOffset = new FileOffset(filename, 
-                                blob.Properties.LastModified ?? DateTimeOffset.UtcNow, blob.Properties.Length);
+                            newOffset = new FileOffset(filename, blob.Properties.LastModified ?? GetDefaultLastOffset(), blob.Properties.Length);
                         }
 
                         TheTrace.TraceInformation("IisBlobScheduler - found {0}", blob.Uri);

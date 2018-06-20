@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using BeeHive;
 using BeeHive.Configuration;
-using BeeHive.DataStructures;
 using ConveyorBelt.Tooling.Configuration;
 
 namespace ConveyorBelt.Tooling.Scheduling
@@ -17,6 +16,16 @@ namespace ConveyorBelt.Tooling.Scheduling
         public BaseScheduler(IConfigurationValueProvider configurationValueProvider)
         {
             _configurationValueProvider = configurationValueProvider;
+        }
+
+        protected DateTimeOffset GetDefaultLastOffset()
+        {
+            var dateString = _configurationValueProvider.GetValue(ConfigurationKeys.LastOffsetPoint);
+
+            DateTimeOffset result;
+            return !string.IsNullOrWhiteSpace(dateString) && DateTimeOffset.TryParse(dateString, out result)
+                ? result
+                : DateTimeOffset.UtcNow;
         }
 
         protected abstract Task<IEnumerable<Event>> DoSchedule(DiagnosticsSource source);

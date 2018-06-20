@@ -24,6 +24,7 @@
       <Setting name="ConveyorBelt.ElasticSearch.OneIndexPerType" />
       <Setting name="ConveyorBelt.ElasticSearch.CreateMappings" />
       <Setting name="ConveyorBelt.ShadKeyArrivalDelayWarningInSeconds" />
+      <Setting name="ConveyorBelt.LastOffsetPoint" />
     </ConfigurationSettings>
   </WorkerRole>
 </ServiceDefinition>
